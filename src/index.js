@@ -8,3 +8,4 @@ app.use(paymentRoutes);
 
 app.listen(PORT);
 console.log("Server on port ", PORT);
+console.log("Open on browser: ", HOST)
