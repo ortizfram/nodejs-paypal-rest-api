@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>products</title>
+</head>
+<body>
+    <h1>Products</h1>
+    <hr>
+    <button id="checkout">
+        Pay with PayPal
+    </button>
+
+    <script>
+        const checkout = document.getElementById("checkout")
+        checkout.addEventListener('click', async () => {
+            try {
+                const response = await fetch('/create-order', {
+                    method: 'POST'
+                });
+                const data = await response.json();
+                console.log(data);
+                window.location.href = data.links[1].href;
+            } catch (error) {
+                console.error('Error during checkout:', error);
+                // Handle the error as required
+            }
+        });
+    </script>
+</body>
+</html>

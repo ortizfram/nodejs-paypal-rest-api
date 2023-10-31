@@ -47,11 +47,29 @@ export const createOrder = async (req, res) => {
     },
   });
 
-  console.log(response.data);
-
-  return res.json("capture order");
+  return res.json(response.data);
 };
 
-export const captureOrder = (req, res) => res.send("Capture created");
+export const captureOrder = async (req, res) => {
+  // They accepted payment so save it
+  const { token } = req.query; // take token and resend it -> confirm
+
+  // token can be save in DB if you want...
+
+  const response = await axios.post(
+    `${PAYPAL_API}/v2/checkout/orders/${token}/capture`,
+    {}, // send nothing to back
+    {
+      auth: {
+        username: PAYPAL_API_CLIENT,
+        password: PAYPAL_API_SECRET,
+      },
+    }
+  );
+
+  console.log(response.data);
+
+  return res.send("Payed");
+};
 
 export const cancelPayment = (req, res) => res.send("Payment cancelled");
