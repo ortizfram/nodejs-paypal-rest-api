@@ -28,11 +28,11 @@ export const createOrder = async (req, res) => {
 
   // params for auth
   const params = new URLSearchParams();
-  params.append('grant_type', 'client_credentials'); //i pass it credentials
+  params.append("grant_type", "client_credentials"); //i pass it credentials
 
   //ask for token on auth
   const {
-    data: {access_token},
+    data: { access_token },
   } = await axios.post(`${PAYPAL_API}/v1/oauth2/token`, params, {
     auth: {
       username: PAYPAL_API_CLIENT,
@@ -43,13 +43,13 @@ export const createOrder = async (req, res) => {
   //create order with order obj
   const response = await axios.post(`${PAYPAL_API}/v2/checkout/orders`, order, {
     headers: {
-        Authorization: `Bearer ${access_token}`
+      Authorization: `Bearer ${access_token}`,
     },
   });
 
-  console.log(response.data)
+  console.log(response.data);
 
-  return res.json('capture order')
+  return res.json("capture order");
 };
 
 export const captureOrder = (req, res) => res.send("Capture created");
