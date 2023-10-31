@@ -72,4 +72,4 @@ export const captureOrder = async (req, res) => {
   return res.send("Payed");
 };
 
-export const cancelPayment = (req, res) => res.send("Payment cancelled");
+export const cancelPayment = (req, res) => res.redirect('/');
