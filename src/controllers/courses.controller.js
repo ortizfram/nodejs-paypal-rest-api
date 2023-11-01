@@ -45,7 +45,7 @@ export const courseDetail = async(req,res) => {
     const course = courses.find(course => course.id === parseInt(courseId, 10));
 
     if (course) {
-        res.render("courseDetail", { course }); // Renders the 'courseDetail.ejs' template with the specific course data
+        res.render("courseOverview", { course }); // Renders the 'courseDetail.ejs' template with the specific course data
     } else {
         res.status(404).send('Course not found');
     }
