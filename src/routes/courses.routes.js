@@ -1,9 +1,10 @@
 import { Router } from "express";
-import { courseDetail, coursesList } from "../controllers/courses.controller.js";
+import { courseEnroll, courseOverview, coursesList } from "../controllers/courses.controller.js";
 
 const router = Router();
 
 router.get("/courses", coursesList);
-router.get("/course/:id", courseDetail);
+router.get("/course/:id", courseOverview);
+router.get("/course/:id/enroll", courseEnroll);
 
 export default router;

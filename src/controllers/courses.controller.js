@@ -38,7 +38,7 @@ export const coursesList = async (req, res) => {
   res.render("courses", { courses });
 };
 
-export const courseDetail = async(req,res) => {
+export const courseOverview = async(req,res) => {
     const courseId = req.params.id; // Retrieve the ID from the URL params //since the ID is part of the route URL. // not being passed as req.query.id. 
     // You could fetch data for the specific course using the ID (e.g., from a database)
     // For demonstration, find the course based on the ID in the courses array
@@ -49,6 +49,19 @@ export const courseDetail = async(req,res) => {
     } else {
         res.status(404).send('Course not found');
     }
+}
+
+export const courseEnroll = async(req,res) => {
+  const courseId = req.params.id; // Retrieve the ID from the URL params //since the ID is part of the route URL. // not being passed as req.query.id. 
+  // You could fetch data for the specific course using the ID (e.g., from a database)
+  // For demonstration, find the course based on the ID in the courses array
+  const course = courses.find(course => course.id === parseInt(courseId, 10));
+
+  if (course) {
+      res.render("courseEnroll", { course }); // Renders the 'courseDetail.ejs' template with the specific course data
+  } else {
+      res.status(404).send('Course not found');
+  }
 }
 
 export default coursesList;
