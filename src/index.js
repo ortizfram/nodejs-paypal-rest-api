@@ -5,6 +5,7 @@ import coursesRoutes from "./routes/courses.routes.js";
 import { HOST, PORT } from "./config.js";
 import path from "path";
 import { fileURLToPath } from 'url'; // For converting import.meta.url to a file path
+import { User } from "./controllers/auth.controller.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -13,7 +14,10 @@ const app = express(); // declare express
 
 // Set EJS as the view engine:templates config
 app.set("view engine", "ejs"); 
-app.set('views', path.join(__dirname, 'views/templates')); // Define the directory for views/templates
+app.set('views', [
+    path.join(__dirname, 'src', 'public'), // For serving EJS files from 'src/public'
+    path.join(__dirname, 'src', 'views', 'templates') // For serving EJS files from 'src/views/templates'
+]);
 
 // imgs config
 app.use(express.static(path.join(__dirname, 'public'))); // imgs directory
@@ -21,6 +25,12 @@ app.use(express.static(path.join(__dirname, 'public'))); // imgs directory
 // use mongodb data
 app.use(express.urlencoded({extended:false}));
 
+// pass user data
+app.get('/', (req, res) => {
+    const user = User // Use user from auth.controller
+    const message = req.query.message;// Retrieve success message from query params authcontroller
+    res.render('index', { user, message  });
+});
 
 // use routes
 app.use(authRoutes);

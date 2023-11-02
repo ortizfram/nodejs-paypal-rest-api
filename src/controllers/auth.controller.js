@@ -1,8 +1,25 @@
 // ask for mongoose collection
-import {users} from "../mongodb.js"
+import { users } from "../mongodb.js";
+
+let User; // Declare a global variable to store logged-in us
 
 export const login = async (req, res) => {
-  res.render("login");
+  try {
+    // find user in db that matches username from login form
+    const check = await users.findOne({ username: req.body.username });
+
+    // password is right, go home
+    if (check && check.password === req.body.password) {
+      User = check;
+      res.redirect("/");
+      res.redirect("/?message=Login successful");
+    } else {
+      res.send("wrong password");
+    }
+  } catch (error) {
+    res.send("wrong details");
+    res.render("login");
+  }
 };
 
 export const signup = async (req, res) => {
@@ -31,3 +48,6 @@ export const signup = async (req, res) => {
     res.redirect("/"); // Redirect even in case of an error
   }
 };
+
+
+export { User }; // Export the User variable
