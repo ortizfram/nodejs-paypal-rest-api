@@ -4,10 +4,10 @@ import mongoose from "mongoose";
 mongoose
   .connect("mongodb://localhost:27017/nodejs-paypal-rest-api")
   .then(() => {
-    console.log("mongodb connected");
+    console.log("MongoDB connected");
   })
-  .catch(() => {
-    console.log("failed to connect db");
+  .catch((err) => {
+    console.error("MongoDB connection error:", err);
   });
 
 // create schema
@@ -26,4 +26,4 @@ const LoginSchema = new mongoose.Schema({
 const collection = new mongoose.model("Collection1", LoginSchema);
 
 // export collection
-export {collection};
+export { collection };
