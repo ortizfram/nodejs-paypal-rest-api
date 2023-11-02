@@ -1,8 +1,14 @@
 import mongoose from "mongoose";
+import { config } from "dotenv";
+
+config();// Loads the .env file into process.env
+
+// database URL: mongodb ATLAS
+const dbUrl = process.env.DB_URL
 
 // connect mongodb to Nodejs
 mongoose
-  .connect("mongodb://localhost:27017/nodejs-paypal-rest-api")
+  .connect(dbUrl)
   .then(() => {
     console.log("MongoDB connected");
   })
@@ -11,8 +17,16 @@ mongoose
   });
 
 // create schema
-const LoginSchema = new mongoose.Schema({
+const SignupSchema = new mongoose.Schema({
   username: {
+    type: String,
+    required: true,
+  },
+  name: {
+    type: String,
+    required: false,
+  },
+  email: {
     type: String,
     required: true,
   },
@@ -23,7 +37,7 @@ const LoginSchema = new mongoose.Schema({
 });
 
 // Define collection
-const collection = new mongoose.model("Collection1", LoginSchema);
+const users = new mongoose.model("Users", SignupSchema);
 
 // export collection
-export { collection };
+export { users };

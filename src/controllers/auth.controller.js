@@ -1,5 +1,5 @@
 // ask for mongoose collection
-import {collection} from "../mongodb.js"
+import {users} from "../mongodb.js"
 
 export const login = async (req, res) => {
   res.render("login");
@@ -22,7 +22,7 @@ export const signup = async (req, res) => {
 
   try {
     // save to MongoDB: MongoDB syntax
-    await collection.create(data);
+    await users.create(data);
     // Commenting out the rendering line res.render("signup");
     res.redirect("/"); // Redirect after successful signup
   } catch (error) {
