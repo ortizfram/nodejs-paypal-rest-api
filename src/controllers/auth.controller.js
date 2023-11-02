@@ -6,13 +6,10 @@ export const login = async (req, res) => {
 };
 
 export const signup = async (req, res) => {
-  res.render("signup");
-
   const { username, name, password, email } = req.body;
 
   // add validation for required fields
   if (!username || !password) {
-    // If username or password is missing, handle the error, redirect, or send an error response
     return res.status(400).send("Username and password are required.");
   }
 
@@ -23,13 +20,14 @@ export const signup = async (req, res) => {
     email,
   };
 
-
   try {
-    // save to mongodb: mongodb syntax
+    // save to MongoDB: MongoDB syntax
     await collection.create(data);
-    res.redirect("/"); //go home
+    // Commenting out the rendering line res.render("signup");
+    res.redirect("/"); // Redirect after successful signup
   } catch (error) {
     console.error("Error while saving to MongoDB:", error);
-    res.redirect("/");//go home
+    // Commenting out the rendering line res.render("signup");
+    res.redirect("/"); // Redirect even in case of an error
   }
 };
