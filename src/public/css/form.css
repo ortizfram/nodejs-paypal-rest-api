@@ -1,0 +1,11 @@
+.vertical-form {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 200px; /* Adjust width as needed */
+}
+
+/* Optional: Add some spacing between the inputs */
+.vertical-form input {
+    margin-bottom: 10px;
+}

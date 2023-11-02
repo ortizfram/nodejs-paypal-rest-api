@@ -18,6 +18,9 @@ app.set('views', path.join(__dirname, 'views/templates')); // Define the directo
 // imgs config
 app.use(express.static(path.join(__dirname, 'public'))); // imgs directory
 
+// use mongodb data
+app.use(express.urlencoded({extended:false}));
+
 
 // use routes
 app.use(authRoutes);
