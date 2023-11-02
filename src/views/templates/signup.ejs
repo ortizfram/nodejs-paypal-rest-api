@@ -3,20 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>login</title>
+    <title>signup</title>
 </head>
 <body>
     <button>
         <a href="/">Go back Home</a>
     </button>
     <hr>
-    <h1>Login</h1>
+    <h1>Signup</h1>
 
-    <form action="/login" method="post">
+    <form action="/signup" method="post">
         <input type="text" name="username" placeholder="Username">
+        <input type="text" name="name" placeholder="Firstname">
+        <input type="text" name="email" placeholder="Email">
         <input type="password" name="password" placeholder="Password">
-        <input type="submit" value="Login">
+        <input type="submit" value="Signup">
     </form>
-    <p><a href="/signup">Dont have an account yet.</a></p>
+    <p><a href="/login">Already have an account.</a></p>
 </body>
 </html>
