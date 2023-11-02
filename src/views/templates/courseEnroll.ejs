@@ -3,7 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Enroll Course</title>
+    <title>Payment Details</title>
+    <style>
+        .course-overview {
+            text-align: center;
+        }
+        .payment-options {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .payment-options button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .payment-options button a {
+            text-decoration: none;
+            color: white;
+        }
+    </style>
 </head>
 <body>
     <button>
@@ -11,9 +33,10 @@
     </button>
     <hr>
     <div class='course-overview'>
-        <h1>Enroll course</h1>
+        <h1>Payment Details</h1>
         <hr>
         <br>
+        <!-- Payment Details -->
         <img src="<%= course.image %>" alt="<%= course.title %> Image">
         <br>
         <h2><%= course.title %></h2>
@@ -28,8 +51,9 @@
     </div>
     <hr>
     <div class='payment-options'>
+        <h2>Total Amount: $<%= course.price %></h2>
         <button>
-            <a href="#">Pay</a>
+            <a href="#">Pay Now</a>
         </button>
     </div>
 </body>
