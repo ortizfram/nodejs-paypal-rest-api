@@ -1,35 +1,52 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Course Overview</title>
+    <link rel="stylesheet" href="/css/alert.css">
+    <link rel="stylesheet" href="/css/navbar.css">
+    <link rel="stylesheet" href="/css/courseOverview.css">
 </head>
+
 <body>
-    <button>
-        <a href="/courses">Go back to All Courses</a>
-    </button>
-    <hr>
-    <div class='course-overview'>
-        <h1>Course Overview</h1>
-        <hr>
-        <br>
-        <img src="<%= course.image %>" alt="<%= course.title %> Image">
-        <br>
-        <h2><%= course.title %></h2>
-        <p><%= course.overview %></p>
-        <div>
-            <p>Instructor: <%= course.instructor %></p>
-            <p>Duration: <%= course.duration %></p>
-            <p>Price: $<%= course.price %></p>
-        </div>
-        <br>
-    </div>
-    <hr>
-    <div class='course-enrollment'>
-        <button>
-            <a href="/course/<%= course.id %>/enroll">Enroll</a>
-        </button>
-    </div>
+    <%- include ('navbar') -%>
+        <%- include ('alert') -%>
+            <div class="course-container">
+                <button>
+                    <a href="/courses">Go back to All Courses</a>
+                </button>
+                <hr>
+                <div class='course-overview'>
+                    <h1>Course Overview</h1>
+                    <hr>
+                    <br>
+                    <img src="<%= course.image %>" alt="<%= course.title %> Image">
+                    <br>
+                    <h2>
+                        <%= course.title %>
+                    </h2>
+                    <p>
+                        <%= course.overview %>
+                    </p>
+                    <div>
+                        <p>Instructor: <%= course.instructor %>
+                        </p>
+                        <p>Duration: <%= course.duration %>
+                        </p>
+                        <p>Price: $<%= course.price %>
+                        </p>
+                    </div>
+                    <br>
+                </div>
+                <hr>
+                <div class='course-enrollment'>
+                    <button>
+                        <a href="/course/<%= course.id %>/enroll">Enroll</a>
+                    </button>
+                </div>
+            </div>
 </body>
+
 </html>

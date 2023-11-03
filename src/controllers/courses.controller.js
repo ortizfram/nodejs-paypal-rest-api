@@ -37,18 +37,20 @@ let courses = [
 
 export const coursesList = async (req, res) => {
   const user = User;
-  res.render("courses", { courses, user });
+  const message = req.query.message;// Retrieve success message from query params authcontroller
+  res.render("courses", { courses, user, message });
 };
 
 export const courseOverview = async(req,res) => {
     const user = User;
+    const message = req.query.message;// Retrieve success message from query params authcontroller
     const courseId = req.params.id; // Retrieve the ID from the URL params //since the ID is part of the route URL. // not being passed as req.query.id. 
     // You could fetch data for the specific course using the ID (e.g., from a database)
     // For demonstration, find the course based on the ID in the courses array
     const course = courses.find(course => course.id === parseInt(courseId, 10));
 
     if (course) {
-        res.render("courseOverview", { course, user }); // Renders the 'courseDetail.ejs' template with the specific course data
+        res.render("courseOverview", { course, user, message }); // Renders the 'courseDetail.ejs' template with the specific course data
     } else {
         res.status(404).send('Course not found');
     }
