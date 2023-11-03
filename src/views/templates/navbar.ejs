@@ -1,0 +1,10 @@
+<nav>
+    <div class="nav-container">
+        <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/courses">Courses</a></li>
+            <li class="user-info"><%= user ? `Welcome, ${user.name}!` : 'Guest' %></li>
+            <li><a href="/logout">Logout</a></li>
+        </ul>
+    </div>
+</nav>

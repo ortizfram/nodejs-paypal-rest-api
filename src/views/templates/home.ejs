@@ -5,26 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home</title>
     <link rel="stylesheet" href="/css/alert.css">
+    <link rel="stylesheet" href="/css/navbar.css">
 </head>
 <body>
-    <% if (user) { %>
-        <p>Welcome, <%= user.name %>!</p>
-    <% } else { %>
-        <p>Welcome, Guest!</p>
-    <% } %>
+    <%- include ('navbar') -%>
+    <%- include ('alert') -%>
 
-    <% if (message) { %>
-        <p id="alert" class="alert"><%= message %></p>
-    <% } %>
 
     <h1>Welcome to Our Website</h1>
 
-    <% if (user) { %>
-        <a href="/logout">Logout</a>
-    <% } else { %>
-        <a href="/login">Login</a>
-        <a href="/signup">Sign Up</a>
-    <% } %>
+    
 
     <script src="/js/alert.js"></script>
 </body>

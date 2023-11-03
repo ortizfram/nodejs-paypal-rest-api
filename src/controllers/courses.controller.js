@@ -1,5 +1,5 @@
 import axios from "axios";
-import { User } from "./auth.controller";
+import { User } from "./auth.controller.js";
 
 // def courses obj for testing
 let courses = [
