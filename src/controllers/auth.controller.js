@@ -1,31 +1,28 @@
-// ask for mongoose collection
 import { users } from "../mongodb.js";
 
-let User; // Declare a global variable to store logged-in us
+let User; // Declare a global variable to store logged-in user
 
 export const login = async (req, res) => {
   try {
-    // find user in db that matches username from login form
+    // Find user in the database that matches the username from the login form
     const check = await users.findOne({ username: req.body.username });
 
-    // password is right, go home
+    // If the username and password are correct, log the user in
     if (check && check.password === req.body.password) {
       User = check;
-      res.redirect("/");
       res.redirect("/?message=Login successful");
     } else {
-      res.send("wrong password");
+      res.send("Wrong password or username");
     }
   } catch (error) {
-    res.send("wrong details");
-    res.render("login");
+    res.send("An error occurred while logging in");
   }
 };
 
 export const signup = async (req, res) => {
   const { username, name, password, email } = req.body;
 
-  // add validation for required fields
+  // Add validation for required fields
   if (!username || !password) {
     return res.status(400).send("Username and password are required.");
   }
@@ -38,16 +35,28 @@ export const signup = async (req, res) => {
   };
 
   try {
-    // save to MongoDB: MongoDB syntax
+    // Save to MongoDB
     await users.create(data);
-    // Commenting out the rendering line res.render("signup");
-    res.redirect("/"); // Redirect after successful signup
+
+    // Directly log in after successful signup
+    const check = await users.findOne({ username, password });
+    if (check) {
+      User = check;
+      res.redirect("/?message=Signup successful. Logged in automatically.");
+    } else {
+      res.send("Error creating user or logging in");
+    }
   } catch (error) {
     console.error("Error while saving to MongoDB:", error);
-    // Commenting out the rendering line res.render("signup");
-    res.redirect("/"); // Redirect even in case of an error
+    res.redirect("/?message=Error during signup or login");
   }
 };
 
+export const logout = (req, res) => {
+  // Log out the user by clearing the global User variable
+  User = undefined;
+  res.redirect("/?message=Logged out successfully");
+  res.render("home")
+};
 
 export { User }; // Export the User variable

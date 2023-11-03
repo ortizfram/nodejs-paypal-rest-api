@@ -4,43 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home</title>
-    <link rel="stylesheet" href="css/alert.css">
+    <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
-    <% if (message) { %>
-        <p class="alert"><%= message %></p>
-    <% } %>
-    <div>
-        <button><a href="/login">login</a></button>
-        <button><a href="/signup">signup</a></button>
-    </div>
-    <p>Hello, <%= user.name %></p>
-    <h1>Home</h1>
-    <hr>
-    
-    <button>
-        <a href="courses/">See courses</a>
-    </button>
-    
-    <button id="checkout">
-        Pay with PayPal
-    </button>
-
-    <script>
-        const checkout = document.getElementById("checkout")
-        checkout.addEventListener('click', async () => {
-            try {
-                const response = await fetch('/create-order', {
-                    method: 'POST'
-                });
-                const data = await response.json();
-                console.log(data);
-                window.location.href = data.links[1].href;
-            } catch (error) {
-                console.error('Error during checkout:', error);
-                // Handle the error as required
-            }
-        });
-    </script>
+   
 </body>
 </html>

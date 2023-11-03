@@ -15,8 +15,7 @@ const app = express(); // declare express
 // Set EJS as the view engine:templates config
 app.set("view engine", "ejs"); 
 app.set('views', [
-    path.join(__dirname, 'src', 'public'), // For serving EJS files from 'src/public'
-    path.join(__dirname, 'src', 'views', 'templates') // For serving EJS files from 'src/views/templates'
+    path.join(__dirname, 'views', 'templates') // For serving EJS files from 'src/views/templates'
 ]);
 
 // imgs config
@@ -25,18 +24,18 @@ app.use(express.static(path.join(__dirname, 'public'))); // imgs directory
 // use mongodb data
 app.use(express.urlencoded({extended:false}));
 
-// pass user data
+// pass user data Home
 app.get('/', (req, res) => {
     const user = User // Use user from auth.controller
     const message = req.query.message;// Retrieve success message from query params authcontroller
-    res.render('index', { user, message  });
+    res.render('home', { user: User, message  });
 });
 
 // use routes
 app.use(authRoutes);
 app.use(paymentRoutes);
 app.use(coursesRoutes);
-app.use(express.static(path.resolve('src/public'))); // home path
+// app.use(express.static(path.resolve('src/public'))); // home path
 
 // PORT HOST
 app.listen(PORT);

@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { login, signup } from "../controllers/auth.controller.js";
+import { login, logout, signup } from "../controllers/auth.controller.js";
 
 const router = Router();
 
@@ -21,5 +21,7 @@ router.get("/signup", (req, res) => {
 // POST request to handle signup form submission
 router.post("/signup", signup); // Point to the controller function
 
+//------------logout-------------------------
+router.get("/logout", logout);
 
 export default router;
