@@ -36,6 +36,8 @@ const SignupSchema = new mongoose.Schema({
   },
 });
 
+
+
 // Define collection
 const users = new mongoose.model("Users", SignupSchema);
 
