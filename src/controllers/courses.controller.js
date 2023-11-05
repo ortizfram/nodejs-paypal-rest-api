@@ -4,42 +4,7 @@ import multer from "multer"; //for upoload imgs
 import { User } from "./auth.controller.js";
 import { Course } from "../models/course.model.js";
 
-// def courses obj for testing
-let courses = [
-  {
-    id: 1,
-    title: "JavaScript Fundamentals",
-    price: 49.99,
-    description: "Learn the basics of JavaScript programming.",
-    overview:
-      "This course covers the fundamentals of JavaScript, including variables, data types, and control structures.",
-    instructor: "John Doe",
-    duration: "5 hours",
-    image: "/images/javascript.png",
-  },
-  {
-    id: 2,
-    title: "Web Development with React",
-    price: 79.99,
-    description: "Master React and build modern web applications.",
-    overview:
-      "Become proficient in React and build interactive and responsive web applications.",
-    instructor: "Jane Smith",
-    duration: "8 hours",
-    image: "/images/react.png",
-  },
-  {
-    id: 3,
-    title: "Python for Beginners",
-    price: 59.99,
-    description: "Get started with Python programming language.",
-    overview:
-      "Start your programming journey with Python and understand its key concepts.",
-    instructor: "Alex Johnson",
-    duration: "6 hours",
-    image: "/images/python.jpg",
-  },
-];
+
 
 export const courseCreate = async (req, res) => {
   try {

@@ -14,22 +14,15 @@ const __dirname = path.dirname(__filename);
 
 const app = express(); // declare express
 
-// Multer setup for handling image uploads
-const upload = multer({
-  dest: "uploads/", // Set the destination folder where the uploaded images will be stored
-});
-
-// Adjust the route to handle file uploads using 'multer'
-app.post("/create-course", upload.single("thumbnail"), courseCreate);
-
 // Set EJS as the view engine:templates config
 app.set("view engine", "ejs");
 app.set("views", [
   path.join(__dirname, "views", "templates"), // For serving EJS files from 'src/views/templates'
 ]);
 
-// imgs config
+// imgs config / static path
 app.use(express.static(path.join(__dirname, "public"))); // imgs directory
+app.use('/src/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // use mongodb data
 app.use(express.urlencoded({ extended: false }));

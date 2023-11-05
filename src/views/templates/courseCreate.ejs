@@ -9,7 +9,7 @@
 
 <body>
     <h1>Create New Course</h1>
-    <form id="courseForm" action="/course/create" method="POST">
+    <form id="courseForm" action="/course/create" method="POST" enctype="multipart/form-data">
         <!-- Form action should match the route for creating a course -->
         <label for="title">Name:</label><br>
         <input type="text" id="title" name="title"><br><br>
@@ -31,7 +31,7 @@
         <input type="checkbox" id="active" name="active" value="true"><br><br>
 
         <label for="thumbnail">Thumbnail:</label><br>
-        <input type="text" id="thumbnail" name="thumbnail"><br><br>
+        <input type="file" id="thumbnail" name="thumbnail"><br><br>
 
         <label for="length">Length:</label><br>
         <input type="number" id="length" name="length"><br><br>
