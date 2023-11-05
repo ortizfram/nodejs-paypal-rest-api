@@ -93,6 +93,10 @@ export const courseCreate = async (req, res) => {
 export const coursesList = async (req, res) => {
   const user = User;
   const message = req.query.message; // Retrieve success message from query params authcontroller
+
+  // Fetch courses from the database using the Mongoose model
+  const courses = await Course.find().lean();
+
   res.render("courses", { courses, user, message });
 };
 
