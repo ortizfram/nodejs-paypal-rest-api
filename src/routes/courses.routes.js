@@ -19,7 +19,7 @@ router.post('/course/create', upload.single('thumbnail'), courseCreate);
 //------------  -------------------------
   
 router.get("/courses", coursesList);
-router.get("/course/:id", courseOverview);
-router.get("/course/:id/enroll", courseEnroll);
+router.get("/course/:slug", courseOverview);
+router.get("/course/:slug/enroll", courseEnroll);
 
 export default router;

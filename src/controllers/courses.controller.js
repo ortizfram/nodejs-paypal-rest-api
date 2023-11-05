@@ -68,29 +68,34 @@ export const coursesList = async (req, res) => {
 export const courseOverview = async (req, res) => {
   const user = User;
   const message = req.query.message; // Retrieve success message from query params authcontroller
-  const courseId = req.params.id; // Retrieve the ID from the URL params //since the ID is part of the route URL. // not being passed as req.query.id.
-  // You could fetch data for the specific course using the ID (e.g., from a database)
-  // For demonstration, find the course based on the ID in the courses array
-  const course = courses.find((course) => course.id === parseInt(courseId, 10));
+  const courseSlug = req.params.slug;
 
-  if (course) {
-    res.render("courseOverview", { course, user, message }); // Renders the 'courseDetail.ejs' template with the specific course data
-  } else {
-    res.status(404).send("Course not found");
+  try {
+    const course = await Course.findOne({ slug: courseSlug }).lean();
+
+    if (course) {
+      res.render('courseOverview', { course, user, message });
+    } else {
+      res.status(404).send('Course not found');
+    }
+  } catch (error) {
+    res.status(500).send('Error fetching the course');
   }
 };
 
 export const courseEnroll = async (req, res) => {
   const user = User;
-  const courseId = req.params.id; // Retrieve the ID from the URL params //since the ID is part of the route URL. // not being passed as req.query.id.
-  // You could fetch data for the specific course using the ID (e.g., from a database)
-  // For demonstration, find the course based on the ID in the courses array
-  const course = courses.find((course) => course.id === parseInt(courseId, 10));
+  const courseSlug = req.params.slug; // Retrieve the ID from the URL params //since the ID is part of the route URL. // not being passed as req.query.id.
+  try {
+    const course = await Course.findOne({ slug: courseSlug }).lean();
 
-  if (course) {
-    res.render("courseEnroll", { course, user }); // Renders the 'courseDetail.ejs' template with the specific course data
-  } else {
-    res.status(404).send("Course not found");
+    if (course) {
+      res.render("courseEnroll", { course, user });
+    } else {
+      res.status(404).send("Course not found");
+    }
+  } catch (error) {
+    res.status(500).send('Error fetching the course');
   }
 };
 
