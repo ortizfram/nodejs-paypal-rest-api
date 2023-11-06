@@ -102,7 +102,7 @@ export const captureOrder = async (req, res) => {
   } else {
     // If the user is not logged in, provide guidance for logging in
     return res
-    .status(401).send("Please log in to enroll in the course.");
+    .redirect('/login?message=Please log in to enroll in the course');
   }
 } catch (error) {
   console.error("Error capturing order:", error);

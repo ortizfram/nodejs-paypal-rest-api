@@ -1,15 +1,17 @@
 import { users } from "../mongodb.js";
+import bcrypt from 'bcrypt';
 
 let User; // Declare a global variable to store logged-in user
 
 export const login = async (req, res) => {
   try {
+    const { username, password } = req.body;
     // Find user in the database that matches the username from the login form
-    const check = await users.findOne({ username: req.body.username });
+    const user = await users.findOne({ username });
 
-    // If the username and password are correct, log the user in
-    if (check && check.password === req.body.password) {
-      User = check;
+    // If the user exists and the passwords match
+    if (user && user.password === password) {
+      req.session.user = user; // Store the user in the session
       res.redirect("/?message=Login successful");
     } else {
       res.send("Wrong password or username");
@@ -27,25 +29,22 @@ export const signup = async (req, res) => {
     return res.status(400).send("Username and password are required.");
   }
 
-  const data = {
-    username,
-    name,
-    password,
-    email,
-  };
-
   try {
-    // Save to MongoDB
-    await users.create(data);
+    // Hash the password before storing it
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Directly log in after successful signup
-    const check = await users.findOne({ username, password });
-    if (check) {
-      User = check;
-      res.redirect("/?message=Signup successful. Logged in automatically.");
-    } else {
-      res.send("Error creating user or logging in");
-    }
+    const data = {
+      username,
+      name,
+      password: hashedPassword, // Save the hashed password
+      email,
+    };
+
+    // Save to MongoDB
+    const user = await users.create(data);
+
+    req.session.user = user; // Set the user in the session
+    res.redirect("/?message=Signup successful. Logged in automatically.");
   } catch (error) {
     console.error("Error while saving to MongoDB:", error);
     res.redirect("/?message=Error during signup or login");
@@ -53,10 +52,14 @@ export const signup = async (req, res) => {
 };
 
 export const logout = (req, res) => {
-  // Log out the user by clearing the global User variable
-  User = undefined;
-  res.redirect("/?message=Logged out successfully");
-  res.render("home")
+  // Clear the user session by destroying it
+  req.session.destroy((err) => {
+    if (err) {
+      console.error('Error destroying session:', err);
+    }
+    // Redirect the user to the home page after logout
+    res.redirect("/?message=Logged out successfully");
+  });
 };
 
 export { User }; // Export the User variable
