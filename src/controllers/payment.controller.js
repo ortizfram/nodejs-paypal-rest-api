@@ -5,15 +5,23 @@ import {
   PAYPAL_API_SECRET,
 } from "../config.js";
 import axios from "axios";
+import { User } from "./auth.controller.js";
+import { Course } from "../models/course.model.js";
 
 export const createOrder = async (req, res) => {
+  // You can receive the courseSlug from the request body or as a parameter
+  const courseSlug = req.body.courseSlug; // is being passed the courseSlug in the request input
+
+  // Fetch course details based on the courseSlug
+  const course = await Course.findOne({ slug: courseSlug });
+
   const order = {
     intent: "CAPTURE",
     purchase_units: [
       {
         amount: {
           currency_code: "USD",
-          value: "100.00",
+          value: course.price, // Use the course price for the order
         },
       },
     ],
@@ -53,6 +61,8 @@ export const createOrder = async (req, res) => {
 export const captureOrder = async (req, res) => {
   // They accepted payment so save it
   const { token } = req.query; // take token and resend it -> confirm
+
+  const user = User;
 
   // token can be save in DB if you want...
 
