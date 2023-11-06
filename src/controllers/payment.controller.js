@@ -70,7 +70,6 @@ export const captureOrder = async (req, res) => {
   try {
     // They accepted payment so save it
     const { token } = req.query; // take token and resend it -> confirm
-
     const courseSlug = req.body.courseSlug; // Assuming courseSlug is available in the request body
 
     const response = await axios.post(
@@ -86,21 +85,29 @@ export const captureOrder = async (req, res) => {
 
     console.log("Captured Order:", response.data);
 
-    // Fetch the user and course details
-    const username = req.user.username; // Assuming you have the user's username from the request
-    const user = await User.findById(username);
+   // Check if the user is logged in
+   if (req.user) {
+    const user = req.user;
     const course = await Course.findOne({ slug: courseSlug });
 
-    // Save the enrolled course to the user's profile
-    user.enrolledCourses.push(course._id);
-    await user.save();
-
-    // Return the rendered view with enrolled course details
-    return res.render("courseDetail", { course });
-  } catch (error) {
-    console.error("Error capturing order:", error);
-    res.status(500).json({ message: "Error capturing the order" });
+    if (course) {
+      user.enrolledCourses.push(course._id);
+      await user.save();
+      // Return the rendered view with enrolled course details
+      return res.render("courseDetail", { course });
+    } else {
+      console.error("Course information not found.");
+      return res.status(404).send("Course not found");
+    }
+  } else {
+    // If the user is not logged in, provide guidance for logging in
+    return res
+    .status(401).send("Please log in to enroll in the course.");
   }
+} catch (error) {
+  console.error("Error capturing order:", error);
+  res.status(500).json({ message: "Error capturing the order" });
+}
 };
 
 export const cancelPayment = (req, res) => res.redirect('/');
