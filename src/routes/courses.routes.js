@@ -21,5 +21,6 @@ router.post('/course/create', upload.single('thumbnail'), courseCreate);
 router.get("/courses", coursesList);
 router.get("/course/:slug", courseOverview);
 router.get("/course/:slug/enroll", courseEnroll);
+router.get("/course/:slug/modules", courseDetail);
 
 export default router;

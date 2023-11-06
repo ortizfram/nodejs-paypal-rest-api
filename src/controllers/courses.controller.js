@@ -83,6 +83,24 @@ export const courseOverview = async (req, res) => {
   }
 };
 
+export const courseDetail = async (req, res) => {
+  const user = User;
+  const message = req.query.message; // Retrieve success message from query params authcontroller
+  const courseSlug = req.params.slug;
+
+  try {
+    const course = await Course.findOne({ slug: courseSlug }).lean();
+
+    if (course) {
+      res.render('courseDetail', { course, user, message });
+    } else {
+      res.status(404).send('Course not found');
+    }
+  } catch (error) {
+    res.status(500).send('Error fetching the course');
+  }
+};
+
 export const courseEnroll = async (req, res) => {
   const user = User;
   const courseSlug = req.params.slug; // Retrieve the ID from the URL params //since the ID is part of the route URL. // not being passed as req.query.id.
@@ -99,4 +117,4 @@ export const courseEnroll = async (req, res) => {
   }
 };
 
-export default { coursesList, courseOverview, courseEnroll, courseCreate };
+export default { coursesList, courseOverview, courseEnroll, courseDetail, courseCreate };
