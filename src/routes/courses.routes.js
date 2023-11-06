@@ -1,6 +1,6 @@
 import { Router } from "express";
 import multer from 'multer';
-import { courseCreate, courseEnroll, courseOverview, coursesList } from "../controllers/courses.controller.js";
+import { courseCreate, courseDetail, courseEnroll, courseOverview, coursesList } from "../controllers/courses.controller.js";
 
 const router = Router();
 
