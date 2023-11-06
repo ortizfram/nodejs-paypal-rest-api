@@ -5,7 +5,6 @@ import { User } from "./auth.controller.js";
 import { Course } from "../models/course.model.js";
 
 
-
 export const courseCreate = async (req, res) => {
   try {
     const {
@@ -56,13 +55,45 @@ export const courseCreate = async (req, res) => {
 };
 
 export const coursesList = async (req, res) => {
-  const user = User;
-  const message = req.query.message; // Retrieve success message from query params authcontroller
-
-  // Fetch courses from the database using the Mongoose model
+  // Fetch all available courses
   const courses = await Course.find().lean();
 
-  res.render("courses", { courses, user, message });
+  const user = req.session.user || null; // Get the user from the session or set to null if not logged in
+
+  if (req.session.user) {
+    // Fetch the enrolled course IDs for the current user
+    const user = req.session.user;
+    const enrolledCourses = user.enrolledCourses.map(courseId => courseId.toString());
+
+    // Filter out the enrolled courses from the course list
+    const availableCourses = courses.filter(course => !enrolledCourses.includes(course._id.toString()));
+
+    res.render("courses", { courses: availableCourses, user });// render not enrolled ones
+  } else {
+    // If user not logged in, display all available courses
+    res.render("courses", { courses });
+  }
+};
+
+export const coursesListOwned = async (req, res) => {
+  // Fetch all available courses
+  const courses = await Course.find().lean();
+
+  const user = req.session.user || null; // Get the user from the session or set to null if not logged in
+
+  if (req.session.user) {
+    // Fetch the enrolled course IDs for the current user
+    const user = req.session.user;
+    const enrolledCourses = user.enrolledCourses.map(courseId => courseId.toString());
+
+    // Filter out the enrolled courses from the course list
+    const availableCourses = courses.filter(course => enrolledCourses.includes(course._id.toString())); // render enrolled ones
+
+    res.render("courses", { courses: availableCourses, user });
+  } else {
+    // If user not logged in, display all available courses
+    res.render("courses", { courses });
+  }
 };
 
 export const courseOverview = async (req, res) => {
@@ -83,32 +114,15 @@ export const courseOverview = async (req, res) => {
   }
 };
 
-export const courseDetail = async (req, res) => {
-  const user = User;
-  const message = req.query.message; // Retrieve success message from query params authcontroller
+export const courseEnroll = async (req, res) => {
+  // Fetch the course slug from the request
   const courseSlug = req.params.slug;
 
   try {
     const course = await Course.findOne({ slug: courseSlug }).lean();
 
     if (course) {
-      res.render('courseDetail', { course, user, message });
-    } else {
-      res.status(404).send('Course not found');
-    }
-  } catch (error) {
-    res.status(500).send('Error fetching the course');
-  }
-};
-
-export const courseEnroll = async (req, res) => {
-  const user = User;
-  const courseSlug = req.params.slug; // Retrieve the ID from the URL params //since the ID is part of the route URL. // not being passed as req.query.id.
-  try {
-    const course = await Course.findOne({ slug: courseSlug }).lean();
-
-    if (course) {
-      res.render("courseEnroll", { course, user });
+      res.render("courseEnroll", { course });
     } else {
       res.status(404).send("Course not found");
     }
@@ -116,5 +130,23 @@ export const courseEnroll = async (req, res) => {
     res.status(500).send('Error fetching the course');
   }
 };
+
+export const courseDetail = async (req, res) => {
+ // Fetch the course slug from the request
+ const courseSlug = req.params.slug;
+
+ try {
+   const course = await Course.findOne({ slug: courseSlug }).lean();
+
+   if (course) {
+     res.render('courseDetail', { course });
+   } else {
+     res.status(404).send('Course not found');
+   }
+ } catch (error) {
+   res.status(500).send('Error fetching the course');
+ }
+};
+
 
 export default { coursesList, courseOverview, courseEnroll, courseDetail, courseCreate };

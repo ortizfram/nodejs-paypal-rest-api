@@ -68,46 +68,31 @@ export const createOrder = async (req, res) => {
 
 export const captureOrder = async (req, res) => {
   try {
-    // They accepted payment so save it
-    const { token } = req.query; // take token and resend it -> confirm
-    const courseSlug = req.body.courseSlug; // Assuming courseSlug is available in the request body
+    const { token, courseSlug } = req.query;
 
-    const response = await axios.post(
-      `${PAYPAL_API}/v2/checkout/orders/${token}/capture`,
-      {}, // send nothing to back
-      {
-        auth: {
-          username: PAYPAL_API_CLIENT,
-          password: PAYPAL_API_SECRET,
-        },
-      }
-    );
+    if (!req.session.user) {
+      // If the user is not logged in, redirect to the login page
+      return res.redirect('/login?message=Please log in to enroll in the course');
+    }
 
-    console.log("Captured Order:", response.data);
-
-   // Check if the user is logged in
-   if (req.user) {
-    const user = req.user;
+    const user = req.session.user; // Retrieve user information from the session
     const course = await Course.findOne({ slug: courseSlug });
 
     if (course) {
+      // Enroll the user in the course
       user.enrolledCourses.push(course._id);
       await user.save();
-      // Return the rendered view with enrolled course details
-      return res.render("courseDetail", { course });
+      
+      // Redirect to the course details page for the enrolled course
+      return res.redirect(`/course/${courseSlug}`);
     } else {
       console.error("Course information not found.");
       return res.status(404).send("Course not found");
     }
-  } else {
-    // If the user is not logged in, provide guidance for logging in
-    return res
-    .redirect('/login?message=Please log in to enroll in the course');
+  } catch (error) {
+    console.error("Error capturing order:", error);
+    res.status(500).json({ message: "Error capturing the order" });
   }
-} catch (error) {
-  console.error("Error capturing order:", error);
-  res.status(500).json({ message: "Error capturing the order" });
-}
 };
 
 export const cancelPayment = (req, res) => res.redirect('/');

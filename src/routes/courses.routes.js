@@ -1,6 +1,6 @@
 import { Router } from "express";
 import multer from 'multer';
-import { courseCreate, courseDetail, courseEnroll, courseOverview, coursesList } from "../controllers/courses.controller.js";
+import { courseCreate, courseDetail, courseEnroll, courseOverview, coursesList, coursesListOwned } from "../controllers/courses.controller.js";
 
 const router = Router();
 
@@ -19,6 +19,7 @@ router.post('/course/create', upload.single('thumbnail'), courseCreate);
 //------------  -------------------------
   
 router.get("/courses", coursesList);
+router.get("/courses-owned", coursesListOwned);
 router.get("/course/:slug", courseOverview);
 router.get("/course/:slug/enroll", courseEnroll);
 router.get("/course/:slug/modules", courseDetail);
