@@ -106,29 +106,34 @@ export const coursesListOwned = async (req, res) => {
 };
 
 export const courseOverview = async (req, res) => {
-  const user = req.session.user; // Retrieve the user from the session
-  const message = req.query.message; // Retrieve success message from query params authcontroller
-  const courseSlug = req.params.slug;
-
   try {
+    const user = req.session.user; // Retrieve the user from the session
+    const message = req.query.message; // Retrieve success message from query params authcontroller
+    const courseSlug = req.params.slug;
+
     const course = await Course.findOne({ slug: courseSlug }).lean();
 
-    if (course) {
-      // Check if the course is enrolled for the user
-      if (user && user.enrolledCourses.includes(course._id.toString())) {
-        // If the course is enrolled, redirect to the course details page
-        res.redirect(`/course/${courseSlug}/modules`);
-      } else {
-        // If the course is not enrolled, render the course overview page
-        res.render('courseOverview', { course, user, message });
-      }
-    } else {
-      res.status(404).send('Course not found');
+    if (!course) {
+      return res.status(404).send('Course not found');
     }
+
+    // Check if the user is logged in and has enrolledCourses before proceeding
+    if (user && user.enrolledCourses) {
+      const isEnrolled = user.enrolledCourses.includes(course._id.toString());
+      
+      if (isEnrolled) {
+        return res.redirect(`/course/${courseSlug}/modules`);
+      }
+    }
+
+    // Render the course overview page if not enrolled
+    res.render('courseOverview', { course, user, message });
   } catch (error) {
+    console.error("Error fetching the course:", error);
     res.status(500).send('Error fetching the course');
   }
 };
+
 
 export const courseEnroll = async (req, res) => {
   
