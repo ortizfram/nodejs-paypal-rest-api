@@ -11,7 +11,32 @@
 </head>
 
 <body>
-    <h1>Course modules DETAIL</h1>
+    <div class="course-container">
+        <%- include ('navbar') -%>
+        <%- include ('alert') -%>
+        <button>
+            <a href="/courses">Go back to All Courses</a>
+        </button>
+        <div class='course-detail'>
+            <img src="<%= course.thumbnail %>" alt="<%= course.title %> Image">
+
+            <h1><%= course.title %></h1>
+                
+            <p>
+                <%= course.overview %>
+            </p>
+            <div>
+                <p>Instructor: <%= course.instructor %>
+                </p>
+                    <p>Description: <%= course.description %>
+                </p>
+                <p>Duration: <%= course.length %>
+                </p>
+            </div>
+            <br>
+        </div>
+
+    </div>
 </body>
 
 </html>

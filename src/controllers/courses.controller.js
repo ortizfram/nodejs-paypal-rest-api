@@ -136,12 +136,14 @@ export const courseEnroll = async (req, res) => {
 export const courseDetail = async (req, res) => {
  // Fetch the course slug from the request
  const courseSlug = req.params.slug;
+ const user = req.session.user || null; // Get the user from the session or set to null if not logged in
+ const message = req.query.message; // Retrieve success message from query params authcontroller
 
  try {
    const course = await Course.findOne({ slug: courseSlug }).lean();
 
    if (course) {
-     res.render('courseDetail', { course });
+     res.render('courseDetail', { course, message, user });
    } else {
      res.status(404).send('Course not found');
    }
