@@ -6,6 +6,7 @@ import {
 } from "../config.js";
 import axios from "axios";
 import { Course } from "../models/course.model.js";
+import EnrolledCourses from "../models/course.enrolled.model.js";
 
 export const createOrder = async (req, res) => {
   try {
@@ -75,24 +76,38 @@ export const createOrder = async (req, res) => {
 export const captureOrder = async (req, res) => {
   try {
     const { token, courseSlug } = req.query;
+    console.log("Payment approved")
 
     if (!req.session.user) {
-      // If the user is not logged in, redirect to the login page
-      return res.redirect(
-        "/login?message=Please log in to enroll in the course"
-      );
+      return res.redirect("/login?message=Please log in to enroll in the course");
     }
 
-    const user = req.session.user; // Retrieve user information from the session
+    const user = req.session.user;
     const course = await Course.findOne({ slug: courseSlug });
 
     if (course) {
-      // Enroll the user in the course
-      user.enrolledCourses.push(course._id);
-      await user.save();
+      // Check if the user is already enrolled in the course
+      const isEnrolled = user.enrolledCourses.includes(course._id);
 
-      // Redirect to the course details page for the enrolled course
-      return res.redirect(`/course/${courseSlug}`);
+      if (!isEnrolled) {
+        // Add the course to the user's enrolled courses
+        user.enrolledCourses.push(course._id);
+        await user.save();
+        console.log("User enrolled in course:", courseSlug);
+      }
+
+      const enrollmentExists = await EnrolledCourses.findOne({ userId: user._id, courseId: course._id });
+
+      if (!enrollmentExists) {
+        // Create a new entry in the EnrolledCourses collection
+        const newEnrollment = await EnrolledCourses.create({
+          userId: user._id,
+          courseId: course._id
+        });
+        console.log("Enrolled course in the database:", newEnrollment);
+      }
+
+      return res.redirect(`/course/${courseSlug}/modules`);
     } else {
       console.error("Course information not found.");
       return res.status(404).send("Course not found");

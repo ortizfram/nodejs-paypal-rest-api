@@ -1,8 +1,6 @@
 import { users } from "../mongodb.js";
 import bcrypt from 'bcrypt';
 
-let User; // Declare a global variable to store logged-in user
-
 export const login = async (req, res) => {
   try {
     const { username, password } = req.body;
@@ -62,4 +60,3 @@ export const logout = (req, res) => {
   });
 };
 
-export { User }; // Export the User variable

@@ -7,7 +7,6 @@
   import { HOST, PORT } from "./config.js";
   import path from "path";
   import { fileURLToPath } from "url"; // For converting import.meta.url to a file path
-  import { User } from "./controllers/auth.controller.js";
   import { courseCreate } from "./controllers/courses.controller.js";
   import { config } from "dotenv";
 

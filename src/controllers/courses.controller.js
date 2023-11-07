@@ -1,7 +1,6 @@
 import axios from "axios";
 import slugify from "slugify";
 import multer from "multer"; //for upoload imgs
-import { User } from "./auth.controller.js";
 import { Course } from "../models/course.model.js";
 
 
@@ -99,7 +98,7 @@ export const coursesListOwned = async (req, res) => {
 };
 
 export const courseOverview = async (req, res) => {
-  const user = User;
+  const user = req.session.user; // Retrieve the user from the session
   const message = req.query.message; // Retrieve success message from query params authcontroller
   const courseSlug = req.params.slug;
 
@@ -107,7 +106,14 @@ export const courseOverview = async (req, res) => {
     const course = await Course.findOne({ slug: courseSlug }).lean();
 
     if (course) {
-      res.render('courseOverview', { course, user, message });
+      // Check if the course is enrolled for the user
+      if (user && user.enrolledCourses.includes(course._id.toString())) {
+        // If the course is enrolled, redirect to the course details page
+        res.redirect(`/course/${courseSlug}/modules`);
+      } else {
+        // If the course is not enrolled, render the course overview page
+        res.render('courseOverview', { course, user, message });
+      }
     } else {
       res.status(404).send('Course not found');
     }
