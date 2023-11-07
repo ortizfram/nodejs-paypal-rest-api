@@ -57,9 +57,7 @@ export const courseCreate = async (req, res) => {
 export const coursesList = async (req, res) => {
   try {
     const message = req.query.message; // Retrieve success message from query params authcontroller
-
     const courses = await Course.find().lean();
-
     const user = req.session.user || null; // Get the user from the session or set to null if not logged in
 
     if (user) {
@@ -78,7 +76,6 @@ export const coursesList = async (req, res) => {
     res.redirect("/courses?message=Error fetching courses");
   }
 };
-
 
 export const coursesListOwned = async (req, res) => {
   // Fetch all available courses

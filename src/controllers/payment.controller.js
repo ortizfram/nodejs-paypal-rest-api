@@ -5,7 +5,6 @@ import {
   PAYPAL_API_SECRET,
 } from "../config.js";
 import axios from "axios";
-import { User } from "./auth.controller.js";
 import { Course } from "../models/course.model.js";
 
 export const createOrder = async (req, res) => {
@@ -30,7 +29,7 @@ export const createOrder = async (req, res) => {
         brand_name: "Mi tienda",
         landing_page: "NO_PREFERENCE",
         user_action: "PAY_NOW",
-        return_url: `${HOST}/capture-order`,
+        return_url: `${HOST}/course/${courseSlug}/modules`,// Include course slug in the return URL
         cancel_url: `${HOST}/cancel-order`,
       },
     };
@@ -50,16 +49,23 @@ export const createOrder = async (req, res) => {
     });
 
     // Create order with order obj
-    const response = await axios.post(`${PAYPAL_API}/v2/checkout/orders`, order, {
-      headers: {
-        Authorization: `Bearer ${access_token}`,
-      },
-    });
+    const response = await axios.post(
+      `${PAYPAL_API}/v2/checkout/orders`,
+      order,
+      {
+        headers: {
+          Authorization: `Bearer ${access_token}`,
+        },
+      }
+    );
 
     // Log the created order
     console.log("Created Order:", response.data);
 
-    return res.json(response.data);
+    const approveLink = response.data.links[1].href; // paypal pay link
+    
+    // Redirect the user to the PayPal approval link
+    res.redirect(approveLink);
   } catch (error) {
     console.error("Error creating order:", error);
     res.status(500).json({ message: "Error creating the order" });
@@ -72,7 +78,9 @@ export const captureOrder = async (req, res) => {
 
     if (!req.session.user) {
       // If the user is not logged in, redirect to the login page
-      return res.redirect('/login?message=Please log in to enroll in the course');
+      return res.redirect(
+        "/login?message=Please log in to enroll in the course"
+      );
     }
 
     const user = req.session.user; // Retrieve user information from the session
@@ -82,7 +90,7 @@ export const captureOrder = async (req, res) => {
       // Enroll the user in the course
       user.enrolledCourses.push(course._id);
       await user.save();
-      
+
       // Redirect to the course details page for the enrolled course
       return res.redirect(`/course/${courseSlug}`);
     } else {
@@ -95,4 +103,4 @@ export const captureOrder = async (req, res) => {
   }
 };
 
-export const cancelPayment = (req, res) => res.redirect('/');
+export const cancelPayment = (req, res) => res.redirect("/");
