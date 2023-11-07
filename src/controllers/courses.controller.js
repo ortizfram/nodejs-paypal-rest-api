@@ -55,25 +55,30 @@ export const courseCreate = async (req, res) => {
 };
 
 export const coursesList = async (req, res) => {
-  // Fetch all available courses
-  const courses = await Course.find().lean();
+  try {
+    const message = req.query.message; // Retrieve success message from query params authcontroller
 
-  const user = req.session.user || null; // Get the user from the session or set to null if not logged in
+    const courses = await Course.find().lean();
 
-  if (req.session.user) {
-    // Fetch the enrolled course IDs for the current user
-    const user = req.session.user;
-    const enrolledCourses = user.enrolledCourses.map(courseId => courseId.toString());
+    const user = req.session.user || null; // Get the user from the session or set to null if not logged in
 
-    // Filter out the enrolled courses from the course list
-    const availableCourses = courses.filter(course => !enrolledCourses.includes(course._id.toString()));
+    if (user) {
+      // Check if the user has enrolled courses before trying to access them
+      const enrolledCourses = user.enrolledCourses || [];
+      const enrolledCourseIds = enrolledCourses.map(courseId => courseId.toString());
 
-    res.render("courses", { courses: availableCourses, user });// render not enrolled ones
-  } else {
-    // If user not logged in, display all available courses
-    res.render("courses", { courses });
+      const availableCourses = courses.filter(course => !enrolledCourseIds.includes(course._id.toString()));
+
+      res.render("courses", { courses: availableCourses, user, message });
+    } else {
+      // If user is not logged in, display all available courses
+      res.render("courses", { courses, user:null, message });// Pass user as null
+    }
+  } catch (error) {
+    res.redirect("/courses?message=Error fetching courses");
   }
 };
+
 
 export const coursesListOwned = async (req, res) => {
   // Fetch all available courses
