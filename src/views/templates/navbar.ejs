@@ -4,9 +4,9 @@
             <li><a href="/">Home</a></li>
             <li><a href="/course/create">Create Course</a></li>
             <li><a href="/courses">Courses</a></li>
-            <li><a href="/courses-owned">My courses</a></li>
             | <% if (user && user.name) { %>
                 <li class="user-info">Welcome, <%= user.name %>!</li>
+                <li><a href="/courses-owned">My courses |</a></li>
                 <li><a href="/logout">Logout</a></li>
             <% } else { %>
                 <li><a href="/login">Login</a></li>

@@ -77,23 +77,31 @@ export const coursesList = async (req, res) => {
 };
 
 export const coursesListOwned = async (req, res) => {
-  // Fetch all available courses
-  const courses = await Course.find().lean();
+  if (!req.session.user) {
+    // Store the course slug in the query parameters to redirect after login
+    return res.redirect(`/login?redirect=/courses-owned`);
+  }
 
-  const user = req.session.user || null; // Get the user from the session or set to null if not logged in
-
-  if (req.session.user) {
-    // Fetch the enrolled course IDs for the current user
+  try {
     const user = req.session.user;
-    const enrolledCourses = user.enrolledCourses.map(courseId => courseId.toString());
+    const message = req.query.message; // Retrieve success message from query params authcontroller
+    
 
-    // Filter out the enrolled courses from the course list
-    const availableCourses = courses.filter(course => enrolledCourses.includes(course._id.toString())); // render enrolled ones
+    if (user) {
+      const courses = await Course.find().lean();
+      const enrolledCourses = user.enrolledCourses || [];
 
-    res.render("courses", { courses: availableCourses, user });
-  } else {
-    // If user not logged in, display all available courses
-    res.render("courses", { courses });
+      const enrolledCourseIds = enrolledCourses.map(courseId => courseId.toString());
+
+      const availableCourses = courses.filter(course => enrolledCourseIds.includes(course._id.toString()));
+
+      res.render("coursesOwned", { courses: availableCourses, user, message });
+    } else {
+      const courses = await Course.find().lean();
+      res.render("courses", { courses, message });
+    }
+  } catch (error) {
+    res.redirect("/courses?message=Error fetching courses");
   }
 };
 
@@ -123,8 +131,14 @@ export const courseOverview = async (req, res) => {
 };
 
 export const courseEnroll = async (req, res) => {
+  
   // Fetch the course slug from the request
   const courseSlug = req.params.slug;
+  
+  if (!req.session.user) {
+    // Store the course slug in the query parameters to redirect after login
+    return res.redirect(`/login?redirect=/course/${courseSlug}/enroll`);
+  }
 
   try {
     const course = await Course.findOne({ slug: courseSlug }).lean();
