@@ -2,6 +2,7 @@ import axios from "axios";
 import slugify from "slugify";
 import multer from "multer"; //for upoload imgs
 import { Course } from "../models/course.model.js";
+import { users } from "../mongodb.js";
 
 
 export const courseCreate = async (req, res) => {
@@ -54,6 +55,8 @@ export const courseCreate = async (req, res) => {
 };
 
 export const coursesList = async (req, res) => {
+  // ♦ Render all courses
+
   try {
     const message = req.query.message; // Retrieve success message from query params authcontroller
     const courses = await Course.find().lean();
@@ -77,35 +80,32 @@ export const coursesList = async (req, res) => {
 };
 
 export const coursesListOwned = async (req, res) => {
-  if (!req.session.user) {
+  // ♦ Same as coursesList view but with my owned courses, 
+
+  if (!req.session.user) { // login needed
     // Store the course slug in the query parameters to redirect after login
     return res.redirect(`/login?redirect=/courses-owned`);
   }
 
   try {
     const user = req.session.user;
-    const message = req.query.message; // Retrieve success message from query params authcontroller
-    
-
     if (user) {
-      const courses = await Course.find().lean();
-      const enrolledCourses = user.enrolledCourses || [];
+      // find sessio user id in db. poplate with enrolledCourses
+      const userDetails = await users.findOne({ _id: user._id }).populate('enrolledCourses').lean();
+      const enrolledCourses = userDetails.enrolledCourses; // []
 
-      const enrolledCourseIds = enrolledCourses.map(courseId => courseId.toString());
-
-      const availableCourses = courses.filter(course => enrolledCourseIds.includes(course._id.toString()));
-
-      res.render("coursesOwned", { courses: availableCourses, user, message });
+      res.render('coursesOwned', { courses: enrolledCourses, user });
     } else {
-      const courses = await Course.find().lean();
-      res.render("courses", { courses, message });
+      res.render('coursesOwned', { courses: [], user });
     }
   } catch (error) {
-    res.redirect("/courses?message=Error fetching courses");
+    res.status(500).send('Error fetching enrolled courses');
   }
 };
 
 export const courseOverview = async (req, res) => {
+  // ♦ View to have a quick look of the course before buying it, 
+
   try {
     const user = req.session.user; // Retrieve the user from the session
     const message = req.query.message; // Retrieve success message from query params authcontroller
@@ -134,8 +134,9 @@ export const courseOverview = async (req, res) => {
   }
 };
 
-
 export const courseEnroll = async (req, res) => {
+  // ♦ This is just a view to send to createOrder, 
+  // ♦ rendering course information 
   
   // Fetch the course slug from the request
   const courseSlug = req.params.slug;
@@ -159,6 +160,9 @@ export const courseEnroll = async (req, res) => {
 };
 
 export const courseDetail = async (req, res) => {
+// ♦ View that renders x bought course ,
+// ♦ it has course modules, videos and content
+
  // Fetch the course slug from the request
  const courseSlug = req.params.slug;
  const user = req.session.user || null; // Get the user from the session or set to null if not logged in
@@ -168,10 +172,18 @@ export const courseDetail = async (req, res) => {
    const course = await Course.findOne({ slug: courseSlug }).lean();
 
    if (course) {
-     res.render('courseDetail', { course, message, user });
+    // Fetch the enrolled courses for the current user
+    if (user) {
+      const userDetails = await users.findOne({ _id: user._id}).populate('enrolledCourses').lean();
+      const enrolledCourses = userDetails.enrolledCourses;
+
+      res.render('courseDetail', { course, message, user, enrolledCourses });
    } else {
-     res.status(404).send('Course not found');
+    res.render('courseDetail', { course, message, user, enrolledCourses: [] });
    }
+  } else {
+    res.status(404).send("Course not found");
+  }
  } catch (error) {
    res.status(500).send('Error fetching the course');
  }
