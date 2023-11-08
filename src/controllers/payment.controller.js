@@ -6,7 +6,7 @@ import {
 } from "../config.js";
 import axios from "axios";
 import { Course } from "../models/course.model.js";
-import EnrolledCourses from "../models/course.enrolled.model.js";
+import { users } from "../mongodb.js";
 
 export const createOrder = async (req, res) => {
   try {
@@ -30,7 +30,7 @@ export const createOrder = async (req, res) => {
         brand_name: "Mi tienda",
         landing_page: "NO_PREFERENCE",
         user_action: "PAY_NOW",
-        return_url: `${HOST}/course/${courseSlug}/modules`,// Include course slug in the return URL
+        return_url: `${HOST}/course/${courseSlug}/modules`, // Include course slug in the return URL
         cancel_url: `${HOST}/cancel-order`,
       },
     };
@@ -64,7 +64,7 @@ export const createOrder = async (req, res) => {
     console.log("Created Order:", response.data);
 
     const approveLink = response.data.links[1].href; // paypal pay link
-    
+
     // Redirect the user to the PayPal approval link
     res.redirect(approveLink);
   } catch (error) {
@@ -75,42 +75,23 @@ export const createOrder = async (req, res) => {
 
 export const captureOrder = async (req, res) => {
   try {
-    const { token, courseSlug } = req.query;
-    console.log("Payment approved")
+    const { courseSlug } = req.query; //is obtained from the successful payment redirect query
+    const user = req.session.user; //user information stored in the session
 
-    if (!req.session.user) {
-      return res.redirect("/login?message=Please log in to enroll in the course");
-    }
-
-    const user = req.session.user;
+    // Find the course using the provided courseSlug
     const course = await Course.findOne({ slug: courseSlug });
 
-    if (course) {
-      // Check if the user is already enrolled in the course
-      const isEnrolled = user.enrolledCourses.includes(course._id);
-
-      if (!isEnrolled) {
-        // Add the course to the user's enrolled courses
-        user.enrolledCourses.push(course._id);
-        await user.save();
-        console.log("User enrolled in course:", courseSlug);
-      }
-
-      const enrollmentExists = await EnrolledCourses.findOne({ userId: user._id, courseId: course._id });
-
-      if (!enrollmentExists) {
-        // Create a new entry in the EnrolledCourses collection
-        const newEnrollment = await EnrolledCourses.create({
-          userId: user._id,
-          courseId: course._id
-        });
-        console.log("Enrolled course in the database:", newEnrollment);
-      }
+    if (course && user) {
+      // Enroll the user in the course in db
+      await users.findByIdAndUpdate(
+        user._id, //user session id from db
+        { $push: { enrolledCourses: course._id } },
+        { new: true }
+      );
 
       return res.redirect(`/course/${courseSlug}/modules`);
     } else {
-      console.error("Course information not found.");
-      return res.status(404).send("Course not found");
+      return res.status(404).send("Course or user not found");
     }
   } catch (error) {
     console.error("Error capturing order:", error);

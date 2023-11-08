@@ -34,9 +34,13 @@ const SignupSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  enrolledCourses: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Course' // Reference to the Course model
+    }
+  ]
 });
-
-
 
 // Define collection
 const users = new mongoose.model("Users", SignupSchema);
