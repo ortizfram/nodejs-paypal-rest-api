@@ -88,15 +88,16 @@ export const coursesListOwned = async (req, res) => {
   }
 
   try {
+    const message = req.query.message;
     const user = req.session.user;
     if (user) {
       // find sessio user id in db. poplate with enrolledCourses
-      const userDetails = await users.findOne({ _id: user._id }).populate('enrolledCourses').lean();
-      const enrolledCourses = userDetails.enrolledCourses; // []
+      const userDetails = await users.findOne({ _id: user._id }).populate('enrolledCourses').exec(callback);//.lean()
+      const enrolledCourses = userDetails.enrolledCourses; //array
 
-      res.render('coursesOwned', { courses: enrolledCourses, user });
+      res.render('coursesOwned', { courses: enrolledCourses, user, message });
     } else {
-      res.render('coursesOwned', { courses: [], user });
+      res.render('coursesOwned', { courses: [], user, message });
     }
   } catch (error) {
     res.status(500).send('Error fetching enrolled courses');

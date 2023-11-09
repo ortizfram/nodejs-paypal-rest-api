@@ -81,13 +81,22 @@ export const captureOrder = async (req, res) => {
     // Find the course using the provided courseSlug
     const course = await Course.findOne({ slug: courseSlug });
 
+    // Log the user ID to ensure it's a valid Object ID
+    console.log('User ID:', user._id);
+    
+    // Log the course ID to ensure it's a valid Object ID
+    console.log('Course ID:', course._id);
+
     if (course && user) {
-      // Enroll the user in the course in db
-      await users.findByIdAndUpdate(
+      // Update the user's enrolledCourses
+      const updatedUser = await users.findByIdAndUpdate(
         user._id, //user session id from db
         { $push: { enrolledCourses: course._id } },
         { new: true }
       );
+
+    // Log the updated user document
+    console.log('Updated User:', updatedUser);
 
       return res.redirect(`/course/${courseSlug}/modules`);
     } else {

@@ -19,6 +19,12 @@
         </button>
         <div class='course-detail'>
             <!--here we display enrolledcourses from the user-->
+            <% if (course) { %>
+                <h1><%= course.title %></h1>
+                <!-- Display other details of the course -->
+              <% } else { %>
+                <p>No course details available.</p>
+              <% } %>
         </div>
 
     </div>

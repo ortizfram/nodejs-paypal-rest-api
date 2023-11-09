@@ -16,6 +16,12 @@
     border: none;
     cursor: pointer;
 }
+.courses-container a {
+    color:#333 ;
+}
+.courses-container a:hover {
+    color:#9e35e4 ;
+}
 
 /* Style for the courses list */
 .courses-container ul {

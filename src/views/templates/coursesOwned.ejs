@@ -17,18 +17,19 @@
         </button>
         <hr>
         <h1>My Library</h1>
-        <ul>
-            <% courses.forEach(course => { %>
-                <li>
-                    <a href="/course/<%= course.slug %>/modules" target="_blank" >
-                        <img src="<%= course.thumbnail %>" alt="<%= course.title %> Image">
-                        <h2><%= course.title %></h2>
-                        <p>Price: $<%= course.price %></p>
-                        <p><%= course.description %></p>
-                    </a>
-                </li>
-            <% }); %>
-        </ul>
+        <div class="course-list">
+            <% if (courses.length > 0) { %>
+              <ul>
+                <% courses.forEach(course => { %>
+                  <li><%= course.title %></li> <!-- Display course details as needed -->
+                <% }) %>
+              </ul>
+            <% } else { %>
+              <p>No courses owned yet.</p>
+              <a href="courses/">go and see courses</a>
+            <% } %>
+          </div>
+          
     </div>
 </body>
 </html>
