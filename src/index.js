@@ -1,13 +1,12 @@
   import express from "express";
+  import { pool } from "./db.js";
   import session from "express-session"; // Import the express-session module
-  import multer from "multer";
   import authRoutes from "./routes/auth.routes.js";
   import paymentRoutes from "./routes/payment.routes.js";
   import coursesRoutes from "./routes/courses.routes.js";
   import { HOST, PORT } from "./config.js";
   import path from "path";
   import { fileURLToPath } from "url"; // For converting import.meta.url to a file path
-  import { courseCreate } from "./controllers/courses.controller.js";
   import { config } from "dotenv";
 
   config();// Loads the .env file into process.env
@@ -27,23 +26,18 @@
   app.use(express.static(path.join(__dirname, "public"))); // imgs directory
   app.use('/src/uploads', express.static(path.join(__dirname, 'uploads')));
 
-  // use mongodb data
-  app.use(express.urlencoded({ extended: false }));
+  // MIDDLEWARE : parse JSON in your application:
+  app.use(express.json());
 
-  // Configure session middleware
-  app.use(
-    session({
-      secret: process.env.SESSION_SECRET , // Add a secret key for session management
-      resave: false,
-      saveUninitialized: true
-    })
-  );
+  // consulta a sql to retrieve
+  app.get("/ping", async (req, res) => {
+    const [rows] = await pool.query(`SELECT * FROM users`);
+    res.json([rows])
+  });
 
-  // pass user data Home
-  app.get("/", (req, res) => {
-    const user = req.session.user; // Access user from the session
-    const message = req.query.message; // Retrieve success message from query params authcontroller
-    res.render("home", { user, message });
+  app.get("/create", async (req, res) => {
+    const result = await pool.query(`INSERT INTO users(name) VALUES ("John")`)
+    res.json(result)
   });
 
   // use routes

@@ -1,4 +1,3 @@
-import { users } from "../postgresql.js";
 import bcrypt from 'bcrypt';
 
 export const login = async (req, res) => {

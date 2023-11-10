@@ -1,4 +1,4 @@
-import pool from "../postgresql";
+import pool from "../db";
 
 const createUserTable = async () => {
     const createUserTableQuery = `

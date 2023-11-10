@@ -6,7 +6,7 @@ import {
 } from "../config.js";
 import axios from "axios";
 import { Course } from "../models/course.model.js";
-import { users as User } from "../postgresql.js";
+// import { users as User } from "../db.js";
 
 export const createOrder = async (req, res) => {
   try {
