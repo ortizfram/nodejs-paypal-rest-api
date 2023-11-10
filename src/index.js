@@ -1,11 +1,11 @@
 // index.js
 import express from "express";
-import { pool } from "./db.js";
 import session from "express-session";
 import authRoutes from "./routes/auth.routes.js";
 import paymentRoutes from "./routes/payment.routes.js";
 import employeeRoutes from "./routes/employee.routes.js";
 import coursesRoutes from "./routes/courses.routes.js";
+import indexRoutes from "./routes/index.routes.js";
 import { HOST, PORT } from "./config.js";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -32,14 +32,8 @@ app.use("/src/uploads", express.static(path.join(__dirname, "uploads")));
 app.use(express.json());
 
 
-//test endpoints
-app.get('/ping', async(req, res) => {
-  const [result] = await pool.query('SELECT "PONG" AS result');
-  res.json(result[0]);
-});
-
-
 // Use routes
+app.use(indexRoutes);
 app.use(authRoutes);
 app.use(paymentRoutes);
 app.use(coursesRoutes);
