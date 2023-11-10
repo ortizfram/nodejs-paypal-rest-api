@@ -28,8 +28,15 @@ app.use(express.static(path.join(__dirname, "public")));
 // config user upload files
 app.use("/src/uploads", express.static(path.join(__dirname, "uploads")));
 
-
+// db use JSON
 app.use(express.json());
+
+
+//test endpoints
+app.get('/ping', async(req, res) => {
+  const [result] = await pool.query('SELECT "PONG" AS result');
+  res.json(result[0]);
+});
 
 
 // Use routes
