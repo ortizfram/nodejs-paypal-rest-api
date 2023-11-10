@@ -2,7 +2,6 @@ import axios from "axios";
 import slugify from "slugify";
 import multer from "multer"; //for upoload imgs
 import { Course } from "../models/course.model.js";
-import { users } from "../mongodb.js";
 
 
 export const courseCreate = async (req, res) => {

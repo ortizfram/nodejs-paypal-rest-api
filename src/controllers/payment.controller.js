@@ -6,7 +6,7 @@ import {
 } from "../config.js";
 import axios from "axios";
 import { Course } from "../models/course.model.js";
-import { users } from "../mongodb.js";
+import { users as User } from "../postgresql.js";
 
 export const createOrder = async (req, res) => {
   try {
@@ -76,27 +76,18 @@ export const createOrder = async (req, res) => {
 export const captureOrder = async (req, res) => {
   try {
     const { courseSlug } = req.query; //is obtained from the successful payment redirect query
-    const user = req.session.user; //user information stored in the session
-
+    const user = req.session.user;
+    
     // Find the course using the provided courseSlug
     const course = await Course.findOne({ slug: courseSlug });
 
-    // Log the user ID to ensure it's a valid Object ID
-    console.log('User ID:', user._id);
-    
-    // Log the course ID to ensure it's a valid Object ID
-    console.log('Course ID:', course._id);
-
     if (course && user) {
       // Update the user's enrolledCourses
-      const updatedUser = await users.findByIdAndUpdate(
-        user._id, //user session id from db
+      const updatedUser = await User.findByIdAndUpdate(
+        user._id,
         { $push: { enrolledCourses: course._id } },
         { new: true }
       );
-
-    // Log the updated user document
-    console.log('Updated User:', updatedUser);
 
       return res.redirect(`/course/${courseSlug}/modules`);
     } else {

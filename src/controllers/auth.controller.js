@@ -1,14 +1,16 @@
-import { users } from "../mongodb.js";
+import { users } from "../postgresql.js";
 import bcrypt from 'bcrypt';
 
 export const login = async (req, res) => {
   try {
     const { username, password } = req.body;
+
     // Find user in the database that matches the username from the login form
-    const user = await users.findOne({ username });
+    const result = await pool.query('SELECT * FROM users WHERE username = $1', [username]);
+    const user = result.rows[0];
 
     // If the user exists and the passwords match
-    if (user && user.password === password) {
+    if (user && await bcrypt.compare(password, user.password)) {
       req.session.user = user; // Store the user in the session
       res.redirect("/?message=Login successful");
     } else {
@@ -31,17 +33,17 @@ export const signup = async (req, res) => {
     // Hash the password before storing it
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const data = {
+    const data = [
       username,
       name,
-      password: hashedPassword, // Save the hashed password
+      hashedPassword, // Save the hashed password
       email,
-    };
+    ];
 
-    // Save to MongoDB
-    const user = await users.create(data);
+    // Save to PostgreSQL
+    await pool.query('INSERT INTO users (username, name, password, email) VALUES ($1, $2, $3, $4)', data);
 
-    req.session.user = user; // Set the user in the session
+    req.session.user = { username, name, email }; // Set the user in the session
     res.redirect("/?message=Signup successful. Logged in automatically.");
   } catch (error) {
     console.error("Error while saving to MongoDB:", error);
