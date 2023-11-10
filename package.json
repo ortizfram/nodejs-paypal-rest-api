@@ -8,7 +8,7 @@
     "dev": "nodemon src/index.js",
     "start": "nodemon src/index.js",
     "test": "jest",
-    "prod": "node --omit=dev src/index.js"
+    "prod": "nodemon --omit=dev src/index.js"
   },
   "repository": {
     "type": "git",
