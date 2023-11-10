@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "dev": "nodemon src/index.js",
-    "start": "nodemon --omit=dev src/index.js"
+    "start": "node --omit=dev src/index.js"
   },
   "repository": {
     "type": "git",
