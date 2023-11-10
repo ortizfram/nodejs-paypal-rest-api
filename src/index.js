@@ -19,23 +19,31 @@ const __dirname = path.dirname(__filename);
 const app = express();
 
 app.set("view engine", "ejs");
-app.set("views", [
-  path.join(__dirname, "views", "templates"),
-]);
+app.set("views", [path.join(__dirname, "views", "templates")]);
 
 app.use(express.static(path.join(__dirname, "public")));
-app.use('/src/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use("/src/uploads", express.static(path.join(__dirname, "uploads")));
 
 app.use(express.json());
 
 app.get("/ping", async (req, res) => {
-  const [rows] = await pool.query(getUsersQuery);
-  res.json([rows]);
+  try {
+    const [rows] = await pool.query(getUsersQuery);
+    res.json({ users: [rows] });
+  } catch (error) {
+    console.error("Error executing query:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
 });
 
 app.get("/create", async (req, res) => {
-  const result = await pool.query(createUserQuery);
-  res.json(result);
+  try {
+    const result = await pool.query(createUserQuery);
+    res.json({ message: "User created successfully", result });
+  } catch (error) {
+    console.error("Error executing query:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
 });
 
 app.use(authRoutes);
