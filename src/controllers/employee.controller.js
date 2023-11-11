@@ -30,7 +30,10 @@ const createEmployee = async (req, res) => {
    });
 };
 
-const updateEmployee = (req, res) => {
+const updateEmployee = async (req, res) => {
+  // req.params.id -> get data  && req.body-> new data
+  const id = await req.params.id
+  const {name, salary} = req.body
   res.send("Updating employees");
 };
 
