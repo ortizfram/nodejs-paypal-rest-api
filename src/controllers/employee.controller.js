@@ -1,5 +1,5 @@
 // controllers/employeeController.js
-import { createEmployeeQuery, getEmployeesQuery, getEmployeeQuery } from "../../db/queries.js";
+import { createEmployeeQuery, getEmployeesQuery, getEmployeeQuery, delEmployeeQuery } from "../../db/queries.js";
 import { pool } from "../db.js";
 
 const getEmployees = async (req, res) => {
@@ -34,8 +34,16 @@ const updateEmployee = (req, res) => {
   res.send("Updating employees");
 };
 
-const deleteEmployee = (req, res) => {
-  res.send("Deleting employees");
+const deleteEmployee = async(req, res) => {
+  const id = await req.params.id
+  const [rows] = await pool.query(delEmployeeQuery, [id]);
+  
+  if (rows.affectedRows >= 1 ) {
+    // 204 means: 202 but not returning anything
+    return res.status(204).json({message: "Employee Deleted"})
+  } else {
+    return res.status(404).json({message: "Employee Not Found"})
+  }
 };
 
 export default {
