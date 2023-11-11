@@ -1,14 +1,17 @@
 // controllers/employeeController.js
-import { createEmployeeQuery } from "../../db/queries.js";
+import { createEmployeeQuery, getEmployeesQuery } from "../../db/queries.js";
 import { pool } from "../db.js";
 
 const getEmployees = async (req, res) => {
+  const [rows] = await pool.query(getEmployeesQuery);
   console.log("getting employees");
+  res.json(rows);
 };
 
 const createEmployee = async (req, res) => {
   const { name, salary } = req.body;
   const [rows] = await pool.query(createEmployeeQuery, [name, salary]);
+  console.log("Employee created")
   res.send({ 
     id: rows.insertId,
     name,

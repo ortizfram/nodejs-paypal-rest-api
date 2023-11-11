@@ -35,7 +35,7 @@ app.use(indexRoutes);
 app.use(authRoutes);
 app.use(paymentRoutes);
 app.use(coursesRoutes);
-app.use(employeeRoutes);
+app.use('/api',employeeRoutes);
 
 
 // RUN
