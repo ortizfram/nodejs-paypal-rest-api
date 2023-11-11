@@ -1,3 +1,3 @@
 // queries.js
 export const getUsersQuery = `SELECT * FROM users`;
-export const createUserQuery = `INSERT INTO users(name) VALUES ("John")`;
+export const createEmployeeQuery = `INSERT INTO employee(name, salary) VALUES (?, ?)`;

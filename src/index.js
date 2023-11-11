@@ -1,6 +1,5 @@
 // index.js
 import express from "express";
-import session from "express-session";
 import authRoutes from "./routes/auth.routes.js";
 import paymentRoutes from "./routes/payment.routes.js";
 import employeeRoutes from "./routes/employee.routes.js";
@@ -10,7 +9,6 @@ import { HOST, PORT } from "./config.js";
 import path from "path";
 import { fileURLToPath } from "url";
 import { config } from "dotenv";
-import { getUsersQuery, createUserQuery } from "../db/queries.js";
 
 config();
 
