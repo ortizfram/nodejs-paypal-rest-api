@@ -9,7 +9,9 @@ router.get("/employees/:id", controller.getEmployee);
 
 router.post("/employees", controller.createEmployee);
  
-router.put("/employees/:id", controller.updateEmployee);
+// put :updates all field if not -> null
+// patch :just 1 field, change it in query
+router.patch("/employees/:id", controller.updateEmployee);
 
 router.delete("/employees/:id", controller.deleteEmployee);
 
