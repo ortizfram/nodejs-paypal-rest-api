@@ -29,14 +29,19 @@ app.use("/src/uploads", express.static(path.join(__dirname, "uploads")));
 // db use JSON
 app.use(express.json());
 
-
 // Use routes
 app.use(indexRoutes);
 app.use(authRoutes);
 app.use(paymentRoutes);
 app.use(coursesRoutes);
-app.use('/api',employeeRoutes);
+app.use("/api", employeeRoutes);
 
+// app middleware for 404
+app.use((req, res) => {
+  res.status(404).json({
+    message: "endpoint Not Found",
+  });
+});
 
 // RUN
 app.listen(PORT);
