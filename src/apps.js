@@ -1,4 +1,5 @@
 import express from "express";
+import session from "express-session";
 import path from "path";
 import { fileURLToPath } from "url";
 import { config } from "dotenv";
@@ -10,7 +11,7 @@ import indexRoutes from "./routes/index.routes.js";
 
 const app = express();
 
-config();
+config();// load .ENV
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -28,10 +29,19 @@ app.use("/src/uploads", express.static(path.join(__dirname, "uploads")));
 // db use JSON
 app.use(express.json());
 
+// Use sessions
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET, // Change this to a secure secret key
+    resave: false,
+    saveUninitialized: true,
+  })
+);
+
 // Use routes
 app.use(indexRoutes);
 app.use(authRoutes);
-app.use(paymentRoutes);
+app.use("/api", paymentRoutes);
 app.use(coursesRoutes);
 app.use("/api", employeeRoutes);
 
