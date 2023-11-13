@@ -1,15 +1,24 @@
-import bcrypt from 'bcrypt';
+import bcrypt from "bcrypt";
+import { pool } from "../db.js";
+import { postSignupQuery, postLoginQuery } from "../../db/queries/auth.queries.js";
 
-export const login = async (req, res) => {
+//------------login-------------------------
+const getLogin = async (req, res) => {
+  res.render("login");
+};
+
+const postLogin = async (req, res) => {
   try {
     const { username, password } = req.body;
 
     // Find user in the database that matches the username from the login form
-    const result = await pool.query('SELECT * FROM users WHERE username = $1', [username]);
-    const user = result.rows[0];
+    const [rows] = await pool.query(postLoginQuery, [
+      username,
+    ]);
+    const user = rows[0];
 
     // If the user exists and the passwords match
-    if (user && await bcrypt.compare(password, user.password)) {
+    if (user && (await bcrypt.compare(password, user.password))) {
       req.session.user = user; // Store the user in the session
       res.redirect("/?message=Login successful");
     } else {
@@ -19,9 +28,13 @@ export const login = async (req, res) => {
     res.send("An error occurred while logging in");
   }
 };
+//------------signup-------------------------
+const getSignup = async (req, res) => {
+  res.render("signup");
+};
 
-export const signup = async (req, res) => {
-  const { username, name, password, email } = req.body;
+const postSignup = async (req, res) => {
+  const { username, name, email, password } = req.body;
 
   // Add validation for required fields
   if (!username || !password) {
@@ -35,29 +48,40 @@ export const signup = async (req, res) => {
     const data = [
       username,
       name,
-      hashedPassword, // Save the hashed password
       email,
+      hashedPassword, // Save the hashed passwords
     ];
 
-    // Save to PostgreSQL
-    await pool.query('INSERT INTO users (username, name, password, email) VALUES ($1, $2, $3, $4)', data);
+    // Insert into users db
+    const [rows] = await pool.query(postSignupQuery, data);
 
-    req.session.user = { username, name, email }; // Set the user in the session
+    // Set the user in the session
+    req.session.user = { username, name, email }; 
+
+    // message on redirect
     res.redirect("/?message=Signup successful. Logged in automatically.");
+
   } catch (error) {
-    console.error("Error while saving to MongoDB:", error);
+    console.error("Error while saving user:", error);
     res.redirect("/?message=Error during signup or login");
   }
 };
-
-export const logout = (req, res) => {
+//------------logout-------------------------
+const logout = (req, res) => {
   // Clear the user session by destroying it
   req.session.destroy((err) => {
     if (err) {
-      console.error('Error destroying session:', err);
+      console.error("Error destroying session:", err);
     }
     // Redirect the user to the home page after logout
     res.redirect("/?message=Logged out successfully");
   });
 };
 
+export default {
+  getLogin,
+  postLogin,
+  getSignup,
+  postSignup,
+  logout,
+};

@@ -7,10 +7,10 @@
             | <% if (user && user.name) { %>
                 <li class="user-info">Welcome, <%= user.name %>!</li>
                 <li><a href="/courses-owned">My courses |</a></li>
-                <li><a href="/logout">Logout</a></li>
+                <li><a href="/api/logout">Logout</a></li>
             <% } else { %>
-                <li><a href="/login">Login</a></li>
-                <li><a href="/signup">Signup</a></li>
+                <li><a href="/api/login">Login</a></li>
+                <li><a href="/api/signup">Signup</a></li>
             <% } %>
         </ul>
     </div>

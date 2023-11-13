@@ -26,7 +26,9 @@ app.use(express.static(path.join(__dirname, "public")));
 // config user upload files
 app.use("/src/uploads", express.static(path.join(__dirname, "uploads")));
 
+
 // db use JSON
+app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 // Use sessions
@@ -40,7 +42,7 @@ app.use(
 
 // Use routes
 app.use(indexRoutes);
-app.use(authRoutes);
+app.use("/api", authRoutes);
 app.use("/api", paymentRoutes);
 app.use(coursesRoutes);
 app.use("/api", employeeRoutes);
