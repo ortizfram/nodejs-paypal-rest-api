@@ -6,7 +6,7 @@ import {
   PAYPAL_API_SECRET,
 } from "../config.js";
 import axios from "axios";
-import { getCourseFromSlugQuery } from "../../db/queries/course.queries.js";
+import { getCourseFromSlugQuery, updateUserEnrolledCoursesQuery } from "../../db/queries/course.queries.js";
 import { pool } from "../db.js";
 
 export const createOrder = async (req, res) => {
@@ -86,11 +86,7 @@ export const captureOrder = async (req, res) => {
 
     if (course && user) {
       // Update the user's enrolledCourses
-      const updatedUser = await User.findByIdAndUpdate(
-        user._id,
-        { $push: { enrolledCourses: course._id } },
-        { new: true }
-      );
+      const [updateResult] = await pool.query(updateUserEnrolledCoursesQuery, [...user.enrolledCourses, course.id], user.id])
 
       return res.redirect(`/course/${courseSlug}/modules`);
     } else {
