@@ -1,6 +1,6 @@
 import { Router } from "express";
 import multer from 'multer';
-import { courseCreate, courseDetail, courseEnroll, courseOverview, coursesList, coursesListOwned } from "../controllers/courses.controller.js";
+import controllers from "../controllers/courses.controller.js";
 
 const router = Router();
 
@@ -10,18 +10,14 @@ const upload = multer({
 });
 
 //------------courseCreate-------------------------
-// GET request for displaying the form
-router.get("/course/create", (req, res) => {
-    res.render("courseCreate");
-});
-// POST request to handle form submission
-router.post('/course/create', upload.single('thumbnail'), courseCreate);
+router.get("/course/create", controllers.getCourseCreate);
+router.post('/course/create', upload.single('thumbnail'), controllers.postCourseCreate);
 //------------  -------------------------
   
-router.get("/courses", coursesList);
-router.get("/courses-owned", coursesListOwned);
-router.get("/course/:slug", courseOverview);
-router.get("/course/:slug/enroll", courseEnroll);
-router.get("/course/:slug/modules", courseDetail);
+router.get("/courses", controllers.coursesList);
+router.get("/courses-owned", controllers.coursesListOwned);
+router.get("/course/:slug", controllers.courseOverview);
+router.get("/course/:slug/enroll", controllers.courseEnroll);
+router.get("/course/:slug/modules", controllers.courseDetail);
 
 export default router;

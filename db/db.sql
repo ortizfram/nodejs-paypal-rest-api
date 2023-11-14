@@ -16,6 +16,23 @@ CREATE TABLE IF NOT EXISTS users (
     PRIMARY KEY(id)
 );
 
+DROP TABLE IF EXISTS users;
+
+CREATE TABLE IF NOT EXISTS courses (
+    id INT NOT NULL AUTO_INCREMENT,
+    title VARCHAR(255) NOT NULL,
+    slug VARCHAR(255) NOT NULL,
+    description TEXT NOT NULL,
+    price DECIMAL(10, 2) NOT NULL,
+    discount DECIMAL(10, 2) DEFAULT 0,
+    active BOOLEAN DEFAULT true,
+    thumbnail VARCHAR(255) DEFAULT NULL,
+    length INT DEFAULT 0,
+    PRIMARY KEY(id),
+    UNIQUE KEY(slug)
+);
+
+
 DESCRIBE employee;
 
 INSERT INTO employee VALUES
