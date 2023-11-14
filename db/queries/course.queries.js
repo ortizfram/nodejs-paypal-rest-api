@@ -15,5 +15,7 @@ export const createCourseTableQuery = `CREATE TABLE IF NOT EXISTS courses (
 
 export const createCourseQuery = `
   INSERT INTO courses (title, slug, description, price, discount, active, thumbnail, length)
-  VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+  VALUES (?, ?, ?, ?, ?, ?, ?, ?);
 `;
+
+export const getCourseFromSlugQuery = `SELECT * FROM courses WHERE slug = ?`;

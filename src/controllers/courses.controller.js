@@ -1,6 +1,5 @@
-import axios from "axios";
+//src/controllers/courses.controller.js
 import slugify from "slugify";
-import { Course } from "../models/course.model.js";
 import { pool } from "../db.js";
 import { createCourseQuery, createCourseTableQuery } from "../../db/queries/course.queries.js";
 
@@ -12,9 +11,10 @@ const postCourseCreate = async (req, res) => {
   try {
     // Query to create course table
     const [result] = await pool.query(createCourseTableQuery);
+    console.log("course table: ", result)
 
     // Course table validation
-    if (result.warningStatus === 0) {//if new
+    if (result && result.warningStatus === 0) {
       console.log("Course table created successfully.");
 
       const {
@@ -39,27 +39,28 @@ const postCourseCreate = async (req, res) => {
       // Get the file path of the uploaded thumbnail
       const thumbnailPath = req.file ? req.file.path : "";
 
-      const newCourse = new Course({
+      // Create an object with column names and values
+      const courseData = {
         title,
-        slug: courseSlug, // Assign the generated or provided slug
+        slug: courseSlug,
         description,
         price,
         discount,
         active,
         thumbnail: thumbnailPath,
         length,
-      });
+      };
 
-      // Query to insert the new course
-      const [rows] = await pool.query(createCourseQuery, [newCourse]);
+      // Insert the new course using the SQL query
+      await pool.query(createCourseQuery, courseData);
+
       console.log("Creating course...");
 
       // Redirect after creating the course
       res.status(201).redirect("/courses");
-    } else if (rows.warningStatus === 1) {
-      res.status(200).send("Course table already exists.");
     } else {
-      res.status(500).send("Error creating course table.");
+      // If result is undefined or doesn't have the expected properties, assume an error
+      res.status(500).send("Error creating course table or result structure unexpected.");
     }
   } catch (error) {
     if (error.code === 11000 && error.keyPattern && error.keyPattern.slug) {
@@ -68,15 +69,10 @@ const postCourseCreate = async (req, res) => {
       res.render("courseCreate", { errorMessage });
     } else {
       // If the error is due to other reasons
-      res
-        .status(500)
-        .json({ message: "Error creating the course", error: error.message });
+      res.status(500).json({ message: "Error creating the course", error: error.message });
     }
   }
 };
-
-
-
 
 const coursesList = async (req, res) => {
   // ♦ Render all courses

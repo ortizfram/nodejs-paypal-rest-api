@@ -1,3 +1,4 @@
+//src/controllers/payment.controller.js
 import {
   HOST,
   PAYPAL_API,
@@ -5,17 +6,18 @@ import {
   PAYPAL_API_SECRET,
 } from "../config.js";
 import axios from "axios";
-import { Course } from "../models/course.model.js";
-// import { users as User } from "../db.js";
+import { getCourseFromSlugQuery } from "../../db/queries/course.queries.js";
+import { pool } from "../db.js";
 
 export const createOrder = async (req, res) => {
   try {
-    // You can receive the courseSlug from the request body or as a parameter
     const courseSlug = req.body.courseSlug; // is being passed the courseSlug in the request input
 
-    // Fetch course details based on the courseSlug
-    const course = await Course.findOne({ slug: courseSlug });
+    // Fetch course details based on the courseSlug using MySQL query
+    const [rows] = await pool.query(getCourseFromSlugQuery, [courseSlug]);
+    const course = rows[0];
 
+    //create order paypal
     const order = {
       intent: "CAPTURE",
       purchase_units: [
@@ -78,8 +80,9 @@ export const captureOrder = async (req, res) => {
     const { courseSlug } = req.query; //is obtained from the successful payment redirect query
     const user = req.session.user;
     
-    // Find the course using the provided courseSlug
-    const course = await Course.findOne({ slug: courseSlug });
+     // Fetch course details based on the courseSlug using MySQL query
+     const [rows] = await pool.query(getCourseFromSlugQuery, [courseSlug]);
+     const course = rows[0];
 
     if (course && user) {
       // Update the user's enrolledCourses
