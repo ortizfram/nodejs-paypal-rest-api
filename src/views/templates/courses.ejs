@@ -20,7 +20,7 @@
         <ul>
             <% courses.forEach(course => { %>
                 <li>
-                    <a href="/course/<%= course.slug %>" target="_blank" >
+                    <a href="/api/course/<%= course.slug %>" target="_blank" >
                         <img src="<%= course.thumbnail %>" alt="<%= course.title %> Image">
                         <h2><%= course.title %></h2>
                         <p>Price: $<%= course.price %></p>

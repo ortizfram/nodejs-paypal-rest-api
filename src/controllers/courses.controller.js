@@ -82,13 +82,11 @@ const postCourseCreate = async (req, res) => {
 };
 
 const coursesList = async (req, res) => {
-  // ♦ Render all courses
-
   try {
     const message = req.query.message;
     const [rows] = await pool.query(getCourseListQuery);
 
-    // map courses fileds and return
+    // map from query courses fields from each course
     const courses = rows.map((course) => {
       return {
         title: course.title,
@@ -101,29 +99,33 @@ const coursesList = async (req, res) => {
 
     const user = req.session.user || null;
 
-    //map user enrolled courses
+    let filteredCourses = courses; // Default to all courses
+
     if (user) {
+      // take enrolledCOurses from user
       const enrolledCourses = user.enrolledCourses || [];
-      const enrolledCourseIds = enrolledCourses.map((courseId) =>
-        courseId.toString()
-      );
 
-      // filter courses not enrolled
-      const availableCourses = courses.filter(
-        (course) => !enrolledCourseIds.includes(course._id.toString())
-      );
+      // if enrolled not empty, map courses Ids
+      if (enrolledCourses.length > 0) { 
+        const enrolledCourseIds = enrolledCourses.map((courseId) =>
+          courseId.toString()
+        );
 
-      // if logged in, render available courses
-      res.render("courses", { courses: availableCourses, user, message });
-    } else {
-      // if not, render all courses
-      res.render("courses", { courses, user: null, message });
+        // filter not enrolled courses
+        filteredCourses = courses.filter(
+          (course) => !enrolledCourseIds.includes(course.id.toString())
+        );
+      }
     }
+
+    // if none enrolled, pass all
+    res.render("courses", { courses: filteredCourses, user, message });
   } catch (error) {
     console.log("Error fetching courses:", error);
     res.redirect("/api/courses?message=Error fetching courses");
   }
 };
+
 
 const coursesListOwned = async (req, res) => {
     // ♦ Same as coursesList view but with my owned courses,
