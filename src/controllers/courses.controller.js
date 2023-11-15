@@ -4,6 +4,7 @@ import { pool } from "../db.js";
 import {
   createCourseQuery,
   createCourseTableQuery,
+  getCourseFromSlugQuery,
   getCourseListQuery,
   tableCheckQuery,
 } from "../../db/queries/course.queries.js";
@@ -125,33 +126,48 @@ const coursesList = async (req, res) => {
 };
 
 const coursesListOwned = async (req, res) => {
-  // ♦ Same as coursesList view but with my owned courses,
-
-  if (!req.session.user) {
-    // login needed
-    // Store the course slug in the query parameters to redirect after login
-    return res.redirect(`/login?redirect=/courses-owned`);
-  }
-
-  try {
-    const message = req.query.message;
-    const user = req.session.user;
-    if (user) {
-      // find sessio user id in db. poplate with enrolledCourses
-      const userDetails = await users
-        .findOne({ _id: user._id })
-        .populate("enrolledCourses")
-        .exec(callback); //.lean()
-      const enrolledCourses = userDetails.enrolledCourses; //array
-
-      res.render("coursesOwned", { courses: enrolledCourses, user, message });
-    } else {
-      res.render("coursesOwned", { courses: [], user, message });
+    // ♦ Same as coursesList view but with my owned courses,
+  
+    try {
+      const message = req.query.message;
+      const [rows] = await pool.query(getCourseListQuery);
+  
+      // map courses fileds and return
+      const courses = rows.map((course) => {
+        return {
+          title: course.title,
+          slug: course.slug,
+          description: course.description,
+          price: course.price,
+          thumbnail: course.thumbnail,
+        };
+      });
+  
+      const user = req.session.user || null;
+  
+      //map user enrolled courses
+      if (user) {
+        const enrolledCourses = user.enrolledCourses || [];
+        const enrolledCourseIds = enrolledCourses.map((courseId) =>
+          courseId.toString()
+        );
+  
+        // filter courses not enrolled
+        const availableCourses = courses.filter(
+          (course) => enrolledCourseIds.includes(course._id.toString())
+        );
+  
+        // if logged in, render available courses
+        res.render("courses", { courses: availableCourses, user, message });
+      } else {
+        // if not, render all courses
+        res.render("courses", { courses, user: null, message });
+      }
+    } catch (error) {
+      console.log("Error fetching courses:", error);
+      res.redirect("/courses?message=Error fetching courses");
     }
-  } catch (error) {
-    res.status(500).send("Error fetching enrolled courses");
-  }
-};
+  };
 
 const courseOverview = async (req, res) => {
   // ♦ View to have a quick look of the course before buying it,
@@ -161,23 +177,38 @@ const courseOverview = async (req, res) => {
     const message = req.query.message; // Retrieve success message from query params authcontroller
     const courseSlug = req.params.slug;
 
-    const course = await Course.findOne({ slug: courseSlug }).lean();
-
+    // Fetch the course using the query
+    const [rows] = await pool.query(getCourseFromSlugQuery, courseSlug);
+    
+    // Check if the course exists
+    const course = rows[0];
     if (!course) {
       return res.status(404).send("Course not found");
     }
 
     // Check if the user is logged in and has enrolledCourses before proceeding
     if (user && user.enrolledCourses) {
-      const isEnrolled = user.enrolledCourses.includes(course._id.toString());
+      const isEnrolled = user.enrolledCourses.includes(course.id.toString());
 
       if (isEnrolled) {
         return res.redirect(`/course/${courseSlug}/modules`);
       }
     }
 
+    // Structure the course data to pass to the view
+    const courseData = {
+      title: course.title,
+      slug: course.slug,
+      description: course.description,
+      price: course.price,
+      discount: course.discount,
+      active: course.active,
+      thumbnail: course.thumbnail,
+      length: course.length,
+    };
+
     // Render the course overview page if not enrolled
-    res.render("courseOverview", { course, user, message });
+    res.render("courseOverview", { course: courseData, user, message });
   } catch (error) {
     console.error("Error fetching the course:", error);
     res.status(500).send("Error fetching the course");
