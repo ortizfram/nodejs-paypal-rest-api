@@ -1,7 +1,7 @@
 //src/controllers/courses.controller.js
 import slugify from "slugify";
 import { pool } from "../db.js";
-import { createCourseQuery, createCourseTableQuery } from "../../db/queries/course.queries.js";
+import { createCourseQuery, createCourseTableQuery, tableCheckQuery } from "../../db/queries/course.queries.js";
 
 const getCourseCreate = async (req, res) => {
   res.render("courseCreate");
@@ -9,59 +9,58 @@ const getCourseCreate = async (req, res) => {
 
 const postCourseCreate = async (req, res) => {
   try {
-    // Query to create course table
-    const [result] = await pool.query(createCourseTableQuery);
-    console.log("course table: ", result)
+    // Check if the table exists
+    const [tableCheck] = await pool.query(tableCheckQuery, 'courses');
 
-    // Course table validation
-    if (result && result.warningStatus === 0) {
-      console.log("Course table created successfully.");
-
-      const {
-        title,
-        slug,
-        description,
-        price,
-        discount,
-        active,
-        thumbnail,
-        length,
-      } = req.body;
-
-      // Set courseSlug as the provided slug, if any
-      let courseSlug = slug;
-
-      // If no slug is provided, generate it from the name
-      if (!courseSlug) {
-        courseSlug = slugify(title, { lower: true, strict: true }); // Generate the slug from the name
-      }
-
-      // Get the file path of the uploaded thumbnail
-      const thumbnailPath = req.file ? req.file.path : "";
-
-      // Create an object with column names and values
-      const courseData = {
-        title,
-        slug: courseSlug,
-        description,
-        price,
-        discount,
-        active,
-        thumbnail: thumbnailPath,
-        length,
-      };
-
-      // Insert the new course using the SQL query
-      await pool.query(createCourseQuery, courseData);
-
-      console.log("Creating course...");
-
-      // Redirect after creating the course
-      res.status(201).redirect("/courses");
+    if (tableCheck.length === 0) {
+      // Table doesn't exist, create it
+      const [createTableResult] = await pool.query(createCourseTableQuery);
+      console.log("course table created: ", createTableResult);
     } else {
-      // If result is undefined or doesn't have the expected properties, assume an error
-      res.status(500).send("Error creating course table or result structure unexpected.");
+      console.log("Course table already exists.");
     }
+
+    const {
+      title,
+      slug,
+      description,
+      price,
+      discount,
+      active,
+      thumbnail,
+      length,
+    } = req.body;
+
+    // Set courseSlug as the provided slug, if any
+    let courseSlug = slug;
+
+    // If no slug is provided, generate it from the name
+    if (!courseSlug) {
+      courseSlug = slugify(title, { lower: true, strict: true }); // Generate the slug from the name
+    }
+
+    // Get the file path of the uploaded thumbnail
+    const thumbnailPath = req.file ? req.file.path : "";
+
+    // Create an object with column names and values
+    const courseData = [
+      title,
+      courseSlug,
+      description,
+      price,
+      discount,
+      active === 'true' ? true : false, // Convert 'true' string to boolean,
+      thumbnailPath,
+      length,
+    ];
+
+    // Insert the new course using the SQL query
+    await pool.query(createCourseQuery, courseData);
+
+    console.log("Creating course...");
+
+    // Redirect after creating the course
+    res.status(201).redirect("/courses");
   } catch (error) {
     if (error.code === 11000 && error.keyPattern && error.keyPattern.slug) {
       // If the error is due to the unique constraint on the slug field
@@ -73,6 +72,7 @@ const postCourseCreate = async (req, res) => {
     }
   }
 };
+
 
 const coursesList = async (req, res) => {
   // ♦ Render all courses

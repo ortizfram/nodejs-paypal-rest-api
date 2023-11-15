@@ -18,6 +18,9 @@ export const createCourseQuery = `
   VALUES (?, ?, ?, ?, ?, ?, ?, ?);
 `;
 
+export const tableCheckQuery = `SELECT 1 FROM information_schema.tables 
+WHERE table_name = ? LIMIT 1;`;
+
 export const getCourseFromSlugQuery = `SELECT * FROM courses WHERE slug = ?`;
 
 export const updateUserEnrolledCoursesQuery = `UPDATE users SET enrolledCourses = ? WHERE id = ?`; 

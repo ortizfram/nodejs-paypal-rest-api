@@ -86,7 +86,7 @@ export const captureOrder = async (req, res) => {
 
     if (course && user) {
       // Update the user's enrolledCourses
-      const [updateResult] = await pool.query(updateUserEnrolledCoursesQuery, [...user.enrolledCourses, course.id], user.id])
+      const [updateResult] = await pool.query(updateUserEnrolledCoursesQuery, [...user.enrolledCourses, course.id], user.id)
 
       return res.redirect(`/course/${courseSlug}/modules`);
     } else {
