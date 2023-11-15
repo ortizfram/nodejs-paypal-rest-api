@@ -86,7 +86,7 @@ const coursesList = async (req, res) => {
     const message = req.query.message;
     const [rows] = await pool.query(getCourseListQuery);
 
-    // map from query courses fields from each course
+    // Map from query courses fields for each course
     const courses = rows.map((course) => {
       return {
         title: course.title,
@@ -99,33 +99,18 @@ const coursesList = async (req, res) => {
 
     const user = req.session.user || null;
 
-    let filteredCourses = courses; // Default to all courses
-
+    // If user is logged in, render all courses
     if (user) {
-      // take enrolledCOurses from user
-      const enrolledCourses = user.enrolledCourses || [];
-
-      // if enrolled not empty, map courses Ids
-      if (enrolledCourses.length > 0) { 
-        const enrolledCourseIds = enrolledCourses.map((courseId) =>
-          courseId.toString()
-        );
-
-        // filter not enrolled courses
-        filteredCourses = courses.filter(
-          (course) => !enrolledCourseIds.includes(course.id.toString())
-        );
-      }
+      res.render("courses", { courses, user, message });
+    } else {
+      // If not logged in, render all courses
+      res.render("courses", { courses, user: null, message });
     }
-
-    // if none enrolled, pass all
-    res.render("courses", { courses: filteredCourses, user, message });
   } catch (error) {
     console.log("Error fetching courses:", error);
     res.redirect("/api/courses?message=Error fetching courses");
   }
 };
-
 
 const coursesListOwned = async (req, res) => {
     // ♦ Same as coursesList view but with my owned courses,
@@ -230,9 +215,21 @@ const courseEnroll = async (req, res) => {
   }
 
   try {
-    const course = await Course.findOne({ slug: courseSlug }).lean();
+    const course = await pool.query(getCourseFromSlugQuery, courseSlug)
 
     if (course) {
+
+      const courseData = {
+        title: course.title,
+        slug: course.slug,
+        description: course.description,
+        price: course.price,
+        discount: course.discount,
+        active: course.active,
+        thumbnail: course.thumbnail,
+        length: course.length,
+      };
+      
       res.render("courseEnroll", { course });
     } else {
       res.status(404).send("Course not found");

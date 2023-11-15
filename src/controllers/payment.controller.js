@@ -13,9 +13,13 @@ export const createOrder = async (req, res) => {
   try {
     const courseSlug = req.body.courseSlug; // is being passed the courseSlug in the request input
 
+    console.log("SQL Query:", getCourseFromSlugQuery);
+    console.log("Parameters:", [courseSlug]);
     // Fetch course details based on the courseSlug using MySQL query
-    const [rows] = await pool.query(getCourseFromSlugQuery, [courseSlug]);
+    const [rows] = await pool.query(getCourseFromSlugQuery, courseSlug);
     const course = rows[0];
+
+    console.log("Fetched Course Details:", course);
 
     //create order paypal
     const order = {
@@ -71,7 +75,7 @@ export const createOrder = async (req, res) => {
     res.redirect(approveLink);
   } catch (error) {
     console.error("Error creating order:", error);
-    res.status(500).json({ message: "Error creating the order" });
+    res.status(500).json({ message: "Error creating the order", error: error.message });
   }
 };
 
