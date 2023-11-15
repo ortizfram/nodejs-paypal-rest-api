@@ -25,4 +25,4 @@ export const getCourseFromSlugQuery = `SELECT * FROM courses WHERE slug = ?`;
 
 export const getCourseListQuery = `SELECT * FROM courses`;
 
-export const updateUserEnrolledCoursesQuery = `UPDATE users SET enrolledCourses = ? WHERE id = ?`; 
+export const updateUserEnrolledCoursesQuery = `UPDATE users SET enrolled_courses = ? WHERE id = ?`;

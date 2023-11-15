@@ -36,8 +36,8 @@ export const createOrder = async (req, res) => {
         brand_name: "Mi tienda",
         landing_page: "NO_PREFERENCE",
         user_action: "PAY_NOW",
-        return_url: `${HOST}/course/${courseSlug}/modules`, // Include course slug in the return URL
-        cancel_url: `${HOST}/cancel-order`,
+        return_url: `${HOST}/api/course/${courseSlug}/modules`, // Include course slug in the return URL
+        cancel_url: `${HOST}/api/cancel-order`,
       },
     };
 
@@ -92,7 +92,7 @@ export const captureOrder = async (req, res) => {
       // Update the user's enrolledCourses
       const [updateResult] = await pool.query(updateUserEnrolledCoursesQuery, [...user.enrolledCourses, course.id], user.id)
 
-      return res.redirect(`/course/${courseSlug}/modules`);
+      return res.redirect(`/api/course/${courseSlug}/modules`);
     } else {
       return res.status(404).send("Course or user not found");
     }

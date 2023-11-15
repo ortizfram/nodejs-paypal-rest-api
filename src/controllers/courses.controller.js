@@ -7,6 +7,7 @@ import {
   getCourseFromSlugQuery,
   getCourseListQuery,
   tableCheckQuery,
+  updateUserEnrolledCoursesQuery,
 } from "../../db/queries/course.queries.js";
 
 const getCourseCreate = async (req, res) => {
@@ -246,16 +247,14 @@ const courseDetail = async (req, res) => {
   const message = req.query.message; // Retrieve success message from query params authcontroller
 
   try {
-    const course = await Course.findOne({ slug: courseSlug }).lean();
+    const [rows] = await pool.query(getCourseFromSlugQuery, courseSlug)
+    const course = rows[0]
 
     if (course) {
       // Fetch the enrolled courses for the current user
       if (user) {
-        const userDetails = await users
-          .findOne({ _id: user._id })
-          .populate("enrolledCourses")
-          .lean();
-        const enrolledCourses = userDetails.enrolledCourses;
+        const [rows] = await pool.query(updateUserEnrolledCoursesQuery, [user.id])
+        const enrolledCourses = rows[0].enrolled_courses || [];
 
         res.render("courseDetail", { course, message, user, enrolledCourses });
       } else {
