@@ -66,7 +66,7 @@ const postCourseCreate = async (req, res) => {
     console.log("Creating course...");
 
     // Redirect after creating the course
-    res.status(201).redirect("/courses");
+    res.status(201).redirect("/api/courses");
   } catch (error) {
     if (error.code === 11000 && error.keyPattern && error.keyPattern.slug) {
       // If the error is due to the unique constraint on the slug field
@@ -121,7 +121,7 @@ const coursesList = async (req, res) => {
     }
   } catch (error) {
     console.log("Error fetching courses:", error);
-    res.redirect("/courses?message=Error fetching courses");
+    res.redirect("/api/courses?message=Error fetching courses");
   }
 };
 
@@ -165,7 +165,7 @@ const coursesListOwned = async (req, res) => {
       }
     } catch (error) {
       console.log("Error fetching courses:", error);
-      res.redirect("/courses?message=Error fetching courses");
+      res.redirect("/api/courses?message=Error fetching courses");
     }
   };
 
@@ -224,7 +224,7 @@ const courseEnroll = async (req, res) => {
 
   if (!req.session.user) {
     // Store the course slug in the query parameters to redirect after login
-    return res.redirect(`/login?redirect=/course/${courseSlug}/enroll`);
+    return res.redirect(`/api/login?redirect=/course/${courseSlug}/enroll`);
   }
 
   try {

@@ -44,7 +44,7 @@ app.use(
 app.use(indexRoutes);
 app.use("/api", authRoutes);
 app.use("/api", paymentRoutes);
-app.use(coursesRoutes);
+app.use("/api", coursesRoutes);
 app.use("/api", employeeRoutes);
 
 // app middleware for 404
