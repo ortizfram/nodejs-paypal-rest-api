@@ -203,9 +203,6 @@ const courseOverview = async (req, res) => {
 };
 
 const courseEnroll = async (req, res) => {
-  // ♦ This is just a view to send to createOrder,
-  // ♦ rendering course information
-
   // Fetch the course slug from the request
   const courseSlug = req.params.slug;
 
@@ -215,10 +212,10 @@ const courseEnroll = async (req, res) => {
   }
 
   try {
-    const course = await pool.query(getCourseFromSlugQuery, courseSlug)
+    const [rows] = await pool.query(getCourseFromSlugQuery, courseSlug);
+    const course = rows[0];
 
     if (course) {
-
       const courseData = {
         title: course.title,
         slug: course.slug,
@@ -229,8 +226,8 @@ const courseEnroll = async (req, res) => {
         thumbnail: course.thumbnail,
         length: course.length,
       };
-      
-      res.render("courseEnroll", { course });
+
+      res.render("courseEnroll", { course: courseData }); // Pass the courseData object
     } else {
       res.status(404).send("Course not found");
     }
