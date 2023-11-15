@@ -1,7 +1,12 @@
 //src/controllers/courses.controller.js
 import slugify from "slugify";
 import { pool } from "../db.js";
-import { createCourseQuery, createCourseTableQuery, tableCheckQuery } from "../../db/queries/course.queries.js";
+import {
+  createCourseQuery,
+  createCourseTableQuery,
+  getCourseListQuery,
+  tableCheckQuery,
+} from "../../db/queries/course.queries.js";
 
 const getCourseCreate = async (req, res) => {
   res.render("courseCreate");
@@ -10,7 +15,7 @@ const getCourseCreate = async (req, res) => {
 const postCourseCreate = async (req, res) => {
   try {
     // Check if the table exists
-    const [tableCheck] = await pool.query(tableCheckQuery, 'courses');
+    const [tableCheck] = await pool.query(tableCheckQuery, "courses");
 
     if (tableCheck.length === 0) {
       // Table doesn't exist, create it
@@ -49,7 +54,7 @@ const postCourseCreate = async (req, res) => {
       description,
       price,
       discount,
-      active === 'true' ? true : false, // Convert 'true' string to boolean,
+      active === "true" ? true : false, // Convert 'true' string to boolean,
       thumbnailPath,
       length,
     ];
@@ -68,37 +73,53 @@ const postCourseCreate = async (req, res) => {
       res.render("courseCreate", { errorMessage });
     } else {
       // If the error is due to other reasons
-      res.status(500).json({ message: "Error creating the course", error: error.message });
+      res
+        .status(500)
+        .json({ message: "Error creating the course", error: error.message });
     }
   }
 };
-
 
 const coursesList = async (req, res) => {
   // ♦ Render all courses
 
   try {
-    const message = req.query.message; // Retrieve success message from query params authcontroller
-    const courses = await Course.find().lean();
-    const user = req.session.user || null; // Get the user from the session or set to null if not logged in
+    const message = req.query.message;
+    const [rows] = await pool.query(getCourseListQuery);
 
+    // map courses fileds and return
+    const courses = rows.map((course) => {
+      return {
+        title: course.title,
+        slug: course.slug,
+        description: course.description,
+        price: course.price,
+        thumbnail: course.thumbnail,
+      };
+    });
+
+    const user = req.session.user || null;
+
+    //map user enrolled courses
     if (user) {
-      // Check if the user has enrolled courses before trying to access them
       const enrolledCourses = user.enrolledCourses || [];
       const enrolledCourseIds = enrolledCourses.map((courseId) =>
         courseId.toString()
       );
 
+      // filter courses not enrolled
       const availableCourses = courses.filter(
         (course) => !enrolledCourseIds.includes(course._id.toString())
       );
 
+      // if logged in, render available courses
       res.render("courses", { courses: availableCourses, user, message });
     } else {
-      // If user is not logged in, display all available courses
-      res.render("courses", { courses, user: null, message }); // Pass user as null
+      // if not, render all courses
+      res.render("courses", { courses, user: null, message });
     }
   } catch (error) {
+    console.log("Error fetching courses:", error);
     res.redirect("/courses?message=Error fetching courses");
   }
 };

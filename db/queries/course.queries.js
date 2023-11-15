@@ -23,4 +23,6 @@ WHERE table_name = ? LIMIT 1;`;
 
 export const getCourseFromSlugQuery = `SELECT * FROM courses WHERE slug = ?`;
 
+export const getCourseListQuery = `SELECT * FROM courses`;
+
 export const updateUserEnrolledCoursesQuery = `UPDATE users SET enrolledCourses = ? WHERE id = ?`; 
