@@ -83,7 +83,7 @@ const postCourseCreate = async (req, res) => {
 };
 
 const coursesList = async (req, res) => {
-  console.log("\n*** coursesList\n")
+  console.log("\n*** coursesList\n");
   try {
     const message = req.query.message;
     const [rows] = await pool.query(getCourseListQuery);
@@ -115,52 +115,52 @@ const coursesList = async (req, res) => {
 };
 
 const coursesListOwned = async (req, res) => {
-  console.log("\n*** courseListOwned\n")
-    // ♦ Same as coursesList view but with my owned courses,
-  
-    try {
-      const message = req.query.message;
-      const [rows] = await pool.query(getCourseListQuery);
-  
-      // map courses fileds and return
-      const courses = rows.map((course) => {
-        return {
-          title: course.title,
-          slug: course.slug,
-          description: course.description,
-          price: course.price,
-          thumbnail: course.thumbnail,
-        };
-      });
-  
-      const user = req.session.user || null;
-  
-      //map user enrolled courses
-      if (user) {
-        const enrolledCourses = user.enrolledCourses || [];
-        const enrolledCourseIds = enrolledCourses.map((courseId) =>
-          courseId.toString()
-        );
-  
-        // filter courses not enrolled
-        const availableCourses = courses.filter(
-          (course) => enrolledCourseIds.includes(course._id.toString())
-        );
-  
-        // if logged in, render available courses
-        res.render("courses", { courses: availableCourses, user, message });
-      } else {
-        // if not, render all courses
-        res.render("courses", { courses, user: null, message });
-      }
-    } catch (error) {
-      console.log("Error fetching courses:", error);
-      res.redirect("/api/courses?message=Error fetching courses");
+  console.log("\n*** courseListOwned\n");
+  // ♦ Same as coursesList view but with my owned courses,
+
+  try {
+    const message = req.query.message;
+    const [rows] = await pool.query(getCourseListQuery);
+
+    // map courses fileds and return
+    const courses = rows.map((course) => {
+      return {
+        title: course.title,
+        slug: course.slug,
+        description: course.description,
+        price: course.price,
+        thumbnail: course.thumbnail,
+      };
+    });
+
+    const user = req.session.user || null;
+
+    //map user enrolled courses
+    if (user) {
+      const enrolledCourses = user.enrolledCourses || [];
+      const enrolledCourseIds = enrolledCourses.map((courseId) =>
+        courseId.toString()
+      );
+
+      // filter courses not enrolled
+      const availableCourses = courses.filter((course) =>
+        enrolledCourseIds.includes(course._id.toString())
+      );
+
+      // if logged in, render available courses
+      res.render("courses", { courses: availableCourses, user, message });
+    } else {
+      // if not, render all courses
+      res.render("courses", { courses, user: null, message });
     }
-  };
+  } catch (error) {
+    console.log("Error fetching courses:", error);
+    res.redirect("/api/courses?message=Error fetching courses");
+  }
+};
 
 const courseOverview = async (req, res) => {
-  console.log("\n*** courseOverview\n")
+  console.log("\n*** courseOverview\n");
   // ♦ View to have a quick look of the course before buying it,
 
   try {
@@ -170,7 +170,7 @@ const courseOverview = async (req, res) => {
 
     // Fetch the course using the query
     const [rows] = await pool.query(getCourseFromSlugQuery, courseSlug);
-    
+
     // Check if the course exists
     const course = rows[0];
     if (!course) {
@@ -207,7 +207,7 @@ const courseOverview = async (req, res) => {
 };
 
 const courseEnroll = async (req, res) => {
-  console.log("\n***courseEnroll\n")
+  console.log("\n***courseEnroll\n");
   // Fetch the course slug from the request
   const courseSlug = req.params.slug;
 
@@ -242,7 +242,7 @@ const courseEnroll = async (req, res) => {
 };
 
 const courseDetail = async (req, res) => {
-  console.log("\n*** courseDetail\n")
+  console.log("\n*** courseDetail\n");
   // ♦ View that renders x bought course ,
   // ♦ it has course modules, videos and content
 
@@ -252,30 +252,27 @@ const courseDetail = async (req, res) => {
   const message = req.query.message; // Retrieve success message from query params authcontroller
 
   try {
-    console.log('Course Slug:', courseSlug);
-    const [courseRows] = await pool.query(getCourseFromSlugQuery, courseSlug)
-    const course = courseRows[0]
-    console.log('Course Rows:', course);
+    console.log("\nCourse Slug:", courseSlug);
+    const [courseRows] = await pool.query(getCourseFromSlugQuery, courseSlug);
+    const course = courseRows[0];
+    console.log("\nFetched course:", course);
 
-    if (course) {
-      // Fetch the enrolled courses for the current user
-      if (user) {
-        const [rows] = await pool.query(getUserEnrolledCoursesQuery, [user.id])
-        const enrolledCourses = rows[0].enrolled_courses || [];
-
-        res.render("courseDetail", { course, message, user, enrolledCourses });
-      } else {
-        res.render("courseDetail", {
-          course,
-          message,
-          user,
-          enrolledCourses: [],
-        });
-      }
-    } else {
-      res.status(404).send("Course not found");
+    if (!course) {
+      return res.status(404).send("Course not found");
     }
+
+    // Fetch the enrolled courses for the current user
+    let enrolledCourses = [];
+    if (user) {
+      const [enrolledRows] = await pool.query(getUserEnrolledCoursesQuery, [
+        user.id,
+      ]);
+      enrolledCourses = enrolledRows[0]?.enrolled_courses || [];
+    }
+
+    res.render("courseDetail", { course, message, user, enrolledCourses });
   } catch (error) {
+    console.error("Error fetching the course:", error);
     res.status(500).send("Error fetching the course");
   }
 };
