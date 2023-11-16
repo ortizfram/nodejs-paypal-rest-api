@@ -96,40 +96,35 @@ const coursesList = async (req, res) => {
         description: course.description,
         price: course.price,
         thumbnail: course.thumbnail,
+        id: course.id.toString(), // Ensure ID is converted to string for comparison
       };
     });
 
     const user = req.session.user || null;
 
+    // Fetch enrolled courses for the user
+    let enrolledCourseIds = [];
     // If user is logged in, render all courses
     if (user) {
       // Fetch enrolled courses for the user to later exclude them from default Courses view
-      const [enrolledCoursesRows] = await pool.query(
-        getUserEnrolledCoursesQuery,
-        [user.id]
+      const [enrolledCoursesRows] = await pool.query(getUserEnrolledCoursesQuery,[user.id]); //get from query
+      enrolledCourseIds = enrolledCoursesRows.map((enrolledCourse) => enrolledCourse.course_id.toString()); // extract enrolled [str(course_id)]
+
+      
+      // Filter out enrolled courses from the default courses view
+      const availableCourses = courses.filter(
+        (course) => !enrolledCourseIds.includes(course.id)
       );
 
       // if user enrolled sm course
-      if (enrolledCoursesRows.length > 0) {
-        // Extract course IDs from enrolledCoursesRows
-        const enrolledCourseIds = enrolledCoursesRows.map(
-          (enrolledCourse) => enrolledCourse.course_id
-        );
-
-        // Filter out enrolled courses from the default courses view
-        const availableCourses = courses.filter(
-          (course) => !enrolledCourseIds.includes(course.id)
-        );
-
+      if (availableCourses.length > 0) {
+        // Render available courses for the user
         res.render("courses", { courses: availableCourses, user, message });
       } else {
-        // If enrolled = none, render all courses
-        res.render("courses", { courses, user, message });
+        // If enrolled = none, []
+        res.render("courses", { courses: [], user, message:"You haven't enrolled to any courses yet." });
       }
-    } else {
-      // If not logged in, render all courses
-      res.render("courses", { courses, user: null, message });
-    }
+    } 
   } catch (error) {
     console.log("Error fetching courses:", error);
     res.redirect("/api/courses?message=Error fetching courses");
@@ -165,19 +160,19 @@ const coursesListOwned = async (req, res) => {
         description: course.description,
         price: course.price,
         thumbnail: course.thumbnail,
-        id: course.id.toString(), // Make sure to convert the ID to string for comparison
+        id: course.id.toString(), // Ensure ID is converted to string for comparison
       };
     });
 
-    // Filter out enrolled courses from the available courses
-    const availableCourses = courses.filter(
-      (course) => !enrolledCourseIds.includes(course.id)
+    // Filter out non-enrolled courses
+    const enrolledCourses = courses.filter((course) =>
+      enrolledCourseIds.includes(course.id)
     );
 
     // if enrolled courses
-    if (availableCourses.length > 0) {
+    if (enrolledCourses.length > 0) {
       // if logged in, render available courses
-      res.render("coursesOwned", { courses: availableCourses, user, message });
+      res.render("coursesOwned", { courses: enrolledCourses, user, message });
     } else {
       // if enrolled = NONE, message
       res.render("coursesOwned", {
