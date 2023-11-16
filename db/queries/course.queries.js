@@ -25,4 +25,11 @@ export const getCourseFromSlugQuery = `SELECT * FROM courses WHERE slug = ?`;
 
 export const getCourseListQuery = `SELECT * FROM courses`;
 
-export const updateUserEnrolledCoursesQuery = `UPDATE users SET enrolled_courses = ? WHERE id = ?`;
+// stored as a comma-separated string
+export const insertUserCourseQuery = `INSERT INTO user_courses (user_id, course_id) VALUES (?, ?)`;
+
+export const getUserEnrolledCoursesQuery = `
+  SELECT course_id 
+  FROM user_courses 
+  WHERE user_id = ?;
+`;

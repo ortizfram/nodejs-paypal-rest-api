@@ -6,10 +6,12 @@ import {
   PAYPAL_API_SECRET,
 } from "../config.js";
 import axios from "axios";
-import { getCourseFromSlugQuery, updateUserEnrolledCoursesQuery } from "../../db/queries/course.queries.js";
+import { getCourseFromSlugQuery, insertUserCourseQuery } from "../../db/queries/course.queries.js";
 import { pool } from "../db.js";
+import { createTableUserCourses } from "../../db/queries/auth.queries.js";
 
 export const createOrder = async (req, res) => {
+  console.log("\n*** createOrder\n")
   try {
     const courseSlug = req.body.courseSlug; // is being passed the courseSlug in the request input
 
@@ -67,9 +69,18 @@ export const createOrder = async (req, res) => {
     );
 
     // Log the created order
-    console.log("Created Order:", response.data);
+    console.log("\n--Created Order:", response.data);
+    
+    // create user_courses table
+    const [table] = await pool.query(createTableUserCourses);
+    if (table.warningStatus === 0) {
+      console.log('\n---user_courses table created.\n');
+    } else {
+      console.log('\n---user_courses table already exists.\n');
+    }
 
-    const approveLink = response.data.links[1].href; // paypal pay link
+    // paypal pay link
+    const approveLink = response.data.links[1].href; 
 
     // Redirect the user to the PayPal approval link
     res.redirect(approveLink);
@@ -80,6 +91,7 @@ export const createOrder = async (req, res) => {
 };
 
 export const captureOrder = async (req, res) => {
+  console.log("\n*** captureOrder\n")
   try {
     const { courseSlug } = req.query; //is obtained from the successful payment redirect query
     const user = req.session.user;
@@ -87,10 +99,12 @@ export const captureOrder = async (req, res) => {
      // Fetch course details based on the courseSlug using MySQL query
      const [rows] = await pool.query(getCourseFromSlugQuery, [courseSlug]);
      const course = rows[0];
+     console.log("\n--Fetched Course:", course);
 
     if (course && user) {
-      // Update the user's enrolledCourses
-      const [updateResult] = await pool.query(updateUserEnrolledCoursesQuery, [...user.enrolledCourses, course.id], user.id)
+      // Add the user and course relationship in user_courses table
+      const [insertUserCourse] = await pool.query(insertUserCourseQuery, [user.id, course.id]);
+      console.log("--Inserted into user_courses: ", insertUserCourse);
 
       return res.redirect(`/api/course/${courseSlug}/modules`);
     } else {

@@ -21,6 +21,7 @@ const postLogin = async (req, res) => {
     if (user && (await bcrypt.compare(password, user.password))) {
       req.session.user = user; // Store the user in the session
       res.redirect("/?message=Login successful");
+      console.log("\n*** Logged in\n")
     } else {
       res.send("Wrong password or username");
     }
@@ -60,6 +61,7 @@ const postSignup = async (req, res) => {
 
     // message on redirect
     res.redirect("/?message=Signup successful. Logged in automatically.");
+    console.log("\n*** Signed ip\n")
 
   } catch (error) {
     console.error("Error while saving user:", error);
@@ -75,6 +77,7 @@ const logout = (req, res) => {
     }
     // Redirect the user to the home page after logout
     res.redirect("/?message=Logged out successfully");
+    console.log("\n*** Logged out\n")
   });
 };
 

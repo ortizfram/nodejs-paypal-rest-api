@@ -6,8 +6,8 @@ import {
   createCourseTableQuery,
   getCourseFromSlugQuery,
   getCourseListQuery,
+  getUserEnrolledCoursesQuery,
   tableCheckQuery,
-  updateUserEnrolledCoursesQuery,
 } from "../../db/queries/course.queries.js";
 
 const getCourseCreate = async (req, res) => {
@@ -83,6 +83,7 @@ const postCourseCreate = async (req, res) => {
 };
 
 const coursesList = async (req, res) => {
+  console.log("\n*** coursesList\n")
   try {
     const message = req.query.message;
     const [rows] = await pool.query(getCourseListQuery);
@@ -114,6 +115,7 @@ const coursesList = async (req, res) => {
 };
 
 const coursesListOwned = async (req, res) => {
+  console.log("\n*** courseListOwned\n")
     // ♦ Same as coursesList view but with my owned courses,
   
     try {
@@ -158,6 +160,7 @@ const coursesListOwned = async (req, res) => {
   };
 
 const courseOverview = async (req, res) => {
+  console.log("\n*** courseOverview\n")
   // ♦ View to have a quick look of the course before buying it,
 
   try {
@@ -204,6 +207,7 @@ const courseOverview = async (req, res) => {
 };
 
 const courseEnroll = async (req, res) => {
+  console.log("\n***courseEnroll\n")
   // Fetch the course slug from the request
   const courseSlug = req.params.slug;
 
@@ -238,6 +242,7 @@ const courseEnroll = async (req, res) => {
 };
 
 const courseDetail = async (req, res) => {
+  console.log("\n*** courseDetail\n")
   // ♦ View that renders x bought course ,
   // ♦ it has course modules, videos and content
 
@@ -247,13 +252,15 @@ const courseDetail = async (req, res) => {
   const message = req.query.message; // Retrieve success message from query params authcontroller
 
   try {
-    const [rows] = await pool.query(getCourseFromSlugQuery, courseSlug)
-    const course = rows[0]
+    console.log('Course Slug:', courseSlug);
+    const [courseRows] = await pool.query(getCourseFromSlugQuery, courseSlug)
+    const course = courseRows[0]
+    console.log('Course Rows:', course);
 
     if (course) {
       // Fetch the enrolled courses for the current user
       if (user) {
-        const [rows] = await pool.query(updateUserEnrolledCoursesQuery, [user.id])
+        const [rows] = await pool.query(getUserEnrolledCoursesQuery, [user.id])
         const enrolledCourses = rows[0].enrolled_courses || [];
 
         res.render("courseDetail", { course, message, user, enrolledCourses });
