@@ -133,6 +133,7 @@ const coursesList = async (req, res) => {
   }
 };
 
+
 const coursesListOwned = async (req, res) => {
   console.log("\n*** courseListOwned\n");
   // ♦ Same as coursesList view but with my owned courses,
@@ -179,6 +180,7 @@ const coursesListOwned = async (req, res) => {
       // if enrolled = NONE, message
       res.render("coursesOwned", {
         user,
+        courses: [],
         message: "You haven't enrolled in any courses yet.",
       });
     }
