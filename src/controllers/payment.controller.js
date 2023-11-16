@@ -104,7 +104,9 @@ export const captureOrder = async (req, res) => {
     if (course && user) {
       // Add the user and course relationship in user_courses table
       const [insertUserCourse] = await pool.query(insertUserCourseQuery, [user.id, course.id]);
-      console.log("--Inserted into user_courses: ", insertUserCourse);
+      if (insertUserCourse.affectedRows > 0) {
+        console.log(`👌🏽 --Inserted into user_courses: User ID: ${user.id}, Course ID: ${course.id}`);
+      }
 
       return res.redirect(`/api/course/${courseSlug}/modules`);
     } else {
