@@ -40,6 +40,15 @@ app.use(
   })
 );
 
+// app middleware :for Logged-in needed
+export const LogInNeeded = (req, res, next) => {
+  if (req.session.user) {
+    next();
+  } else {
+    res.redirect('/api/login');
+  }
+};
+
 // Use routes
 app.use(indexRoutes);
 app.use("/api", authRoutes);
