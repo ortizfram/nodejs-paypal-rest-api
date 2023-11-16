@@ -38,7 +38,7 @@ export const createOrder = async (req, res) => {
         brand_name: "Mi tienda",
         landing_page: "NO_PREFERENCE",
         user_action: "PAY_NOW",
-        return_url: `${HOST}/api/course/${courseSlug}/modules`, // Include course slug in the return URL
+        return_url: `${HOST}/api/capture-order?courseSlug=${courseSlug}`, // Include course slug in the return URL
         cancel_url: `${HOST}/api/cancel-order`,
       },
     };
