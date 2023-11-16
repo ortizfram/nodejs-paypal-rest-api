@@ -124,7 +124,9 @@ const coursesList = async (req, res) => {
         // If enrolled = none, []
         res.render("courses", { courses: [], user, message:"You haven't enrolled to any courses yet." });
       }
-    } 
+    } else { // not logged in
+      res.render("courses", { courses: courses , user, message });
+    }
   } catch (error) {
     console.log("Error fetching courses:", error);
     res.redirect("/api/courses?message=Error fetching courses");
