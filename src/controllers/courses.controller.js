@@ -86,10 +86,10 @@ const coursesList = async (req, res) => {
   console.log("\n*** coursesList\n");
   try {
     const message = req.query.message;
-    const [rows] = await pool.query(getCourseListQuery);
+    const [coursesRows] = await pool.query(getCourseListQuery);
 
     // Map from query courses fields for each course
-    const courses = rows.map((course) => {
+    const courses = coursesRows.map((course) => {
       return {
         title: course.title,
         slug: course.slug,
@@ -103,7 +103,29 @@ const coursesList = async (req, res) => {
 
     // If user is logged in, render all courses
     if (user) {
-      res.render("courses", { courses, user, message });
+      // Fetch enrolled courses for the user to later exclude them from default Courses view
+      const [enrolledCoursesRows] = await pool.query(
+        getUserEnrolledCoursesQuery,
+        [user.id]
+      );
+
+      // if user enrolled sm course
+      if (enrolledCoursesRows.length > 0) {
+        // Extract course IDs from enrolledCoursesRows
+        const enrolledCourseIds = enrolledCoursesRows.map(
+          (enrolledCourse) => enrolledCourse.course_id
+        );
+
+        // Filter out enrolled courses from the default courses view
+        const availableCourses = courses.filter(
+          (course) => !enrolledCourseIds.includes(course.id)
+        );
+
+        res.render("courses", { courses: availableCourses, user, message });
+      } else {
+        // If enrolled = none, render all courses
+        res.render("courses", { courses, user, message });
+      }
     } else {
       // If not logged in, render all courses
       res.render("courses", { courses, user: null, message });
@@ -120,9 +142,22 @@ const coursesListOwned = async (req, res) => {
 
   try {
     const message = req.query.message;
-    const [rows] = await pool.query(getCourseListQuery);
 
-    // map courses fileds and return
+    // Fetch the courses that the user has already enrolled in
+    const user = req.session.user || null;
+    let enrolledCourseIds = [];
+    if (user) {
+      const [enrolledCoursesRows] = await pool.query(
+        getUserEnrolledCoursesQuery,
+        [user.id]
+      );
+      enrolledCourseIds = enrolledCoursesRows.map((enrolledCourse) =>
+        enrolledCourse.course_id.toString()
+      );
+    }
+
+    // Fetch all courses
+    const [rows] = await pool.query(getCourseListQuery);
     const courses = rows.map((course) => {
       return {
         title: course.title,
@@ -130,28 +165,25 @@ const coursesListOwned = async (req, res) => {
         description: course.description,
         price: course.price,
         thumbnail: course.thumbnail,
+        id: course.id.toString(), // Make sure to convert the ID to string for comparison
       };
     });
 
-    const user = req.session.user || null;
+    // Filter out enrolled courses from the available courses
+    const availableCourses = courses.filter(
+      (course) => !enrolledCourseIds.includes(course.id)
+    );
 
-    //map user enrolled courses
-    if (user) {
-      const enrolledCourses = user.enrolledCourses || [];
-      const enrolledCourseIds = enrolledCourses.map((courseId) =>
-        courseId.toString()
-      );
-
-      // filter courses not enrolled
-      const availableCourses = courses.filter((course) =>
-        enrolledCourseIds.includes(course._id.toString())
-      );
-
+    // if enrolled courses
+    if (availableCourses.length > 0) {
       // if logged in, render available courses
-      res.render("courses", { courses: availableCourses, user, message });
+      res.render("coursesOwned", { courses: availableCourses, user, message });
     } else {
-      // if not, render all courses
-      res.render("courses", { courses, user: null, message });
+      // if enrolled = NONE, message
+      res.render("coursesOwned", {
+        user,
+        message: "You haven't enrolled in any courses yet.",
+      });
     }
   } catch (error) {
     console.log("Error fetching courses:", error);
