@@ -33,10 +33,16 @@
         <!--course enroll-->
         <h2>Total Amount: $<%= course.price %></h2>
         <!-- The form to trigger the payment -->
-        <form action="/api/create-order" method="POST">
+        <form action="/api/create-order-paypal" method="POST">
             <!-- Hidden input to pass the course slug to the server -->
             <input type="hidden" name="courseSlug" value="<%= course.slug %>">
-            <button type="submit">Pay Now</button>
+            <button type="submit">Continue with Paypal</button>
+        </form>
+        <br>
+        <form action="/api/create-order-mp" method="POST">
+            <!-- Hidden input to pass the course slug to the server -->
+            <input type="hidden" name="courseSlug" value="<%= course.slug %>">
+            <button type="submit">Continue with Mercado Pago</button>
         </form>
     </div>
 </body>

@@ -10,8 +10,9 @@ import { getCourseFromSlugQuery, insertUserCourseQuery } from "../../db/queries/
 import { pool } from "../db.js";
 import { createTableUserCourses } from "../../db/queries/auth.queries.js";
 
-export const createOrder = async (req, res) => {
-  console.log("\n*** createOrder\n")
+// PAYPAL ---------------------------------------------------
+export const createOrderPaypal = async (req, res) => {
+  console.log("\n*** createOrderPaypal\n")
   try {
     const courseSlug = req.body.courseSlug; // is being passed the courseSlug in the request input
 
@@ -38,8 +39,8 @@ export const createOrder = async (req, res) => {
         brand_name: "Mi tienda",
         landing_page: "NO_PREFERENCE",
         user_action: "PAY_NOW",
-        return_url: `${HOST}/api/capture-order?courseSlug=${courseSlug}`, // Include course slug in the return URL
-        cancel_url: `${HOST}/api/cancel-order`,
+        return_url: `${HOST}/api/capture-order-paypal?courseSlug=${courseSlug}`, // Include course slug in the return URL
+        cancel_url: `${HOST}/api/cancel-order-paypal`,
       },
     };
 
@@ -90,8 +91,8 @@ export const createOrder = async (req, res) => {
   }
 };
 
-export const captureOrder = async (req, res) => {
-  console.log("\n*** captureOrder\n")
+export const captureOrderPaypal = async (req, res) => {
+  console.log("\n*** captureOrderPaypal\n")
   try {
     const { courseSlug } = req.query; //is obtained from the successful payment redirect query
     const user = req.session.user;
@@ -118,4 +119,16 @@ export const captureOrder = async (req, res) => {
   }
 };
 
-export const cancelPayment = (req, res) => res.redirect("/");
+export const cancelPaymentPaypal = (req, res) => res.redirect("/");
+
+// Mercado Pago ---------------------------------------------------
+export const createOrderMP = async(req, res) => {
+  res.send("\n*** Creating MP order...\n")
+}
+export const successMP = async(req, res) => {
+  res.send("\n*** Success MP...\n")
+}
+export const webhookMP = async(req, res) => {
+  res.send("\n*** Webhook MP...\n")
+}
+

@@ -8,6 +8,7 @@ import paymentRoutes from "./routes/payment.routes.js";
 import employeeRoutes from "./routes/employee.routes.js";
 import coursesRoutes from "./routes/courses.routes.js";
 import indexRoutes from "./routes/index.routes.js";
+import morgan from "morgan";
 
 const app = express();
 
@@ -30,6 +31,9 @@ app.use("/src/uploads", express.static(path.join(__dirname, "uploads")));
 // db use JSON
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+
+// Use morgan to see requests in console
+app.use(morgan('dev'));
 
 // Use sessions
 app.use(
