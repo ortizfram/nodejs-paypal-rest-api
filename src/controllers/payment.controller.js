@@ -141,7 +141,8 @@ export const createOrderMP = async (req, res) => {
   // Check if the course exists
   const course = rows[0];
 
-  console.log(`\nFetched Course Details: ${course}\n`);
+  console.log(`\nFetched Course Details:`);
+  console.log(course)
 
   // Check the type of course.price
   // console.log(`\nType of course.price: ${typeof course.price}\n`);
@@ -167,7 +168,8 @@ export const createOrderMP = async (req, res) => {
   };
     
   const result = await mercadopago.preferences.create(preference)
-  console.log(`\n--- MP preference created:\n${result}\n`);
+  console.log(`\n--- MP preference created:`);
+  console.log(result)
 };
 
 
