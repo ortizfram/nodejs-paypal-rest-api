@@ -9,7 +9,7 @@ import axios from "axios";
 import { getCourseFromSlugQuery, insertUserCourseQuery } from "../../db/queries/course.queries.js";
 import { pool } from "../db.js";
 import { createTableUserCourses } from "../../db/queries/auth.queries.js";
-import { MercadoPagoConfig, Payment } from 'mercadopago';
+import mercadopago from 'mercadopago';
 import { config } from "dotenv";
 
 
@@ -127,32 +127,50 @@ export const captureOrderPaypal = async (req, res) => {
 
 export const cancelPaymentPaypal = (req, res) => res.redirect("/");
 
-// Mercado Pago ---------------------------------------------------
-export const createOrderMP = async(req, res) => {
-  console.log("\n*** Creating MP order...\n")
+// Mercado Pago 1.5.16 ---------------------------------------------------
+export const createOrderMP = async (req, res) => {
+  console.log("\n*** Creating MP order...\n");
 
-  const user = req.session.user || null;
+  // • get course
+  const courseSlug = req.body.courseSlug; // is being passed the courseSlug in the request input
+  console.log(`\nSQL Query: ${getCourseFromSlugQuery}\n`);
+  console.log(`\nParameters: ${[courseSlug]}\n`);
 
-  //step 1: imports  
-  // Step 2: Initialize the client object
-  const client = new MercadoPagoConfig({ accessToken: process.env.MP_SANDBOX_ACCESS_TOKEN, options: { timeout: 5000, idempotencyKey: 'abc' } });
+  // Fetch the course using the query
+  const [rows] = await pool.query(getCourseFromSlugQuery, courseSlug);
+  // Check if the course exists
+  const course = rows[0];
 
-  // Step 3: Initialize the API object
-  const payment = new Payment(client);
+  console.log(`\nFetched Course Details: ${course}\n`);
 
-  // Step 4: Create the request object
-  const body = {
-    transaction_amount: 12.34,
-    description: '<DESCRIPTION>',
-    payment_method_id: 'debit_card',
-    payer: {
-      email: user.email? user.email:'',
-    },
+  // Check the type of course.price
+  // console.log(`\nType of course.price: ${typeof course.price}\n`);
+
+  // Convert course.price to a decimal
+  const priceAsFloat = parseFloat(course.price);
+
+//♣
+
+  mercadopago.configure({
+    access_token: process.env.MP_SANDBOX_ACCESS_TOKEN,
+  });
+  
+  var preference = {
+    items: [
+      {
+        title: course.title,
+        quantity: 1,
+        currency_id: 'ARS',
+        unit_price: priceAsFloat,
+      }
+    ]
   };
-
-  // Step 5: Make the request
-  payment.create({ body }).then(console.log).catch(console.log);
+    
+  const result = await mercadopago.preferences.create(preference)
+  console.log(`\n--- MP preference created:\n${result}\n`);
 };
+
+
 
 export const successMP = async(req, res) => {
   res.send("\n*** Success MP...\n")
