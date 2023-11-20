@@ -22,7 +22,7 @@
         <div>
             <p>Instructor: <%= course.instructor %></p>
             <p>Duration: <%= course.length %></p>
-            <p>Price: $<%= course.price %></p>
+            <p>Price: USD<%= course.usd_price %> | ARS<%= course.ars_price %></p>
         </div>
         <br>
         <p><%= course.description %></p>

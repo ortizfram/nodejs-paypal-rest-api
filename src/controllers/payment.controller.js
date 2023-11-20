@@ -38,7 +38,7 @@ export const createOrderPaypal = async (req, res) => {
         {
           amount: {
             currency_code: "USD",
-            value: course.price, // Use the course price for the order
+            value: course.usd_price, // Use the course price for the order
           },
         },
       ],
@@ -158,7 +158,7 @@ export const createOrderMP = async (req, res) => {
   // console.log(`\nType of course.price: ${typeof course.price}\n`);
 
   // Convert course.price to a decimal
-  const priceAsFloat = parseFloat(course.price);
+  const priceAsFloat = parseFloat(course.ars_price);
 
   //♣
 

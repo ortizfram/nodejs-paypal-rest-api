@@ -4,8 +4,9 @@ export const createCourseTableQuery = `CREATE TABLE IF NOT EXISTS courses (
     title VARCHAR(255) NOT NULL,
     slug VARCHAR(255) NOT NULL,
     description TEXT NOT NULL,
-    price DECIMAL(10, 2) NOT NULL,
-    discount DECIMAL(10, 2) DEFAULT 0,
+    ars_price DECIMAL(10, 2) NOT NULL,
+    usd_price DECIMAL(10, 2) NOT NULL,
+    discount DECIMAL(10, 2) DEFAULT NULL,
     active BOOLEAN DEFAULT true,
     thumbnail VARCHAR(255) DEFAULT NULL,
     length INT DEFAULT 0,
@@ -13,9 +14,10 @@ export const createCourseTableQuery = `CREATE TABLE IF NOT EXISTS courses (
     UNIQUE KEY(slug)
 );`
 
+
 export const createCourseQuery = `
-  INSERT INTO courses (title, slug, description, price, discount, active, thumbnail, length)
-  VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+  INSERT INTO courses (title, slug, description, ars_price, usd_price , discount, active, thumbnail, length)
+  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
 `;
 
 export const tableCheckQuery = `SELECT 1 FROM information_schema.tables 
