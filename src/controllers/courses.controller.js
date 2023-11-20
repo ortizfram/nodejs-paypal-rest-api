@@ -246,6 +246,8 @@ const courseEnroll = async (req, res) => {
     // Store the course slug in the query parameters to redirect after login
     return res.redirect(`/api/login?redirect=/course/${courseSlug}/enroll`);
   }
+  const userId = req.session.user.id;
+
 
   try {
     const [rows] = await pool.query(getCourseFromSlugQuery, courseSlug);
@@ -263,7 +265,7 @@ const courseEnroll = async (req, res) => {
         length: course.length,
       };
 
-      res.render("courseEnroll", { course: courseData }); // Pass the courseData object
+      res.render("courseEnroll", { course: courseData, userId }); // Pass the courseData object
     } else {
       res.status(404).send("Course not found");
     }

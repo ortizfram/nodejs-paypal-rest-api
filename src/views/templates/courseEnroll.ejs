@@ -42,6 +42,7 @@
         <form action="/api/create-order-mp" method="POST">
             <!-- Hidden input to pass the course slug to the server -->
             <input type="hidden" name="courseSlug" value="<%= course.slug %>">
+            <input type="hidden" name="userId" value="<%= userId %>">
             <button type="submit">Continue with Mercado Pago</button>
         </form>
     </div>

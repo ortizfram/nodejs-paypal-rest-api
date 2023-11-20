@@ -141,8 +141,10 @@ export const createOrderMP = async (req, res) => {
 
   // • get course
   const courseSlug = req.body.courseSlug; // is being passed the courseSlug in the request input
+  const userId = req.body.userId; // is being passed the courseSlug in the request input
   console.log(`\nSQL Query: ${getCourseFromSlugQuery}\n`);
   console.log(`\ncourseSlug: ${[courseSlug]}\n`);
+  console.log(`\nuserId: ${[userId]}\n`);
 
   // Fetch the course using the query
   const [rows] = await pool.query(getCourseFromSlugQuery, courseSlug);
@@ -179,7 +181,7 @@ export const createOrderMP = async (req, res) => {
       pending: "http://localhost:3000/api/pending-mp",
     },
     //here we use NGROK till it's deployed
-    notification_url: `https://d2d2-190-15-205-177.ngrok.io/api/webhook-mp?courseSlug=${courseSlug}`,
+    notification_url: `https://51a4-201-251-124-106.ngrok-free.app/api/webhook-mp?courseSlug=${courseSlug}&userId=${userId}`,
   };
 
   const result = await mercadopago.preferences.create(preference);
@@ -200,27 +202,28 @@ export const webhookMP = async (req, res) => {
     const paymentType = req.query.type;
     const paymentId = req.query["data.id"];
     const courseSlug = req.query.courseSlug; // Ensure Mercado Pago sends courseSlug
+    const userId = req.query.userId;
     console.log("courseSlug:", courseSlug);
     console.log("paymentId:", paymentId);
     console.log("paymentType:", paymentType);
+    console.log("userId:", userId);
 
     if (paymentType === "payment" && paymentId && courseSlug) {
-      const user = req.session.user;
 
       // Fetch course details based on the courseSlug using MySQL query
       const [rows] = await pool.query(getCourseFromSlugQuery, [courseSlug]);
       const course = rows[0];
 
-      if (course && user) {
+      if (course && userId) {
         // Add the user and course relationship in user_courses table
         const [insertUserCourse] = await pool.query(insertUserCourseQuery, [
-          user.id,
+          userId,
           course.id,
         ]);
 
         if (insertUserCourse.affectedRows > 0) {
           console.log(
-            `👌🏽 --Inserted into user_courses: User ID: ${user.id}, Course ID: ${course.id}`
+            `\n👌🏽 --Inserted into user_courses: User ID: ${userId}, Course ID: ${course.id}`
           );
         }
       }
