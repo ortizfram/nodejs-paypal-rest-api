@@ -164,7 +164,14 @@ export const createOrderMP = async (req, res) => {
         currency_id: 'ARS',
         unit_price: priceAsFloat,
       }
-    ]
+    ],
+    back_urls: {
+      success: "http://localhost:3000/api/success-mp",
+      failure: "http://localhost:3000/api/failure-mp",
+      pending: "http://localhost:3000/api/pending-mp",
+    },
+    //here we use NGROK till it's deployed
+    notification_url: "https://b9a8-190-15-205-177.ngrok.io/api/webhook-mp",
   };
     
   const result = await mercadopago.preferences.create(preference)
@@ -179,6 +186,8 @@ export const successMP = async(req, res) => {
 }
 
 export const webhookMP = async(req, res) => {
-  res.send("\n*** Webhook MP...\n")
+  console.log("\n\n*** Webhook MP...\n\n")
+
+  console.log(req.query)// ? type: 'payment' && topic: 'merchant_order'
 }
 
