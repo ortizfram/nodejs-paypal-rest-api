@@ -17,7 +17,7 @@ export const createCourseTableQuery = `CREATE TABLE IF NOT EXISTS courses (
 export const updateCourseQuery = `
     UPDATE courses
     SET title = ?, description = ?, ars_price = ?, usd_price = ?, discount = ?, active = ?, thumbnail = ?, length = ?
-    WHERE slug = ?;
+    WHERE id = ?;
 `;
 
 export const createCourseQuery = `
@@ -30,6 +30,7 @@ export const tableCheckQuery = `SELECT 1 FROM information_schema.tables
 WHERE table_name = ? LIMIT 1;`;
 
 export const getCourseFromSlugQuery = `SELECT * FROM courses WHERE slug = ?`;
+export const getCourseFromIdQuery = `SELECT * FROM courses WHERE id = ?`;
 
 export const getCourseListQuery = `SELECT * FROM courses`;
 

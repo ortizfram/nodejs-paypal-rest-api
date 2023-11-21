@@ -4,6 +4,7 @@ import { pool } from "../db.js";
 import {
   createCourseQuery,
   createCourseTableQuery,
+  getCourseFromIdQuery,
   getCourseFromSlugQuery,
   getCourseListQuery,
   getUserEnrolledCoursesQuery,
@@ -49,10 +50,10 @@ const postCourseCreate = async (req, res) => {
     }
 
     // Convert empty string to NULL for discount
-    const discountValue = discount !== '' ? discount : null;
+    const discountValue = discount !== "" ? discount : null;
 
     // Get the file path of the uploaded thumbnail
-    const thumbnailPath = req.file ? req.file.path : '';
+    const thumbnailPath = req.file ? req.file.path : "";
 
     // Create an object with column names and values
     const courseData = [
@@ -62,7 +63,7 @@ const postCourseCreate = async (req, res) => {
       ars_price,
       usd_price,
       discountValue,
-      active === 'true' ? true : false,
+      active === "true" ? true : false,
       thumbnailPath,
       length,
     ];
@@ -89,59 +90,80 @@ const postCourseCreate = async (req, res) => {
 };
 
 // --- UPDATE --------------------------
-const getCourseUpdate  =  async (req, res) => {
-  const courseSlug = req.params.slug;
+const getCourseUpdate = async (req, res) => {
+  const message = req.query.message;
+  const user = req.session.user || null;
+  const courseId = req.params.id;
 
-  try{
-
-    console.log("\nCourse Slug:", courseSlug);
-    const [courseRows] = await pool.query(getCourseFromSlugQuery, courseSlug);
+  try {
+    console.log("\nCourse Id:", courseId);
+    const [courseRows] = await pool.query(getCourseFromIdQuery, courseId);
     const course = courseRows[0];
     console.log("\nFetched course:", course);
 
     if (!course) {
       return res.status(404).send("Course not found");
-    };
-    
-    res.render("courseUpdate", {course});
+    }
+
+    res.render("courseUpdate", { course, message, user });
   } catch (error) {
     console.error("Error fetching the course:", error);
     res.status(500).send("Error fetching the course");
-  };
+  }
 };
 
 const patchCourseUpdate = async (req, res) => {
-  // Fetch the course slug from the request
-  const courseSlug = req.params.slug;
+  const courseId = req.body.course.id; // Assuming the ID is coming from the request body
 
   try {
-      // Retrieve updated course details from the request body
-      const { title, description, ars_price, usd_price, discount, active, thumbnail, length } = req.body;
+    const {
+      title,
+      description,
+      ars_price,
+      usd_price,
+      discount,
+      active,
+      thumbnail,
+      length,
+    } = req.body;
 
-      // Execute the update query
-      await pool.query(updateCourseQuery, [
-          title,
-          description,
-          ars_price,
-          usd_price,
-          discount,
-          active === 'true' ? true : false,
-          thumbnail,
-          length,
-          courseSlug, // Slug used in WHERE clause for update
-      ]);
+    let courseSlug;
 
-      // Fetch the updated course data from the database
-      const [updatedCourseRows] = await pool.query(getCourseFromSlugQuery, courseSlug);
-      const updatedCourse = updatedCourseRows[0];
+    if (!courseSlug) {
+      courseSlug = slugify(title, { lower: true, strict: true });
+    }
 
-      // Render a template with the updated course data
-      res.render("courseDetail", { course: updatedCourse, message:"Course updated correctly" });
+    const discountValue = discount !== "" ? discount : null;
+    const thumbnailPath = req.file ? req.file.path : "";
+
+    const { affectedRows } = await pool.query(updateCourseQuery, [
+      title,
+      courseSlug,
+      description,
+      ars_price,
+      usd_price,
+      discountValue,
+      active === "true" ? true : false,
+      thumbnailPath,
+      length,
+      courseId, // where course.id
+    ]);
+
+    if (affectedRows > 0) {
+      res.redirect(
+        `/api/course/${courseSlug}/modules?message=Course updated correctly`
+      );
+    } else {
+      res.redirect(
+        `/api/course/${courseSlug}/modules?message=No changes detected`
+      );
+    }
   } catch (error) {
-      console.error("Error updating course:", error);
-      res.status(500).json({ message: "Error updating the course" });
+    console.error("Error updating course:", error);
+    res.status(500).json({ message: "Error updating the course" });
   }
 };
+
 // ---  --------------------------
 
 const coursesList = async (req, res) => {
@@ -170,10 +192,14 @@ const coursesList = async (req, res) => {
     // If user is logged in, render all courses
     if (user) {
       // Fetch enrolled courses for the user to later exclude them from default Courses view
-      const [enrolledCoursesRows] = await pool.query(getUserEnrolledCoursesQuery,[user.id]); //get from query
-      enrolledCourseIds = enrolledCoursesRows.map((enrolledCourse) => enrolledCourse.course_id.toString()); // extract enrolled [str(course_id)]
+      const [enrolledCoursesRows] = await pool.query(
+        getUserEnrolledCoursesQuery,
+        [user.id]
+      ); //get from query
+      enrolledCourseIds = enrolledCoursesRows.map((enrolledCourse) =>
+        enrolledCourse.course_id.toString()
+      ); // extract enrolled [str(course_id)]
 
-      
       // Filter out enrolled courses from the default courses view
       const availableCourses = courses.filter(
         (course) => !enrolledCourseIds.includes(course.id)
@@ -185,10 +211,15 @@ const coursesList = async (req, res) => {
         res.render("courses", { courses: availableCourses, user, message });
       } else {
         // If enrolled = none, []
-        res.render("courses", { courses: [], user, message:"You haven't enrolled to any courses yet." });
+        res.render("courses", {
+          courses: [],
+          user,
+          message: "You haven't enrolled to any courses yet.",
+        });
       }
-    } else { // not logged in
-      res.render("courses", { courses: courses , user, message });
+    } else {
+      // not logged in
+      res.render("courses", { courses: courses, user, message });
     }
   } catch (error) {
     console.log("Error fetching courses:", error);
@@ -311,7 +342,6 @@ const courseEnroll = async (req, res) => {
     return res.redirect(`/api/login?redirect=/course/${courseSlug}/enroll`);
   }
   const userId = req.session.user.id;
-
 
   try {
     const [rows] = await pool.query(getCourseFromSlugQuery, courseSlug);
