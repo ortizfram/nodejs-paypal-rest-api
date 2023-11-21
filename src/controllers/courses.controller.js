@@ -5,7 +5,6 @@ import {
   createCourseQuery,
   createCourseTableQuery,
   getCourseFromIdQuery,
-  getCourseFromSlugQuery,
   getCourseListQuery,
   getUserEnrolledCoursesQuery,
   tableCheckQuery,
@@ -113,7 +112,8 @@ const getCourseUpdate = async (req, res) => {
 };
 
 const patchCourseUpdate = async (req, res) => {
-  const courseId = req.body.course.id; // Assuming the ID is coming from the request body
+  const courseId = req.params.id; // Assuming the ID is coming from the request body
+  console.log(`\n--- courseId: ${courseId}\n`);
 
   try {
     const {
@@ -129,7 +129,7 @@ const patchCourseUpdate = async (req, res) => {
 
     let courseSlug;
 
-    if (!courseSlug) {
+    if (typeof title === 'string' && title.trim() !== '') {
       courseSlug = slugify(title, { lower: true, strict: true });
     }
 
@@ -148,14 +148,15 @@ const patchCourseUpdate = async (req, res) => {
       length,
       courseId, // where course.id
     ]);
+    console.log('\n--- Affected Rows:', affectedRows);
 
     if (affectedRows > 0) {
-      res.redirect(
-        `/api/course/${courseSlug}/modules?message=Course updated correctly`
-      );
+      res.status(200).json({ url: 
+        `/api/course/${courseId}/modules?message=Course updated correctly`
+    });
     } else {
       res.redirect(
-        `/api/course/${courseSlug}/modules?message=No changes detected`
+        `/api/course/${courseId}/modules?message=No changes detected`
       );
     }
   } catch (error) {
@@ -291,10 +292,10 @@ const courseOverview = async (req, res) => {
   try {
     const user = req.session.user; // Retrieve the user from the session
     const message = req.query.message; // Retrieve success message from query params authcontroller
-    const courseSlug = req.params.slug;
+    const courseId = req.params.id;
 
     // Fetch the course using the query
-    const [rows] = await pool.query(getCourseFromSlugQuery, courseSlug);
+    const [rows] = await pool.query(getCourseFromIdQuery, courseId);
 
     // Check if the course exists
     const course = rows[0];
@@ -307,7 +308,7 @@ const courseOverview = async (req, res) => {
       const isEnrolled = user.enrolledCourses.includes(course.id.toString());
 
       if (isEnrolled) {
-        return res.redirect(`/course/${courseSlug}/modules`);
+        return res.redirect(`/course/${courseId}/modules`);
       }
     }
 
@@ -335,16 +336,16 @@ const courseOverview = async (req, res) => {
 const courseEnroll = async (req, res) => {
   console.log("\n***courseEnroll\n");
   // Fetch the course slug from the request
-  const courseSlug = req.params.slug;
+  const courseId = req.params.id;
 
   if (!req.session.user) {
     // Store the course slug in the query parameters to redirect after login
-    return res.redirect(`/api/login?redirect=/course/${courseSlug}/enroll`);
+    return res.redirect(`/api/login?redirect=/course/${courseId}/enroll`);
   }
   const userId = req.session.user.id;
 
   try {
-    const [rows] = await pool.query(getCourseFromSlugQuery, courseSlug);
+    const [rows] = await pool.query(getCourseFromIdQuery, courseId);
     const course = rows[0];
 
     if (course) {
@@ -375,13 +376,13 @@ const courseDetail = async (req, res) => {
   // ♦ it has course modules, videos and content
 
   // Fetch the course slug from the request
-  const courseSlug = req.params.slug;
+  const courseId = req.params.id;
   const user = req.session.user || null; // Get the user from the session or set to null if not logged in
   const message = req.query.message; // Retrieve success message from query params authcontroller
 
   try {
-    console.log("\nCourse Slug:", courseSlug);
-    const [courseRows] = await pool.query(getCourseFromSlugQuery, courseSlug);
+    console.log("\nCourseId:", courseId);
+    const [courseRows] = await pool.query(getCourseFromIdQuery, courseId);
     const course = courseRows[0];
     console.log("\nFetched course:", course);
 

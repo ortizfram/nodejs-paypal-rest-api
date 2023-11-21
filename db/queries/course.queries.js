@@ -18,7 +18,9 @@ export const updateCourseQuery = `
     UPDATE courses
     SET title = ?, description = ?, ars_price = ?, usd_price = ?, discount = ?, active = ?, thumbnail = ?, length = ?
     WHERE id = ?;
+    SELECT ROW_COUNT() as affectedRows; -- MySQL specific query to return affected rows
 `;
+
 
 export const createCourseQuery = `
   INSERT INTO courses (title, slug, description, ars_price, usd_price , discount, active, thumbnail, length)

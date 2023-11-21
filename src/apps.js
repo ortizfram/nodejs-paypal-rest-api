@@ -9,8 +9,12 @@ import employeeRoutes from "./routes/employee.routes.js";
 import coursesRoutes from "./routes/courses.routes.js";
 import indexRoutes from "./routes/index.routes.js";
 import morgan from "morgan";
+import methodOverride from "method-override";
 
 const app = express();
+
+// configure methodOverride
+app.use(methodOverride('_method'));
 
 config();// load .ENV
 
