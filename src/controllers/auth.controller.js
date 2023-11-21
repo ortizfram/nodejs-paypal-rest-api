@@ -1,6 +1,7 @@
 import bcrypt from "bcrypt";
 import { pool } from "../db.js";
-import { postSignupQuery, postLoginQuery } from "../../db/queries/auth.queries.js";
+import { postSignupQuery, postLoginQuery, createTableUserCourses } from "../../db/queries/auth.queries.js";
+import { tableCheckQuery } from "../../db/queries/course.queries.js";
 
 //------------login-------------------------
 const getLogin = async (req, res) => {
@@ -22,6 +23,17 @@ const postLogin = async (req, res) => {
       req.session.user = user; // Store the user in the session
       res.redirect("/?message=Login successful");
       console.log("\n*** Logged in\n")
+
+      // Check if the user_courses table exists
+      const [tableCheck] = await pool.query(tableCheckQuery, "user_courses");
+      const tableExists = tableCheck.length > 0;
+
+      if (!tableExists) {
+        // Create user_courses table if it doesn't exist
+        await pool.query(createTableUserCourses);
+        console.log(`\n--- user_courses table created\n`);
+      }
+
     } else {
       res.send("Wrong password or username");
     }

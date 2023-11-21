@@ -47,8 +47,11 @@ const postCourseCreate = async (req, res) => {
       courseSlug = slugify(title, { lower: true, strict: true }); // Generate the slug from the name
     }
 
+    // Convert empty string to NULL for discount
+    const discountValue = discount !== '' ? discount : null;
+
     // Get the file path of the uploaded thumbnail
-    const thumbnailPath = req.file ? req.file.path : "";
+    const thumbnailPath = req.file ? req.file.path : '';
 
     // Create an object with column names and values
     const courseData = [
@@ -57,8 +60,8 @@ const postCourseCreate = async (req, res) => {
       description,
       ars_price,
       usd_price,
-      discount,
-      active === "true" ? true : false, // Convert 'true' string to boolean,
+      discountValue,
+      active === 'true' ? true : false,
       thumbnailPath,
       length,
     ];
@@ -83,6 +86,7 @@ const postCourseCreate = async (req, res) => {
     }
   }
 };
+
 
 const coursesList = async (req, res) => {
   console.log("\n*** coursesList\n");

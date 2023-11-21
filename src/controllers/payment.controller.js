@@ -181,7 +181,7 @@ export const createOrderMP = async (req, res) => {
       pending: "http://localhost:3000/api/pending-mp",
     },
     //here we use NGROK till it's deployed
-    notification_url: `https://51a4-201-251-124-106.ngrok-free.app/api/webhook-mp?courseSlug=${courseSlug}&userId=${userId}`,
+    notification_url: `https://b639-190-15-205-177.ngrok.io/api/webhook-mp?courseSlug=${courseSlug}&userId=${userId}`,
   };
 
   const result = await mercadopago.preferences.create(preference);
