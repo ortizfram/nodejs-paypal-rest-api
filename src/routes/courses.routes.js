@@ -12,6 +12,8 @@ const upload = multer({
 //------------courseCreate-------------------------
 router.get("/course/create", controllers.getCourseCreate);
 router.post('/course/create', upload.single('thumbnail'), controllers.postCourseCreate);
+router.get('/course/:slug/update', controllers.getCourseUpdate);
+router.patch('/course/:slug/update', controllers.patchCourseUpdate);
 //------------  -------------------------
   
 router.get("/courses", controllers.coursesList);

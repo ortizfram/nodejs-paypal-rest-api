@@ -14,11 +14,17 @@ export const createCourseTableQuery = `CREATE TABLE IF NOT EXISTS courses (
     UNIQUE KEY(slug)
 );`
 
+export const updateCourseQuery = `
+    UPDATE courses
+    SET title = ?, description = ?, ars_price = ?, usd_price = ?, discount = ?, active = ?, thumbnail = ?, length = ?
+    WHERE slug = ?;
+`;
 
 export const createCourseQuery = `
   INSERT INTO courses (title, slug, description, ars_price, usd_price , discount, active, thumbnail, length)
   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
 `;
+
 
 export const tableCheckQuery = `SELECT 1 FROM information_schema.tables 
 WHERE table_name = ? LIMIT 1;`;

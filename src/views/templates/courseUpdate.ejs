@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Edit Course</title>
+</head>
+
+<body>
+    <h1>Edit Course</h1>
+    <form id="courseEditForm" action="/api/course/<%= course.slug %>/update" method="PATCH" enctype="multipart/form-data">
+        <label for="title">Title:</label><br>
+        <input type="text" id="title" name="title" value="<%= course.title %>"><br><br>
+        <!--.....-->
+        <button type="submit">Update Course</button>
+    </form>
+</body>
+
+</html>

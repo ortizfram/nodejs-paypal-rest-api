@@ -8,6 +8,7 @@ import {
   getCourseListQuery,
   getUserEnrolledCoursesQuery,
   tableCheckQuery,
+  updateCourseQuery,
 } from "../../db/queries/course.queries.js";
 
 const getCourseCreate = async (req, res) => {
@@ -87,6 +88,61 @@ const postCourseCreate = async (req, res) => {
   }
 };
 
+// --- UPDATE --------------------------
+const getCourseUpdate  =  async (req, res) => {
+  const courseSlug = req.params.slug;
+
+  try{
+
+    console.log("\nCourse Slug:", courseSlug);
+    const [courseRows] = await pool.query(getCourseFromSlugQuery, courseSlug);
+    const course = courseRows[0];
+    console.log("\nFetched course:", course);
+
+    if (!course) {
+      return res.status(404).send("Course not found");
+    };
+    
+    res.render("courseUpdate", {course});
+  } catch (error) {
+    console.error("Error fetching the course:", error);
+    res.status(500).send("Error fetching the course");
+  };
+};
+
+const patchCourseUpdate = async (req, res) => {
+  // Fetch the course slug from the request
+  const courseSlug = req.params.slug;
+
+  try {
+      // Retrieve updated course details from the request body
+      const { title, description, ars_price, usd_price, discount, active, thumbnail, length } = req.body;
+
+      // Execute the update query
+      await pool.query(updateCourseQuery, [
+          title,
+          description,
+          ars_price,
+          usd_price,
+          discount,
+          active === 'true' ? true : false,
+          thumbnail,
+          length,
+          courseSlug, // Slug used in WHERE clause for update
+      ]);
+
+      // Fetch the updated course data from the database
+      const [updatedCourseRows] = await pool.query(getCourseFromSlugQuery, courseSlug);
+      const updatedCourse = updatedCourseRows[0];
+
+      // Render a template with the updated course data
+      res.render("courseDetail", { course: updatedCourse, message:"Course updated correctly" });
+  } catch (error) {
+      console.error("Error updating course:", error);
+      res.status(500).json({ message: "Error updating the course" });
+  }
+};
+// ---  --------------------------
 
 const coursesList = async (req, res) => {
   console.log("\n*** coursesList\n");
@@ -139,7 +195,6 @@ const coursesList = async (req, res) => {
     res.redirect("/api/courses?message=Error fetching courses");
   }
 };
-
 
 const coursesListOwned = async (req, res) => {
   console.log("\n*** courseListOwned\n");
@@ -328,4 +383,6 @@ export default {
   courseDetail,
   getCourseCreate,
   postCourseCreate,
+  getCourseUpdate,
+  patchCourseUpdate,
 };
