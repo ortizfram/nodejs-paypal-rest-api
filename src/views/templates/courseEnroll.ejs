@@ -35,13 +35,13 @@
         <!-- The form to trigger the payment -->
         <form action="/api/create-order-paypal" method="POST">
             <!-- Hidden input to pass the course slug to the server -->
-            <input type="hidden" name="courseSlug" value="<%= course.slug %>">
+            <input type="hidden" name="courseId" value="<%= course.id %>">
             <button type="submit">Continue with Paypal</button>
         </form>
         <br>
         <form action="/api/create-order-mp" method="POST">
             <!-- Hidden input to pass the course slug to the server -->
-            <input type="hidden" name="courseSlug" value="<%= course.slug %>">
+            <input type="hidden" name="courseId" value="<%= course.id %>">
             <input type="hidden" name="userId" value="<%= userId %>">
             <button type="submit">Continue with Mercado Pago</button>
         </form>

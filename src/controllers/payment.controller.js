@@ -7,6 +7,7 @@ import {
 } from "../config.js";
 import axios from "axios";
 import {
+  getCourseFromIdQuery,
   getCourseFromSlugQuery,
   insertUserCourseQuery,
 } from "../../db/queries/course.queries.js";
@@ -31,6 +32,8 @@ export const createOrderPaypal = async (req, res) => {
 
     console.log("Fetched Course Details:", course);
 
+    const courseId = course.id;
+
     //create order paypal
     const order = {
       intent: "CAPTURE",
@@ -46,7 +49,7 @@ export const createOrderPaypal = async (req, res) => {
         brand_name: "Mi tienda",
         landing_page: "NO_PREFERENCE",
         user_action: "PAY_NOW",
-        return_url: `${HOST}/api/capture-order-paypal?courseSlug=${courseSlug}`, // Include course slug in the return URL
+        return_url: `${HOST}/api/capture-order-paypal?courseId=${courseId}`, // Include course slug in the return URL
         cancel_url: `${HOST}/api/cancel-order-paypal`,
       },
     };
@@ -111,6 +114,8 @@ export const captureOrderPaypal = async (req, res) => {
     const course = rows[0];
     console.log("\n--Fetched Course:", course);
 
+    const courseId = course.id;
+
     if (course && user) {
       // Add the user and course relationship in user_courses table
       const [insertUserCourse] = await pool.query(insertUserCourseQuery, [
@@ -123,7 +128,7 @@ export const captureOrderPaypal = async (req, res) => {
         );
       }
 
-      return res.redirect(`/api/course/${courseSlug}/modules`);
+      return res.redirect(`/api/course/${courseId}/modules`);
     } else {
       return res.status(404).send("Course or user not found");
     }
@@ -140,14 +145,14 @@ export const createOrderMP = async (req, res) => {
   console.log("\n*** Creating MP order...\n");
 
   // • get course
-  const courseSlug = req.body.courseSlug; // is being passed the courseSlug in the request input
+  const courseId = req.body.courseId; // is being passed the courseSlug in the request input
   const userId = req.body.userId; // is being passed the courseSlug in the request input
   console.log(`\nSQL Query: ${getCourseFromSlugQuery}\n`);
-  console.log(`\ncourseSlug: ${[courseSlug]}\n`);
+  console.log(`\ncourseId: ${[courseId]}\n`);
   console.log(`\nuserId: ${[userId]}\n`);
 
   // Fetch the course using the query
-  const [rows] = await pool.query(getCourseFromSlugQuery, courseSlug);
+  const [rows] = await pool.query(getCourseFromIdQuery, courseId);
   // Check if the course exists
   const course = rows[0];
 
@@ -176,12 +181,12 @@ export const createOrderMP = async (req, res) => {
       },
     ],
     back_urls: {
-      success: `http://localhost:3000/api/course/${courseSlug}/modules`,
+      success: `http://localhost:3000/api/course/${courseId}/modules`,
       failure: "http://localhost:3000/api/failure-mp",
       pending: "http://localhost:3000/api/pending-mp",
     },
     //here we use NGROK till it's deployed
-    notification_url: `https://b639-190-15-205-177.ngrok.io/api/webhook-mp?courseSlug=${courseSlug}&userId=${userId}`,
+    notification_url: `https://9149-190-15-205-177.ngrok.io/api/webhook-mp?courseId=${courseId}&userId=${userId}`,
   };
 
   const result = await mercadopago.preferences.create(preference);
@@ -191,7 +196,7 @@ export const createOrderMP = async (req, res) => {
 
   // change on deployment
   const initPoint = result.body.sandbox_init_point;
-  const redirectURL = `${initPoint}&courseSlug=${courseSlug}`;
+  const redirectURL = `${initPoint}&courseId=${courseId}`;
   res.redirect(redirectURL);
 };
 

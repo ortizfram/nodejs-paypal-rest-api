@@ -18,9 +18,20 @@
             <a href="/api/courses">Go back to All Courses</a>
         </button>
         <div class='course-detail'>
+            <div>
+                <button>
+                    <p><a href="/api/course/<%= course.id %>/update">Edit</a></p>
+                </button>
+                <button>
+                    <p><a href="#">Delete</a></p>
+                </button>
+            </div>
             <!--here we display enrolledcourses from the user-->
             <% if (course) { %>
+                <img src="<%= course.thumbnail %>" alt="<%= course.title %> image">
                 <h1><%= course.title %></h1>
+                <h3><%= course.description %></h3>
+                <p><%= course.instructor %></hp>
                 <!-- Display other details of the course -->
               <% } else { %>
                 <p>No course details available.</p>

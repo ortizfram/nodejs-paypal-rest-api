@@ -113,7 +113,7 @@ const getCourseUpdate = async (req, res) => {
   }
 };
 
-const patchCourseUpdate = async (req, res) => {
+const postCourseUpdate = async (req, res) => {
   const courseId = req.params.id; // Assuming the ID is coming from the request body
   console.log(`\n--- courseId: ${courseId}\n`);
 
@@ -329,6 +329,7 @@ const courseOverview = async (req, res) => {
 
     // Structure the course data to pass to the view
     const courseData = {
+      id: course.id,
       title: course.title,
       slug: course.slug,
       description: course.description,
@@ -364,7 +365,9 @@ const courseEnroll = async (req, res) => {
     const course = rows[0];
 
     if (course) {
+      console.log("\n -- courseId",typeof(course.id), course.id)
       const courseData = {
+        id: course.id,
         title: course.title,
         slug: course.slug,
         description: course.description,
@@ -430,5 +433,5 @@ export default {
   getCourseCreate,
   postCourseCreate,
   getCourseUpdate,
-  patchCourseUpdate,
+  postCourseUpdate,
 };
