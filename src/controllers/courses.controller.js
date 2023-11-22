@@ -356,7 +356,7 @@ const courseEnroll = async (req, res) => {
 
   if (!req.session.user) {
     // Store the course slug in the query parameters to redirect after login
-    return res.redirect(`/api/login?redirect=/course/${courseId}/enroll`);
+    return res.redirect(`/api/login?redirect=/course/${courseId}/enroll?courseId=${courseId}`);
   }
   const userId = req.session.user.id;
 

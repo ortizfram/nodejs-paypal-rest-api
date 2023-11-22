@@ -21,13 +21,13 @@ config(); // load .ENV
 // PAYPAL ---------------------------------------------------
 export const createOrderPaypal = async (req, res) => {
   console.log("\n*** createOrderPaypal\n");
-  try {
-    const courseSlug = req.body.courseSlug; // is being passed the courseSlug in the request input
 
-    console.log("SQL Query:", getCourseFromSlugQuery);
-    console.log("Parameters:", [courseSlug]);
+  const courseId = req.params.courseId; // is being passed the courseSlug in the request input
+  try {
+    console.log("SQL Query:", getCourseFromIdQuery);
+    console.log("Parameters courseId:", courseId);
     // Fetch course details based on the courseSlug using MySQL query
-    const [rows] = await pool.query(getCourseFromSlugQuery, courseSlug);
+    const [rows] = await pool.query(getCourseFromIdQuery, courseId);
     const course = rows[0];
 
     console.log("Fetched Course Details:", course);
@@ -105,12 +105,12 @@ export const createOrderPaypal = async (req, res) => {
 
 export const captureOrderPaypal = async (req, res) => {
   console.log("\n*** captureOrderPaypal\n");
+  const courseId = req.body.courseId;
   try {
-    const { courseSlug } = req.query; //is obtained from the successful payment redirect query
     const user = req.session.user;
 
     // Fetch course details based on the courseSlug using MySQL query
-    const [rows] = await pool.query(getCourseFromSlugQuery, [courseSlug]);
+    const [rows] = await pool.query(getCourseFromIdQuery, [courseId]);
     const course = rows[0];
     console.log("\n--Fetched Course:", course);
 
