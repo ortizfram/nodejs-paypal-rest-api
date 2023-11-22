@@ -206,17 +206,17 @@ export const webhookMP = async (req, res) => {
   try {
     const paymentType = req.query.type;
     const paymentId = req.query["data.id"];
-    const courseSlug = req.query.courseSlug; // Ensure Mercado Pago sends courseSlug
+    const courseId = req.query.courseId; // Ensure Mercado Pago sends courseSlug
     const userId = req.query.userId;
-    console.log("courseSlug:", courseSlug);
+    console.log("courseId:", courseId);
     console.log("paymentId:", paymentId);
     console.log("paymentType:", paymentType);
     console.log("userId:", userId);
 
-    if (paymentType === "payment" && paymentId && courseSlug) {
+    if (paymentType === "payment" && paymentId && courseId) {
 
       // Fetch course details based on the courseSlug using MySQL query
-      const [rows] = await pool.query(getCourseFromSlugQuery, [courseSlug]);
+      const [rows] = await pool.query(getCourseFromIdQuery, [courseId]);
       const course = rows[0];
 
       if (course && userId) {
