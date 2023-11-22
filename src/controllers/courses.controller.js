@@ -167,9 +167,11 @@ const patchCourseUpdate = async (req, res) => {
       if (affectedRows > 0) {
         const message = "course updated correctly"
         console.log(`\n\n\→ Go to courseDetail: ${message}`)
+        res.redirect(`/api/course/${courseId}/modules`);
       } else {
         const message = "no changes made to course"
         console.log(`\n\n\→ Go to courseDetail: ${message}`)
+        res.redirect(`/api/course/${courseId}/modules`);
       }
     }
   } catch (error) {

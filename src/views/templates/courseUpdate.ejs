@@ -47,29 +47,4 @@
             </form>
 </body>
 
-<script>
-    document.getElementById('courseEditForm').addEventListener('submit', async (event) => {
-        event.preventDefault();
-        const formData = new FormData(event.target);
-        try {
-            const courseId = document.getElementById('courseId').value; // Retrieve courseId from the hidden input
-
-            const url = `/api/course/${courseId}/update`;
-
-            const response = await fetch(url, {
-                method: 'PATCH',
-                body: formData,
-            });
-
-            if (response.ok) {
-                // Handle successful response
-                window.location.href = '/path/to/redirect'; // Redirect to a specific URL upon successful update
-            } else {
-                // Handle errors
-            }
-        } catch (error) {
-            // Handle errors
-        }
-    });
-</script>
 </html>
