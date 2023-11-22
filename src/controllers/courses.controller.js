@@ -265,6 +265,8 @@ const coursesListOwned = async (req, res) => {
 
     // Fetch all courses
     const [rows] = await pool.query(getCourseListQuery);
+
+    // map each field
     const courses = rows.map((course) => {
       return {
         title: course.title,
@@ -281,6 +283,9 @@ const coursesListOwned = async (req, res) => {
     const enrolledCourses = courses.filter((course) =>
       enrolledCourseIds.includes(course.id)
     );
+
+    // Reverse the order of enrolled courses
+    enrolledCourses.reverse();
 
     // if enrolled courses
     if (enrolledCourses.length > 0) {
