@@ -22,17 +22,15 @@ config(); // load .ENV
 export const createOrderPaypal = async (req, res) => {
   console.log("\n*** createOrderPaypal\n");
 
-  const courseId = req.params.courseId; // is being passed the courseSlug in the request input
+  const courseId = req.query.courseId; // is being passed the courseSlug in the request input
   try {
     console.log("SQL Query:", getCourseFromIdQuery);
-    console.log("Parameters courseId:", courseId);
+    console.log("? courseId:", courseId);
     // Fetch course details based on the courseSlug using MySQL query
     const [rows] = await pool.query(getCourseFromIdQuery, courseId);
     const course = rows[0];
 
     console.log("Fetched Course Details:", course);
-
-    const courseId = course.id;
 
     //create order paypal
     const order = {
