@@ -22,10 +22,10 @@ config(); // load .ENV
 export const createOrderPaypal = async (req, res) => {
   console.log("\n*** createOrderPaypal\n");
 
-  const courseId = req.query.courseId; // is being passed the courseSlug in the request input
+  const courseId = req.body.courseId; // is being passed the courseSlug in the request input
   try {
     console.log("SQL Query:", getCourseFromIdQuery);
-    console.log("? courseId:", courseId);
+    console.log("params courseId:", courseId);
     // Fetch course details based on the courseSlug using MySQL query
     const [rows] = await pool.query(getCourseFromIdQuery, courseId);
     const course = rows[0];
@@ -37,7 +37,7 @@ export const createOrderPaypal = async (req, res) => {
       intent: "CAPTURE",
       purchase_units: [
         {
-          amount: {
+      amount: {
             currency_code: "USD",
             value: course.usd_price, // Use the course price for the order
           },
