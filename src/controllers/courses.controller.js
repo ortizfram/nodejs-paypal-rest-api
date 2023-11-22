@@ -90,6 +90,8 @@ const postCourseCreate = async (req, res) => {
 
 // --- UPDATE --------------------------
 const getCourseUpdate = async (req, res) => {
+  console.log(`\n\n*** courseUpdate\n\n`);
+
   const message = req.query.message;
   const user = req.session.user || null;
   const courseId = req.params.id;
@@ -98,7 +100,7 @@ const getCourseUpdate = async (req, res) => {
     console.log("\nCourse Id:", courseId);
     const [courseRows] = await pool.query(getCourseFromIdQuery, courseId);
     const course = courseRows[0];
-    console.log("\nFetched course:", course);
+    console.log("\n---Fetched course:", course);
 
     if (!course) {
       return res.status(404).send("Course not found");
@@ -129,14 +131,14 @@ const patchCourseUpdate = async (req, res) => {
 
     let courseSlug;
 
-    if (typeof title === 'string' && title.trim() !== '') {
+    if (typeof title === "string" && title.trim() !== "") {
       courseSlug = slugify(title, { lower: true, strict: true });
     }
 
     const discountValue = discount !== "" ? discount : null;
     const thumbnailPath = req.file ? req.file.path : "";
 
-    const { affectedRows } = await pool.query(updateCourseQuery, [
+    const updateParams = [
       title,
       courseSlug,
       description,
@@ -147,17 +149,28 @@ const patchCourseUpdate = async (req, res) => {
       thumbnailPath,
       length,
       courseId, // where course.id
-    ]);
-    console.log('\n--- Affected Rows:', affectedRows);
+    ];
 
-    if (affectedRows > 0) {
-      res.status(200).json({ url: 
-        `/api/course/${courseId}/modules?message=Course updated correctly`
-    });
-    } else {
-      res.redirect(
-        `/api/course/${courseId}/modules?message=No changes detected`
-      );
+    console.log("\n\n---Update Parameters:", updateParams); // Log the update parameters
+
+    const result = await pool.query(updateCourseQuery, updateParams);
+    console.log("\n\n---Update Query:", updateCourseQuery);
+    console.log("\n\n---Query Result:", result); // Log the result of the query execution
+
+    if (result && result[0].affectedRows !== undefined) {
+      const affectedRows = parseInt(result[0].affectedRows);
+      console.log("\n\n---Affected Rows:", affectedRows);
+
+      const user = req.session.user || null;
+
+      
+      if (affectedRows > 0) {
+        const message = "course updated correctly"
+        console.log(`\n\n\→ Go to courseDetail: ${message}`)
+      } else {
+        const message = "no changes made to course"
+        console.log(`\n\n\→ Go to courseDetail: ${message}`)
+      }
     }
   } catch (error) {
     console.error("Error updating course:", error);

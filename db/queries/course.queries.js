@@ -16,9 +16,8 @@ export const createCourseTableQuery = `CREATE TABLE IF NOT EXISTS courses (
 
 export const updateCourseQuery = `
     UPDATE courses
-    SET title = ?, description = ?, ars_price = ?, usd_price = ?, discount = ?, active = ?, thumbnail = ?, length = ?
+    SET title = ?, slug=?, description = ?, ars_price = ?, usd_price = ?, discount = ?, active = ?, thumbnail = ?, length = ?
     WHERE id = ?;
-    SELECT ROW_COUNT() as affectedRows; -- MySQL specific query to return affected rows
 `;
 
 
