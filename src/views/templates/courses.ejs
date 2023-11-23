@@ -21,7 +21,7 @@
                 <% courses.forEach(course => { %>
                     <li>
                         <a href="/api/course/<%= course.id %>" target="_blank" >
-                            <img src="<%= course.thumbnail %>" alt="<%= course.title %> Image">
+                            <img src="/src/uploads/<%= course.thumbnail %>" alt="<%= course.title %> Image">
                             <h2><%= course.title %></h2>
                             <p>USD <%= course.usd_price %> | ARS <%= course.ars_price %></p>
                             <p><%= course.description %></p>

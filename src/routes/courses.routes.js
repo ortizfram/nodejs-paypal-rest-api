@@ -1,13 +1,9 @@
 import { Router } from "express";
-import multer from 'multer';
 import controllers from "../controllers/courses.controller.js";
+import upload from "../public/js/multerSetup.js";
 
 const router = Router();
 
-// Multer setup for handling image uploads
-const upload = multer({
-    dest: "src/uploads", // Set the destination folder where the uploaded images will be stored
-});
 
 //------------courseCreate-------------------------
 router.get("/course/create", controllers.getCourseCreate);
