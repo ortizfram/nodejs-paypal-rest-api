@@ -72,17 +72,17 @@ const postCourseCreate = async (req, res) => {
     // Insert the new course using the SQL query
     await pool.query(createCourseQuery, courseData);
 
-    console.log("\nCreating course...");
+    console.log("\n◘ Creating course...");
 
     // Check if the table exists
-    const [tableCheck2] = await pool.query(tableCheckQuery, "courses");
+    const [tableCheck2] = await pool.query(tableCheckQuery, "videos");
 
     if (tableCheck2.length === 0) {
       // Table doesn't exist, create it
       const [createTableResult] = await pool.query(createVideosTableQuery);
-      console.log("course video table created: ", createTableResult);
+      console.log("\n◘ course video table created: ", createTableResult);
     } else {
-      console.log("Course video table already exists.");
+      console.log("\n---Course video table already exists.");
     }
     // Redirect after creating the course
     res.status(201).redirect("/api/courses");
