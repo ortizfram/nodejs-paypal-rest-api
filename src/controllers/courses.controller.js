@@ -14,7 +14,7 @@ import {
 } from "../../db/queries/course.queries.js";
 
 const getCourseCreate = async (req, res) => {
-  res.render("courseCreate");
+  res.render("courseCreate/courseCreate");
 };
 
 const postCourseCreate = async (req, res) => {
@@ -90,7 +90,7 @@ const postCourseCreate = async (req, res) => {
     if (error.code === 11000 && error.keyPattern && error.keyPattern.slug) {
       // If the error is due to the unique constraint on the slug field
       const errorMessage = "Slug must be unique";
-      res.render("courseCreate", { errorMessage });
+      res.render("courseCreate/courseCreate", { errorMessage });
     } else {
       // If the error is due to other reasons
       res
