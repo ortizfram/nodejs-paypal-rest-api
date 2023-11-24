@@ -4,6 +4,7 @@ import { pool } from "../db.js";
 import {
   createCourseQuery,
   createCourseTableQuery,
+  createVideosTableQuery,
   getCourseFromIdQuery,
   getCourseListQuery,
   getUserEnrolledCoursesQuery,
@@ -71,8 +72,18 @@ const postCourseCreate = async (req, res) => {
     // Insert the new course using the SQL query
     await pool.query(createCourseQuery, courseData);
 
-    console.log("Creating course...");
+    console.log("\nCreating course...");
 
+    // Check if the table exists
+    const [tableCheck2] = await pool.query(tableCheckQuery, "courses");
+
+    if (tableCheck2.length === 0) {
+      // Table doesn't exist, create it
+      const [createTableResult] = await pool.query(createVideosTableQuery);
+      console.log("course video table created: ", createTableResult);
+    } else {
+      console.log("Course video table already exists.");
+    }
     // Redirect after creating the course
     res.status(201).redirect("/api/courses");
   } catch (error) {
@@ -164,14 +175,13 @@ const postCourseUpdate = async (req, res) => {
 
       const user = req.session.user || null;
 
-      
       if (affectedRows > 0) {
-        const message = "course updated correctly"
-        console.log(`\n\n\→ Go to courseDetail: ${message}`)
+        const message = "course updated correctly";
+        console.log(`\n\n\→ Go to courseDetail: ${message}`);
         res.redirect(`/api/course/${courseId}/modules`);
       } else {
-        const message = "no changes made to course"
-        console.log(`\n\n\→ Go to courseDetail: ${message}`)
+        const message = "no changes made to course";
+        console.log(`\n\n\→ Go to courseDetail: ${message}`);
         res.redirect(`/api/course/${courseId}/modules`);
       }
     }
@@ -362,7 +372,9 @@ const courseEnroll = async (req, res) => {
 
   if (!req.session.user) {
     // Store the course slug in the query parameters to redirect after login
-    return res.redirect(`/api/login?redirect=/course/${courseId}/enroll?courseId=${courseId}`);
+    return res.redirect(
+      `/api/login?redirect=/course/${courseId}/enroll?courseId=${courseId}`
+    );
   }
   const userId = req.session.user.id;
 
@@ -371,7 +383,7 @@ const courseEnroll = async (req, res) => {
     const course = rows[0];
 
     if (course) {
-      console.log("\n -- courseId",typeof(course.id), course.id)
+      console.log("\n -- courseId", typeof course.id, course.id);
       const courseData = {
         id: course.id,
         title: course.title,
@@ -425,7 +437,13 @@ const courseDetail = async (req, res) => {
       enrolledCourses = enrolledRows[0]?.enrolled_courses || [];
     }
 
-    res.render("courseDetail", { course, videos, message, user, enrolledCourses });
+    res.render("courseDetail", {
+      course,
+      videos,
+      message,
+      user,
+      enrolledCourses,
+    });
   } catch (error) {
     console.error("Error fetching the course:", error);
     res.status(500).send("Error fetching the course");

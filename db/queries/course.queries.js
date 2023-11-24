@@ -27,6 +27,26 @@ VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
 // -----// -----------------
 
 
+// ----- Module Queries ------------------
+export const createModulesTableQuery = `
+CREATE TABLE IF NOT EXISTS modules (
+    id INT NOT NULL AUTO_INCREMENT,
+    title VARCHAR(255) NOT NULL,
+    description TEXT DEFAULT NULL,
+    course_id INT NOT NULL,
+    PRIMARY KEY(id),
+    FOREIGN KEY(course_id) REFERENCES courses(id) ON DELETE CASCADE
+);
+`;
+
+export const createModuleQuery = `
+INSERT INTO modules (title, description, course_id)
+VALUES (?, ?, ?);
+`;
+
+export const listModulesQuery = `SELECT * FROM modules WHERE course_id = ?`;
+// -----// -----------------
+
 // -----VIdeo Queries ------------------
 export const createVideosTableQuery = `
 CREATE TABLE IF NOT EXISTS videos (
