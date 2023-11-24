@@ -28,7 +28,7 @@ VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
 
 
 // ----- Module Queries ------------------
-export const moduleTableCreateQuery = `
+export const createTableModuleQuery = `
 CREATE TABLE IF NOT EXISTS modules (
     id INT NOT NULL AUTO_INCREMENT,
     title VARCHAR(255) NOT NULL,

@@ -4,12 +4,14 @@ import { pool } from "../db.js";
 import {
   createCourseQuery,
   createCourseTableQuery,
+  createTableModuleQuery,
   createVideosTableQuery,
   getCourseFromIdQuery,
   getCourseFromSlugQuery,
   getCourseListQuery,
   getUserEnrolledCoursesQuery,
   listCourseVideosQuery,
+  moduleCreateQuery,
   tableCheckQuery,
   updateCourseQuery,
 } from "../../db/queries/course.queries.js";
@@ -130,7 +132,7 @@ const postModuleCreate = async (req, res) => {
     const tableExists = tableCheck.length > 0;
     if (!tableExists) {
       // Create user_courses table if it doesn't exist
-      await pool.query(createTableUserCourses);
+      await pool.query(createTableModuleQuery);
       console.log(`\n--- modules table created\n`);
     } else {
       console.log(`\n--- modules table already exists\n`);
