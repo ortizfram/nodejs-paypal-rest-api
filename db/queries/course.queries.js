@@ -28,7 +28,7 @@ VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
 
 
 // ----- Module Queries ------------------
-export const createModulesTableQuery = `
+export const moduleTableCreateQuery = `
 CREATE TABLE IF NOT EXISTS modules (
     id INT NOT NULL AUTO_INCREMENT,
     title VARCHAR(255) NOT NULL,
@@ -39,12 +39,12 @@ CREATE TABLE IF NOT EXISTS modules (
 );
 `;
 
-export const createModuleQuery = `
+export const moduleCreateQuery = `
 INSERT INTO modules (title, description, course_id)
 VALUES (?, ?, ?);
 `;
 
-export const listModulesQuery = `SELECT * FROM modules WHERE course_id = ?`;
+export const modulesListQuery = `SELECT * FROM modules WHERE course_id = ?`;
 // -----// -----------------
 
 // -----VIdeo Queries ------------------
