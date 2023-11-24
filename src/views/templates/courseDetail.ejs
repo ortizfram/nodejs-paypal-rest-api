@@ -4,13 +4,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Course Overview</title>
+    <title>Course <%=course.title%></title>
     <link rel="stylesheet" href="/css/alert.css">
     <link rel="stylesheet" href="/css/navbar.css">
     <link rel="stylesheet" href="/css/courseOverview.css">
 </head>
 
 <body>
+
     <div class="course-container">
         <%- include ('navbar') -%>
         <%- include ('alert') -%>
@@ -30,7 +31,10 @@
             <% if (course) { %>
                 <img src="<%= course.thumbnail %>" alt="<%= course.title %> image">
                 <h1><%= course.title %></h1>
-                <h3><%= course.description %></h3>
+                <div class="markdown-content">
+                    <h3><%= course.description %></h3>
+                </div>
+                <!--  -->
                 <p><%= course.instructor %></hp>
                 <!-- Display other details of the course -->
               <% } else { %>
@@ -39,6 +43,7 @@
         </div>
 
     </div>
+
 </body>
 
 </html>

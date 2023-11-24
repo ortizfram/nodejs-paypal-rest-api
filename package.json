@@ -30,6 +30,7 @@
     "express-ejs-layouts": "^2.5.1",
     "express-session": "^1.17.3",
     "hbs": "^4.2.0",
+    "marked": "^10.0.0",
     "mercadopago": "^1.5.16",
     "method-override": "^3.0.0",
     "mongodb": "^6.2.0",

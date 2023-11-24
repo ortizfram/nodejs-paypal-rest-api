@@ -7,6 +7,7 @@ import {
   getCourseFromIdQuery,
   getCourseListQuery,
   getUserEnrolledCoursesQuery,
+  listCourseVideosQuery,
   tableCheckQuery,
   updateCourseQuery,
 } from "../../db/queries/course.queries.js";
@@ -413,6 +414,8 @@ const courseDetail = async (req, res) => {
       return res.status(404).send("Course not found");
     }
 
+    const [videos] = await pool.query(listCourseVideosQuery, courseId);
+
     // Fetch the enrolled courses for the current user
     let enrolledCourses = [];
     if (user) {
@@ -422,7 +425,7 @@ const courseDetail = async (req, res) => {
       enrolledCourses = enrolledRows[0]?.enrolled_courses || [];
     }
 
-    res.render("courseDetail", { course, message, user, enrolledCourses });
+    res.render("courseDetail", { course, videos, message, user, enrolledCourses });
   } catch (error) {
     console.error("Error fetching the course:", error);
     res.status(500).send("Error fetching the course");
