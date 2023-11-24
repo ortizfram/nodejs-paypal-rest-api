@@ -121,11 +121,26 @@ const getModuleCreate = async (req, res) => {
 const postModuleCreate = async (req, res) => {
   try {
     const courseId = req.query.courseId;
+    // get data from form
     const { title, description } = req.body;
     const moduleData = [title, description, courseId];
+
+    // Check if the "modules" table exists
+    const [tableCheck] = await pool.query(tableCheckQuery, "modules");
+    const tableExists = tableCheck.length > 0;
+    if (!tableExists) {
+      // Create user_courses table if it doesn't exist
+      await pool.query(createTableUserCourses);
+      console.log(`\n--- modules table created\n`);
+    } else {
+      console.log(`\n--- modules table already exists\n`);
+    }
+
+    // create modules query
     const [moduleRows] = await pool.query(moduleCreateQuery, moduleData);
     console.log("\n--- module created")
 
+    // redirect to video creation of modules
     res.status(201).redirect(`/api/course/${courseId}/video/create?courseId=${courseId}`);
   } catch (error) {
     res.status(500).json({ message: "Error creating module", error: error.message });
