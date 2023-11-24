@@ -6,6 +6,7 @@ import {
   createCourseTableQuery,
   createVideosTableQuery,
   getCourseFromIdQuery,
+  getCourseFromSlugQuery,
   getCourseListQuery,
   getUserEnrolledCoursesQuery,
   listCourseVideosQuery,
@@ -69,8 +70,12 @@ const postCourseCreate = async (req, res) => {
       length,
     ];
 
-    // Insert the new course using the SQL query
+    // Create the new course using the SQL query
     await pool.query(createCourseQuery, courseData);
+    // get the course
+    const [courseRows] = await pool.query(getCourseFromSlugQuery, courseSlug);
+    const course = courseRows[0];
+    const courseId = course.id;
 
     console.log("\n◘ Creating course...");
 
@@ -84,8 +89,9 @@ const postCourseCreate = async (req, res) => {
     } else {
       console.log("\n---Course video table already exists.");
     }
+
     // Redirect after creating the course
-    res.status(201).redirect("/api/courses");
+    res.status(201).redirect(`/api/course/${courseId}/module/create`);
   } catch (error) {
     if (error.code === 11000 && error.keyPattern && error.keyPattern.slug) {
       // If the error is due to the unique constraint on the slug field
@@ -97,6 +103,69 @@ const postCourseCreate = async (req, res) => {
         .status(500)
         .json({ message: "Error creating the course", error: error.message });
     }
+  }
+};
+
+const getModuleCreate = async (req, res) => {
+  // Fetch necessary data for creating modules and render the module creation form
+  try {
+    const courseId = req.params.id; // Extract the course ID from the request parameters
+
+    // Perform necessary operations to prepare data for module creation form rendering
+    // Fetch course details or perform any other necessary operations
+
+    res.render("courseCreate/courseModules", { courseId }); // Render the module creation form with necessary data
+  } catch (error) {
+    // Handle errors appropriately
+    res.status(500).json({ message: "Error fetching course data for module creation", error: error.message });
+  }
+};
+
+const postModuleCreate = async (req, res) => {
+  // Handle the POST request to create modules
+  try {
+    // Extract necessary data from the request body and parameters
+    const courseId = req.params.id; // Extract the course ID from the request parameters
+
+    // Perform necessary operations to create a module for the specified course
+    // Process the received form data and create a new module in the database
+
+    res.status(201).redirect(`/api/course/${courseId}/video/create`); // Redirect to the video creation form after successfully creating a module
+  } catch (error) {
+    // Handle errors appropriately
+    res.status(500).json({ message: "Error creating module", error: error.message });
+  }
+};
+
+const getVideoCreate = async (req, res) => {
+  // Fetch necessary data for creating videos and render the video creation form
+  try {
+    const courseId = req.params.id; // Extract the course ID from the request parameters
+
+    // Perform necessary operations to prepare data for video creation form rendering
+    // Fetch course details or perform any other necessary operations
+
+    res.render("courseCreate/courseVideos", { courseId }); // Render the video creation form with necessary data
+  } catch (error) {
+    // Handle errors appropriately
+    res.status(500).json({ message: "Error fetching course data for video creation", error: error.message });
+  }
+};
+
+const postVideoCreate = async (req, res) => {
+  // Handle the POST request to create videos
+  try {
+    // Extract necessary data from the request body and parameters
+    const courseId = req.params.id; // Extract the course ID from the request parameters
+
+    // Perform necessary operations to create a video for the specified course
+    // Process the received form data and create a new video in the database
+
+    // Redirect after creating the course
+    res.status(201).redirect("/api/courses");
+  } catch (error) {
+    // Handle errors appropriately
+    res.status(500).json({ message: "Error creating video", error: error.message });
   }
 };
 
@@ -460,4 +529,8 @@ export default {
   postCourseCreate,
   getCourseUpdate,
   postCourseUpdate,
+  getModuleCreate,
+  postModuleCreate,
+  getVideoCreate,
+  postVideoCreate,
 };

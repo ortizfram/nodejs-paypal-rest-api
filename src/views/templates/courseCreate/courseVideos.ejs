@@ -1,10 +1,26 @@
-<!-- Create Videos Form -->
-<form id="videoForm" action="/api/video/create" method="POST">
-    <!-- Video details section -->
-    <!-- Title, Video URL/Upload, Description, etc. -->
-    <!-- Use appropriate input fields, labels, and elements -->
+<!DOCTYPE html>
+<html lang="en">
 
-    <!-- Button to submit video creation -->
-    <button type="submit">Create Video</button>
-    <!-- Include error handling for any form submission errors -->
-</form>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+
+    <!-- Create Videos Form -->
+    <form id="videoForm" action="/api/course/<%= course.id %>/video/create" method="POST">
+        <!-- Video details section -->
+        <!-- Title, Video URL/Upload, Description, etc. -->
+        <!-- Use appropriate input fields, labels, and elements -->
+
+        <!-- Button to submit video creation -->
+        <input type="hidden" name="">
+        <button type="submit">Create Video</button>
+        <!-- Include error handling for any form submission errors -->
+    </form>
+
+</body>
+
+</html>

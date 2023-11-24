@@ -1,10 +1,26 @@
-<!-- Create Modules Form -->
-<form id="moduleForm" action="/api/module/create" method="POST">
-    <!-- Module details section -->
-    <!-- Title, Description, etc. related to modules -->
-    <!-- Use appropriate input fields, labels, and elements -->
+<!DOCTYPE html>
+<html lang="en">
 
-    <!-- Button to submit module creation -->
-    <button type="submit">Create Module</button>
-    <!-- Include error handling for any form submission errors -->
-</form>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+
+    <!-- Create Modules Form -->
+    <form id="moduleForm" action="/api/course/<%= course.id %>/module/create" method="POST">
+        <!-- Module details section -->
+        <!-- Title, Description, etc. related to modules -->
+        <!-- Use appropriate input fields, labels, and elements -->
+
+        <!-- Button to submit module creation -->
+        <input type="hidden" name="">
+        <button type="submit">Create Module</button>
+        <!-- Include error handling for any form submission errors -->
+    </form>
+
+</body>
+
+</html>
