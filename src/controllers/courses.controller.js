@@ -181,12 +181,14 @@ const postModuleCreate = async (req, res) => {
 const getVideoCreate = async (req, res) => {
   // Fetch necessary data for creating videos and render the video creation form
   try {
-    const courseId = req.params.id; // Extract the course ID from the request parameters
+    const courseId = req.query.courseId; // Extract the course ID from the request parameters
+    const [courseRows] = await pool.query(getCourseFromIdQuery, [courseId]);
+    const course = courseRows[0]
 
     // Perform necessary operations to prepare data for video creation form rendering
     // Fetch course details or perform any other necessary operations
 
-    res.render("courseCreate/courseVideos", { courseId }); // Render the video creation form with necessary data
+    res.render("courseCreate/courseVideos", { courseId, course }); // Render the video creation form with necessary data
   } catch (error) {
     // Handle errors appropriately
     res.status(500).json({
