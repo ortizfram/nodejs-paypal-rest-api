@@ -4,7 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Add Videos</title>
+    <link rel="stylesheet" href="/css/courseCreateVideo.css">
 </head>
 
 <body>
@@ -12,15 +13,62 @@
     <!-- Create Videos Form -->
     <form id="videoForm" action="/api/course/<%= course.id %>/video/create" method="POST">
         <!-- Video details section -->
-        <!-- Title, Video URL/Upload, Description, etc. -->
+        <h1>
+            <%= course.title %> 
+        </h1>
+        <h3>Add Videos</h3>
+        <div id="videoFields">
+            <div class="videoField">
+                <label for="title">Title:</label><br>
+                <input type="text" class="title" name="title[]"><br><br>
+                <label for="serialNumber">Serial Number:</label><br>
+                <input type="number" class="serialNumber" name="serialNumber[]"><br><br>
+                <label for="videoId">Video ID: (From Youtube)</label><br>
+                <input type="text" class="videoId" name="videoId[]"><br><br>
+                <label for="isPreview">Is Preview:</label><br>
+                <input type="checkbox" class="isPreview" name="isPreview[]"><br><br>
+                <button type="button" class="removeVideo">X</button>
+            </div>
+        </div>
+        <button type="button" id="addMoreVideos">
+            <p>add more</p>
+        </button>
         <!-- Use appropriate input fields, labels, and elements -->
 
         <!-- Button to submit video creation -->
-        <input type="hidden" name="">
-        <button type="submit">Create Video</button>
+        <input type="hidden" name="courseId" value="<%= courseId %>">
+        <button type="submit">Create Videos</button>
         <!-- Include error handling for any form submission errors -->
     </form>
 
+    <script>
+        // Function to remove a video field when clicking on the "X" button
+        function removeVideoField(event) {
+            const videoField = event.target.closest('.videoField');
+            if (videoField) {
+                videoField.remove();
+            }
+        }
+    
+        // Event listener to handle removing video fields
+        document.getElementById('videoFields').addEventListener('click', function(event) {
+            if (event.target.classList.contains('removeVideo')) {
+                removeVideoField(event);
+            }
+        });
+    
+        // Event listener to add more video fields
+        document.getElementById('addMoreVideos').addEventListener('click', function () {
+            const videoFields = document.getElementById('videoFields');
+            const newVideoField = document.querySelector('.videoField').cloneNode(true);
+            newVideoField.querySelector('.title').value = ''; // Clear the cloned field value
+            newVideoField.querySelector('.serialNumber').value = ''; // Clear the cloned field value
+            newVideoField.querySelector('.videoId').value = ''; // Clear the cloned field value
+            newVideoField.querySelector('.isPreview').checked = false; // Uncheck the cloned field
+            videoFields.appendChild(newVideoField);
+        });
+    </script>
+    
 </body>
 
 </html>

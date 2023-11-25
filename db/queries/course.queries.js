@@ -51,16 +51,16 @@ export const createVideosTableQuery = `
 CREATE TABLE IF NOT EXISTS videos (
     id INT NOT NULL AUTO_INCREMENT,
     title VARCHAR(255) NOT NULL,
-    course_id INT NOT NULL,
+    courseId INT NOT NULL,
     serial_number INT NOT NULL,
     video_id VARCHAR(100) NOT NULL,
     is_preview BOOLEAN DEFAULT false,
     PRIMARY KEY(id),
-    FOREIGN KEY(course_id) REFERENCES courses(id) ON DELETE CASCADE
+    FOREIGN KEY(courseId) REFERENCES courses(id) ON DELETE CASCADE
   );
 `;
 export const createVideoQuery = `
-  INSERT INTO videos (title, course_id, serial_number, video_id, is_preview)
+  INSERT INTO videos (title, courseId, serial_number, video_id, is_preview)
   VALUES (?, ?, ?, ?, ?);
 `;
 export const listCourseVideosQuery = `SELECT * FROM videos WHERE courseId = ?`;

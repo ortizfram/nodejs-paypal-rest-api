@@ -15,12 +15,14 @@ import {
   tableCheckQuery,
   updateCourseQuery,
 } from "../../db/queries/course.queries.js";
-
+// --- COURSE CREATE --------------------------
 const getCourseCreate = async (req, res) => {
+  console.log("\n\n*** getCourseCreate\n\n");
   res.render("courseCreate/courseCreate");
 };
 
 const postCourseCreate = async (req, res) => {
+  console.log("\n\n*** PostCourseCreate\n\n");
   try {
     // Check if the table exists
     const [tableCheck] = await pool.query(tableCheckQuery, "courses");
@@ -109,8 +111,9 @@ const postCourseCreate = async (req, res) => {
     }
   }
 };
-
+// --- MODULE CREATE --------------------------
 const getModuleCreate = async (req, res) => {
+  console.log("\n\n*** getVideoCreate\n\n");
   try {
     const courseId = parseInt(req.query.courseId);
     const [courseRows] = await pool.query(getCourseFromIdQuery, [courseId]);
@@ -126,6 +129,7 @@ const getModuleCreate = async (req, res) => {
 };
 
 const postModuleCreate = async (req, res) => {
+  console.log("\n\n*** PostModuleCreate\n\n");
   try {
     const requestedCourseId = req.body.courseId;
 
@@ -177,13 +181,15 @@ const postModuleCreate = async (req, res) => {
       .json({ message: "Error creating module", error: error.message });
   }
 };
-
+// --- VIDEO CREATE--------------------------
 const getVideoCreate = async (req, res) => {
+  console.log("\n\n*** getVideoCreate\n\n");
   // Fetch necessary data for creating videos and render the video creation form
   try {
     const courseId = req.query.courseId; // Extract the course ID from the request parameters
     const [courseRows] = await pool.query(getCourseFromIdQuery, [courseId]);
     const course = courseRows[0]
+    courseId = course.id;
 
     // Perform necessary operations to prepare data for video creation form rendering
     // Fetch course details or perform any other necessary operations
@@ -199,10 +205,26 @@ const getVideoCreate = async (req, res) => {
 };
 
 const postVideoCreate = async (req, res) => {
+  console.log("\n\n*** PostVideoCreate\n\n");
   // Handle the POST request to create videos
   try {
     // Extract necessary data from the request body and parameters
-    const courseId = req.params.id; // Extract the course ID from the request parameters
+    const courseId = req.body.courseId; // Extract the course ID from the request parameters
+    const [courseRows] = await pool.query(getCourseFromIdQuery, [courseId]);
+    const course = courseRows[0]
+    courseId = course.id
+
+    // create table
+    // Check if the table exists
+    const [tableCheck] = await pool.query(tableCheckQuery, "videos");
+    // validation & msgs
+    if (tableCheck.length === 0) {
+      // Table doesn't exist, create it
+      const [createTableResult] = await pool.query(createCourseTableQuery);
+      console.log("\n--- 'videos' table created: ", createTableResult);
+    } else {
+      console.log("\n---'videos' table already exists.");
+    }
 
     // Perform necessary operations to create a video for the specified course
     // Process the received form data and create a new video in the database
@@ -217,8 +239,9 @@ const postVideoCreate = async (req, res) => {
   }
 };
 
-// --- UPDATE --------------------------
+// --- COURSE UPDATE --------------------------
 const getCourseUpdate = async (req, res) => {
+
   console.log(`\n\n*** courseUpdate\n\n`);
 
   const message = req.query.message;
@@ -243,6 +266,7 @@ const getCourseUpdate = async (req, res) => {
 };
 
 const postCourseUpdate = async (req, res) => {
+  console.log("\n\n*** PostCourseUpdate\n\n");
   const courseId = req.params.id; // Assuming the ID is coming from the request body
   console.log(`\n--- courseId: ${courseId}\n`);
 
@@ -308,7 +332,7 @@ const postCourseUpdate = async (req, res) => {
   }
 };
 
-// ---  --------------------------
+// --- COURSE LIST , ENROLL, & DETAILS --------------------------
 
 const coursesList = async (req, res) => {
   console.log("\n*** coursesList\n");
