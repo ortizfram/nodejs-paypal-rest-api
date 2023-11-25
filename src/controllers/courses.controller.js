@@ -93,7 +93,9 @@ const postCourseCreate = async (req, res) => {
     }
 
     // Redirect after creating the course
-    res.status(201).redirect(`/api/course/${courseId}/module/create?courseId=${courseId}`);
+    res
+      .status(201)
+      .redirect(`/api/course/${courseId}/module/create?courseId=${courseId}`);
   } catch (error) {
     if (error.code === 11000 && error.keyPattern && error.keyPattern.slug) {
       // If the error is due to the unique constraint on the slug field
@@ -110,19 +112,38 @@ const postCourseCreate = async (req, res) => {
 
 const getModuleCreate = async (req, res) => {
   try {
-    const courseId = req.query.courseId;
+    const courseId = parseInt(req.query.courseId);
     const [courseRows] = await pool.query(getCourseFromIdQuery, [courseId]);
     const course = courseRows[0];
 
-    res.render("courseCreate/courseModules", { course });
+    res.render("courseCreate/courseModules", { course, courseId });
   } catch (error) {
-    res.status(500).json({ message: "Error fetching course data for module creation", error: error.message });
+    res.status(500).json({
+      message: "Error fetching course data for module creation",
+      error: error.message,
+    });
   }
 };
 
 const postModuleCreate = async (req, res) => {
   try {
-    const courseId = req.query.courseId;
+    const requestedCourseId = req.body.courseId;
+
+    // fetch course with req id
+    const [courseRows] = await pool.query(getCourseFromIdQuery, [
+      requestedCourseId,
+    ]);
+
+    const course = courseRows[0];
+    console.log("\n---Course:", course); // Log the course object to check if it's defined
+
+    let courseId; // Define courseId variable
+
+    if (course) {
+      courseId = course.id;
+      console.log("Course ID:", courseId); // Log the course ID if it exists
+    }
+
     // get data from form
     const { title, description } = req.body;
     const moduleData = [title, description, courseId];
@@ -139,13 +160,21 @@ const postModuleCreate = async (req, res) => {
     }
 
     // create modules query
-    const [moduleRows] = await pool.query(moduleCreateQuery, moduleData);
-    console.log("\n--- module created")
+    const [moduleRows] = await pool.query(moduleCreateQuery, [
+      moduleData[0],
+      moduleData[1],
+      moduleData[2],
+    ]);
+    console.log("\n--- module created");
 
     // redirect to video creation of modules
-    res.status(201).redirect(`/api/course/${courseId}/video/create?courseId=${courseId}`);
+    res
+      .status(201)
+      .redirect(`/api/course/${courseId}/video/create?courseId=${courseId}`);
   } catch (error) {
-    res.status(500).json({ message: "Error creating module", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Error creating module", error: error.message });
   }
 };
 
@@ -160,7 +189,10 @@ const getVideoCreate = async (req, res) => {
     res.render("courseCreate/courseVideos", { courseId }); // Render the video creation form with necessary data
   } catch (error) {
     // Handle errors appropriately
-    res.status(500).json({ message: "Error fetching course data for video creation", error: error.message });
+    res.status(500).json({
+      message: "Error fetching course data for video creation",
+      error: error.message,
+    });
   }
 };
 
@@ -177,7 +209,9 @@ const postVideoCreate = async (req, res) => {
     res.status(201).redirect("/api/courses");
   } catch (error) {
     // Handle errors appropriately
-    res.status(500).json({ message: "Error creating video", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Error creating video", error: error.message });
   }
 };
 

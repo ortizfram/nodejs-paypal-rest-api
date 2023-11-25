@@ -14,7 +14,7 @@
     <form id="moduleForm" action="/api/course/<%= course.id %>/module/create" method="POST">
         <!-- Module details section -->
         <h1>
-            <%= course.title %>
+            <%= course.title %> 
         </h1>
         <h3>Add Modules</h3>
         <div id="moduleFields">
@@ -32,7 +32,7 @@
         <!-- Use appropriate input fields, labels, and elements -->
 
         <!-- Button to submit module creation -->
-        <input type="hidden" name="">
+        <input type="hidden" name="courseId" value="<%= courseId %>">
         <button type="submit">Create Modules</button>
         <!-- Include error handling for any form submission errors -->
     </form>

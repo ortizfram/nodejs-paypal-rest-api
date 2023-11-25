@@ -14,7 +14,7 @@ export const createCourseTableQuery = `CREATE TABLE IF NOT EXISTS courses (
     length INT DEFAULT 0,
     PRIMARY KEY(id),
     UNIQUE KEY(slug)
-);`
+);`;
 export const updateCourseQuery = `
 UPDATE courses
 SET title = ?, slug=?, description = ?, ars_price = ?, usd_price = ?, discount = ?, active = ?, thumbnail = ?, length = ?
@@ -26,25 +26,24 @@ VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
 `;
 // -----// -----------------
 
-
 // ----- Module Queries ------------------
 export const createTableModuleQuery = `
 CREATE TABLE IF NOT EXISTS modules (
-    id INT NOT NULL AUTO_INCREMENT,
-    title VARCHAR(255) NOT NULL,
-    description TEXT DEFAULT NULL,
-    course_id INT NOT NULL,
-    PRIMARY KEY(id),
-    FOREIGN KEY(course_id) REFERENCES courses(id) ON DELETE CASCADE
+  id INT NOT NULL AUTO_INCREMENT,
+  title VARCHAR(255) NOT NULL,
+  description TEXT DEFAULT NULL,
+  courseId INT NOT NULL,
+  PRIMARY KEY(id),
+  FOREIGN KEY(courseId) REFERENCES courses(id) ON DELETE CASCADE
 );
 `;
 
 export const moduleCreateQuery = `
-INSERT INTO modules (title, description, course_id)
+INSERT INTO modules (title, description, courseId)
 VALUES (?, ?, ?);
 `;
 
-export const modulesListQuery = `SELECT * FROM modules WHERE course_id = ?`;
+export const modulesListQuery = `SELECT * FROM modules WHERE courseId = ?`;
 // -----// -----------------
 
 // -----VIdeo Queries ------------------
@@ -64,7 +63,7 @@ export const createVideoQuery = `
   INSERT INTO videos (title, course_id, serial_number, video_id, is_preview)
   VALUES (?, ?, ?, ?, ?);
 `;
-export const listCourseVideosQuery = `SELECT * FROM videos WHERE courseId = ?`
+export const listCourseVideosQuery = `SELECT * FROM videos WHERE courseId = ?`;
 // -----// -----------------
 
 // -----Get course queries-----------------
