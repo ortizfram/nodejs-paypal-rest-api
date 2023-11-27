@@ -1,0 +1,24 @@
+/* Minimal styling for the course container */
+.course-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+/* Styling for the first module */
+.first-module {
+  /* Styles for the first module */
+  /* You can adjust the width, height, borders, etc. */
+  flex-basis: 60%;
+  padding: 20px;
+  border: 1px solid #ccc;
+}
+
+/* Styling for the modules list */
+.modules-list {
+  /* Styles for the list of modules */
+  /* You can adjust the width, height, margins, etc. */
+  flex-basis: 35%;
+  padding: 20px;
+  border: 1px solid #ccc;
+}
