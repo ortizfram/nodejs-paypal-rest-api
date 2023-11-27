@@ -239,11 +239,11 @@
         console.log("\n---'videos' table already exists.");
       }
 
-      const { moduleId, videoId, isPreview } = req.body;
-      console.log(`\n ---requested body data:\n courseId=${courseId},moduleId=${moduleId},videoId=${videoId},isPreview=${isPreview}`)
+      const { moduleId, videoId } = req.body;
+      console.log(`\n ---requested body data:\n courseId=${courseId},moduleId=${moduleId},videoId=${videoId}`)
 
       // Assuming you have a createVideoQuery to insert videos
-      const createVideoData = [moduleId, videoId, isPreview];
+      const createVideoData = [moduleId, videoId];
 
       // Execute the query to insert the video into the videos table
       await pool.query(createVideoQuery, createVideoData);

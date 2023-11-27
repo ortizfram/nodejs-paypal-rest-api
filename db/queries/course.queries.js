@@ -43,7 +43,6 @@ INSERT INTO modules (title, description, courseId)
 VALUES (?, ?, ?);
 `;
 
-
 export const modulesListQuery = `SELECT * FROM modules WHERE courseId = ?`;
 // -----// -----------------
 
@@ -54,15 +53,14 @@ CREATE TABLE IF NOT EXISTS videos (
     courseId INT NOT NULL,
     module_id INT NOT NULL,
     video_id VARCHAR(100) NOT NULL,
-    is_preview BOOLEAN DEFAULT false,
     PRIMARY KEY(id),
     FOREIGN KEY(courseId) REFERENCES courses(id) ON DELETE CASCADE,
     FOREIGN KEY (module_id) REFERENCES modules(id) ON DELETE CASCADE
-);
+)
 `;
 
 export const createVideoQuery = `
-INSERT INTO videos (courseId, module_id, video_id, is_preview)
+INSERT INTO videos (courseId, module_id, video_id)
 VALUES (?, ?, ?, ?);
 `;
 
