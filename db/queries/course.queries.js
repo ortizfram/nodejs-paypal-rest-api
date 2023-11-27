@@ -32,6 +32,7 @@ CREATE TABLE IF NOT EXISTS modules (
   id INT NOT NULL AUTO_INCREMENT,
   title VARCHAR(255) NOT NULL,
   description TEXT DEFAULT NULL,
+  video_link VARCHAR(255) NOT NULL,
   courseId INT NOT NULL,
   PRIMARY KEY(id),
   FOREIGN KEY(courseId) REFERENCES courses(id) ON DELETE CASCADE
@@ -39,8 +40,8 @@ CREATE TABLE IF NOT EXISTS modules (
 `;
 
 export const moduleCreateQuery = `
-INSERT INTO modules (title, description, courseId)
-VALUES (?, ?, ?);
+INSERT INTO modules (courseId, title, description, video_link)
+VALUES (?, ?, ?, ?);
 `;
 
 export const modulesListQuery = `SELECT * FROM modules WHERE courseId = ?`;

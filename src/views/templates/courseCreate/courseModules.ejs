@@ -23,6 +23,8 @@
                 <input type="text" class="title" name="title[]"><br><br>
                 <label for="description">Description:</label><br>
                 <input type="text" class="description" name="description[]"><br><br>
+                <label for="video_link">Video Link:</label><br>
+                <input type="text" class="video_link" name="video_link[]"><br><br>
                 <button type="button" class="removeModule">X</button>
             </div>
         </div>
@@ -59,6 +61,7 @@
             const newModuleField = document.querySelector('.moduleField').cloneNode(true);
             newModuleField.querySelector('.title').value = ''; // Clear the cloned field value
             newModuleField.querySelector('.description').value = ''; // Clear the cloned field value
+            newModuleField.querySelector('.video_link').value = ''; // Clear the cloned field value
             moduleFields.appendChild(newModuleField);
         });
     </script>
