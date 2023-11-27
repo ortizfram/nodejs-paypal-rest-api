@@ -4,7 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Course <%=course.title%></title>
+    <title>Course <%=course.title%>
+    </title>
     <link rel="stylesheet" href="/css/alert.css">
     <link rel="stylesheet" href="/css/navbar.css">
     <link rel="stylesheet" href="/css/courseOverview.css">
@@ -14,36 +15,80 @@
 
     <div class="course-container">
         <%- include ('navbar') -%>
-        <%- include ('alert') -%>
-        <button>
-            <a href="/api/courses">Go back to All Courses</a>
-        </button>
-        <div class='course-detail'>
-            <div>
+            <%- include ('alert') -%>
                 <button>
-                    <p><a href="/api/course/<%= course.id %>/update">Edit</a></p>
+                    <a href="/api/courses">Go back to All Courses</a>
                 </button>
-                <button>
-                    <p><a href="#">Delete</a></p>
-                </button>
-            </div>
-            <!--here we display enrolledcourses from the user-->
-            <% if (course) { %>
-                <img src="<%= course.thumbnail %>" alt="<%= course.title %> image">
-                <h1><%= course.title %></h1>
-                <div class="markdown-content">
-                    <h3><%= course.description %></h3>
+                <div class='course-detail'>
+                    <div>
+                        <button>
+                            <p><a href="/api/course/<%= course.id %>/update">Edit</a></p>
+                        </button>
+                        <button>
+                            <p><a href="#">Delete</a></p>
+                        </button>
+                    </div>
+                    <!--here we display enrolledcourses from the user-->
+                    <% if (course) { %>
+                        <img src="<%= course.thumbnail %>" alt="<%= course.title %> image">
+                        <h1>
+                            <%= course.title %>
+                        </h1>
+                        <div class="markdown-content">
+                            <h3>
+                                <%= course.description %>
+                            </h3>
+                        </div>
+                        <!--  -->
+                        <p>
+                            <%= course.instructor %>
+                                </hp>
+                                <!-- Display other details of the course -->
+                                <% } else { %>
+                                    <p>No course details available.</p>
+                                    <% } %>
                 </div>
-                <!--  -->
-                <p><%= course.instructor %></hp>
-                <!-- Display other details of the course -->
-              <% } else { %>
-                <p>No course details available.</p>
-              <% } %>
-        </div>
+
+                <!-- Include Plyr.js CSS -->
+                <link rel="stylesheet" href="https://cdn.plyr.io/3.6.4/plyr.css" />
+
+                <!-- MODULES LIST --------------->
+                <div class="modules-list">
+                    <!-- Render modules for the current course -->
+                    <h2>Modules</h2>
+                    <ul>
+                        <% modules.forEach((module) => { %>
+                            <li>
+                                <h3><%= module.title %></h3>
+                                <p><%= module.description %></p>
+                                <!-- Video player container -->
+                                <div class="plyr__video-embed" id="player<%= module.id %>">
+                                    <!-- Embedded video link -->
+                                    <iframe
+                                        src="<%= module.video_link %>"
+                                        allowfullscreen
+                                        allowtransparency
+                                        allow="autoplay"
+                                    ></iframe>
+                                </div>
+                            </li>
+                        <% }) %>
+                    </ul>
+                </div>
 
     </div>
 
+    <!--SCRIPTS-------------------------------------------------------------------------------------------------------------------->
+    <!-- Include Plyr.js library -->
+    <script src="https://cdn.plyr.io/3.6.4/plyr.js"></script>
+
+    <!-- Initialize Plyr.js -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Select all video players with class 'plyr__video-embed' and initialize Plyr
+            const players = Array.from(document.querySelectorAll('.plyr__video-embed')).map(p => new Plyr(p));
+        });
+    </script>
 </body>
 
 </html>

@@ -590,6 +590,9 @@ const courseDetail = async (req, res) => {
       return res.status(404).send("Course not found");
     }
 
+    // Fetch modules associated with the current course
+    const [moduleRows] = await pool.query(modulesListQuery, courseId);
+    const modules = moduleRows || []; // Assuming moduleRows contain the modules for the course
 
     // Fetch the enrolled courses for the current user
     let enrolledCourses = [];
@@ -604,6 +607,7 @@ const courseDetail = async (req, res) => {
       course,
       message,
       user,
+      modules,
       enrolledCourses,
     });
   } catch (error) {
