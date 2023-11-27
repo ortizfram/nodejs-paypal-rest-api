@@ -134,46 +134,50 @@
     console.log("\n\n*** PostModuleCreate\n\n");
     try {
       const requestedCourseId = req.body.courseId;
-
+  
       // fetch course with req id
       const [courseRows] = await pool.query(getCourseFromIdQuery, [
         requestedCourseId,
       ]);
-
+  
       const course = courseRows[0];
       console.log("\n---Course:", course); // Log the course object to check if it's defined
-
+  
       let courseId; // Define courseId variable
-
+  
       if (course) {
         courseId = course.id;
         console.log("Course ID:", courseId); // Log the course ID if it exists
       }
-
-      // get data from form
+  
+      // Get data from form - handle multiple modules
       const { title, description } = req.body;
-      const moduleData = [title, description, courseId];
-
-      // Check if the "modules" table exists
-      const [tableCheck] = await pool.query(tableCheckQuery, "modules");
-      const tableExists = tableCheck.length > 0;
-      if (!tableExists) {
-        // Create user_courses table if it doesn't exist
-        await pool.query(createTableModuleQuery);
-        console.log(`\n--- modules table created\n`);
+  
+      // If there are multiple titles and descriptions sent as arrays
+      if (Array.isArray(title) && Array.isArray(description)) {
+        // Ensure the lengths match before proceeding
+        if (title.length !== description.length) {
+          throw new Error('Mismatch in the number of titles and descriptions provided');
+        }
+  
+        // Process each module data in the array
+        for (let i = 0; i < title.length; i++) {
+          const moduleData = [title[i], description[i], courseId];
+  
+          // Create modules query
+          const [moduleRows] = await pool.query(moduleCreateQuery, moduleData);
+          console.log("\n--- Module created in DB:", i + 1);
+        }
       } else {
-        console.log(`\n--- modules table already exists\n`);
+        // If only a single module is being added
+        const moduleData = [title, description, courseId];
+  
+        // Create modules query
+        const [moduleRows] = await pool.query(moduleCreateQuery, moduleData);
+        console.log("\n--- Module created");
       }
-
-      // create modules query
-      const [moduleRows] = await pool.query(moduleCreateQuery, [
-        moduleData[0],
-        moduleData[1],
-        moduleData[2],
-      ]);
-      console.log("\n--- module created");
-
-      // redirect to video creation of modules
+  
+      // Redirect to video creation of modules
       res
         .status(201)
         .redirect(`/api/course/${courseId}/video/create?courseId=${courseId}`);
@@ -183,6 +187,7 @@
         .json({ message: "Error creating module", error: error.message });
     }
   };
+  
   // --- VIDEO CREATE--------------------------
   const getVideoCreate = async (req, res) => {
     console.log("\n\n*** getVideoCreate\n\n");
@@ -235,7 +240,7 @@
       }
 
       const { moduleId, videoId, isPreview } = req.body;
-      console.log(`\n ---requested body data:\n courseId=${courseId},moduleId=${moduleId},videoId=${videoId},isPreview=${isPreview}\n`)
+      console.log(`\n ---requested body data:\n courseId=${courseId},moduleId=${moduleId},videoId=${videoId},isPreview=${isPreview}`)
 
       // Assuming you have a createVideoQuery to insert videos
       const createVideoData = [moduleId, videoId, isPreview];

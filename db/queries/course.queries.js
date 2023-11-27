@@ -67,6 +67,10 @@ VALUES (?, ?, ?, ?);
 `;
 
 export const listCourseVideosQuery = `SELECT * FROM videos WHERE courseId = ?`;
+
+export const listModuleVideosQuery = `
+SELECT * FROM videos WHERE courseId = ? AND moduleId = ?;
+`;
 // -----// -----------------
 
 // -----Get course queries-----------------
