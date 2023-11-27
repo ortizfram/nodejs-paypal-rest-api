@@ -219,45 +219,44 @@
 
   const postVideoCreate = async (req, res) => {
     console.log("\n\n*** PostVideoCreate\n\n");
-    // Handle the POST request to create videos
     try {
-      // Extract necessary data from the request body and parameters
-      let courseId = req.body.courseId; // Extract the course ID from the request parameters
+      let courseId = req.body.courseId;
       const [courseRows] = await pool.query(getCourseFromIdQuery, [courseId]);
-      const course = courseRows[0]
-      courseId = course.id
-
-      // create table
-      // Check if the table exists
+      const course = courseRows[0];
+      courseId = course.id;
+  
       const [tableCheck] = await pool.query(tableCheckQuery, "videos");
-      // validation & msgs
+  
       if (tableCheck.length === 0) {
-        // Table doesn't exist, create it
         const [createTableResult] = await pool.query(createCourseTableQuery);
         console.log("\n--- 'videos' table created: ", createTableResult);
       } else {
         console.log("\n---'videos' table already exists.");
       }
-
-      const { moduleId, videoId } = req.body;
-      console.log(`\n ---requested body data:\n courseId=${courseId},moduleId=${moduleId},videoId=${videoId}`)
-
-      // Assuming you have a createVideoQuery to insert videos
-      const createVideoData = [moduleId, videoId];
-
-      // Execute the query to insert the video into the videos table
-      await pool.query(createVideoQuery, createVideoData);
-
-      // Perform necessary operations to create a video for the specified course
-      // Process the received form data and create a new video in the database
-
+  
+      // Request data and ensure they are arrays
+      let { moduleId, videoId } = req.body;
+      if (!Array.isArray(moduleId)) {
+        moduleId = [moduleId];
+      }
+      if (!Array.isArray(videoId)) {
+        videoId = [videoId];
+      }
+  
+      // Prepare data for insertion into the table
+      for (let i = 0; i < moduleId.length; i++) {
+        const createVideoData = [courseId, moduleId[i], videoId[i]];
+        console.log(`\n ---requested body data:\n ${createVideoData}\n`);
+  
+        // Execute the query to insert the video into the videos table
+        await pool.query(createVideoQuery, createVideoData);
+      }
+  
       // Redirect after creating the course
       res.status(201).redirect("/api/courses");
     } catch (error) {
       // Handle errors appropriately
-      res
-        .status(500)
-        .json({ message: "Error creating video", error: error.message });
+      res.status(500).json({ message: "Error creating video", error: error.message });
     }
   };
 
