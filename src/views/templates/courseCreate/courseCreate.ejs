@@ -10,54 +10,58 @@
 
 <body>
     <h1>Create New Course</h1>
-    <form id="courseForm" action="/api/course/create" method="POST" enctype="multipart/form-data">
-        <!-- Form action should match the route for creating a course -->
-        <h3>Course description</h3>
-        <label for="title">Name:</label><br>
-        <input type="text" id="title" name="title"><br><br>
+    <div>
+        <form id="courseForm" action="/api/course/create" method="POST" enctype="multipart/form-data">
+            <!-- Form action should match the route for creating a course -->
+            <h3>Course description</h3>
+            <label for="title">Name:</label><br>
+            <input type="text" id="title" name="title"><br><br>
 
-        <label for="slug">Slug:</label><br>
-        <input type="text" id="slug" name="slug"><br>
-        <span id="slugError" style="color: red;"></span><br>
+            <label for="slug">Slug:</label><br>
+            <input type="text" id="slug" name="slug"><br>
+            <span id="slugError" style="color: red;"></span><br>
 
-        <label for="description">Description:</label><br>
-        <textarea id="description" name="description"></textarea><br><br>
+            <label for="description">Description:</label><br>
+            <textarea id="description" name="description"></textarea><br><br>
 
-        <label for="thumbnail">Thumbnail:</label><br>
-        <input type="file" id="thumbnail" name="thumbnail"><br><br>
+            <label for="thumbnail">Thumbnail:</label><br>
+            <input type="file" id="thumbnail" name="thumbnail"><br><br>
 
-        <h3>Price settings</h3>
-        <label for="price">ARS Price:</label><br>
-        <input type="number" id="ars_price" name="ars_price"><br><br>
+            <h3>Price settings</h3>
+            <label for="price">ARS Price:</label><br>
+            <input type="number" id="ars_price" name="ars_price"><br><br>
 
-        <label for="price">USD Price:</label><br>
-        <input type="number" id="usd_price" name="usd_price"><br><br>
+            <label for="price">USD Price:</label><br>
+            <input type="number" id="usd_price" name="usd_price"><br><br>
 
-        <h3>Aditional configs</h3>
-        <label for="discount">Discount:</label><br>
-        % <input type="number" id="discount" name="discount"><br><br>
+            <h3>Aditional configs</h3>
+            <label for="discount">Discount:</label><br>
+            % <input type="number" id="discount" name="discount"><br><br>
 
-        <div style="display: flex;">
-            <div>
-                <label for="active">Active:</label><br>
-                <input type="checkbox" id="active" name="active" value="true"><br><br>
+            <div style="display: flex;">
+                <div>
+                    <label for="active">Active:</label><br>
+                    <input type="checkbox" id="active" name="active" value="true"><br><br>
+                </div>
+
+                <div style="margin-left: 40px;">
+                    <label for="length">Length:</label><br>
+                    <input type="number" id="length" name="length" style="width: 80px;"><br><br>
+                </div>
             </div>
 
-            <div style="margin-left: 40px;">
-                <label for="length">Length:</label><br>
-                <input type="number" id="length" name="length" style="width: 80px;"><br><br>
-            </div>
-        </div>
+            <button type="submit">Create Course</button>
 
-        <button type="submit">Create Course</button>
-
-        <!-- Display error message -->
-        <% if (typeof errorMessage !=='undefined' ) { %>
-            <p style="color: red;">
-                <%= errorMessage %>
-            </p>
-            <% } %>
-    </form>
+            <!-- Display error message -->
+            <% if (typeof errorMessage !=='undefined' ) { %>
+                <p style="color: red;">
+                    <%= errorMessage %>
+                </p>
+                <% } %>
+        </form>
+        <form id="courseModulesForm" action=""></form>
+        <form id="courseVideosForm" action=""></form>
+    </div>
 </body>
 
 </html>
