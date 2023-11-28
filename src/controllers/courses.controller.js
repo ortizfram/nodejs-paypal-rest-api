@@ -13,11 +13,13 @@ import {
   getUserEnrolledCoursesQuery,
   listCourseVideosQuery,
   moduleCreateQuery,
+  moduleUpdateQuery,
   modulesListQuery,
   tableCheckQuery,
   updateCourseQuery,
 } from "../../db/queries/course.queries.js";
-// --- COURSE CREATE --------------------------
+
+// --- COURSE CREATE/UPDATE --------------------------
 const getCourseCreate = async (req, res) => {
   console.log("\n\n*** getCourseCreate\n\n");
   res.render("courseCreate/courseCreate");
@@ -113,15 +115,112 @@ const postCourseCreate = async (req, res) => {
     }
   }
 };
-// --- MODULE CREATE --------------------------
+
+const getCourseUpdate = async (req, res) => {
+  console.log(`\n\n*** getCourseUpdate\n\n`);
+
+  const message = req.query.message;
+  const user = req.session.user || null;
+  const courseId = req.params.id;
+
+  try {
+    console.log("\nCourse Id:", courseId);
+    const [courseRows] = await pool.query(getCourseFromIdQuery, courseId);
+    const course = courseRows[0];
+    console.log("\n---Fetched course:", course);
+
+    if (!course) {
+      return res.status(404).send("Course not found");
+    }
+
+    res.render("courseUpdate/courseUpdate", { course, message, user });
+  } catch (error) {
+    console.error("Error fetching the course:", error);
+    res.status(500).send("Error fetching the course");
+  }
+};
+
+const postCourseUpdate = async (req, res) => {
+  console.log("\n\n*** PostCourseUpdate\n\n");
+
+  const courseId = req.params.id; // Assuming the ID is coming from the request body
+  console.log(`\n--- courseId: ${courseId}\n`);
+
+  try {
+    const {
+      title,
+      description,
+      ars_price,
+      usd_price,
+      discount,
+      active,
+      thumbnail,
+      length,
+    } = req.body;
+
+    let courseSlug;
+
+    if (typeof title === "string" && title.trim() !== "") {
+      courseSlug = slugify(title, { lower: true, strict: true });
+    }
+
+    const discountValue = discount !== "" ? discount : null;
+    const thumbnailPath = req.file ? req.file.path : "";
+
+    const updateParams = [
+      title,
+      courseSlug,
+      description,
+      ars_price,
+      usd_price,
+      discountValue,
+      active === "true" ? true : false,
+      thumbnailPath,
+      length,
+      courseId, // where course.id
+    ];
+
+    console.log("\n\n---Update Parameters:", updateParams); // Log the update parameters
+
+    const result = await pool.query(updateCourseQuery, updateParams);
+    console.log("\n\n---Update Query:", updateCourseQuery);
+    console.log("\n\n---Query Result:", result); // Log the result of the query execution
+
+    if (result && result[0].affectedRows !== undefined) {
+      const affectedRows = parseInt(result[0].affectedRows);
+      console.log("\n\n---Affected Rows:", affectedRows);
+
+      const user = req.session.user || null;
+
+      if (affectedRows > 0) {
+        const message = "course updated correctly";
+        console.log(`\n\n\→ Go to courseModuleUpdate: ${message}`);
+        res.redirect(`/api/course/${courseId}/module/update?courseId=${courseId}`);
+      } else {
+        const message = "no changes made to course";
+        console.log(`\n\n\→ Go to courseModuleUpdate: ${message}`);
+        res
+          .status(201)
+          .redirect(
+            `/api/course/${courseId}/module/update?courseId=${courseId}`
+          );
+      }
+    }
+  } catch (error) {
+    console.error("Error updating course:", error);
+    res.status(500).json({ message: "Error updating the course" });
+  }
+};
+// --- MODULE CREATE/UPDATE --------------------------
 const getModuleCreate = async (req, res) => {
   console.log("\n\n*** getVideoCreate\n\n");
   try {
     const courseId = parseInt(req.query.courseId);
     const [courseRows] = await pool.query(getCourseFromIdQuery, [courseId]);
     const course = courseRows[0];
+    const user = req.session.user || null;
 
-    res.render("courseCreate/courseModules", { course, courseId });
+    res.render("courseCreate/courseModules", { course, courseId, user });
   } catch (error) {
     res.status(500).json({
       message: "Error fetching course data for module creation",
@@ -178,9 +277,76 @@ const postModuleCreate = async (req, res) => {
     }
 
     // Redirect to video creation of modules
+    res.status(201).redirect(`/api/course/${courseId}/modules`);
+  } catch (error) {
     res
-      .status(201)
-      .redirect(`/api/course/${courseId}/modules`);
+      .status(500)
+      .json({ message: "Error creating module", error: error.message });
+  }
+};
+
+const getModuleUpdate = async (req, res) => {
+  console.log("\n\n*** getModuleUpdate\n\n");
+
+  let courseId = parseInt(req.query.courseId);
+  const [courseRows] = await pool.query(getCourseFromIdQuery, [courseId]);
+  const course = courseRows[0];
+  courseId = course.id;
+  const user = req.session.user || null;
+  const message = req.query.message;
+
+  res.render("courseUpdate/courseModuleUpdate", {course, courseId, user, message});
+};
+
+const postModuleUpdate = async (req, res) => {
+  console.log("\n\n*** PostModuleUpdate\n\n");
+  try {
+    const requestedCourseId = req.body.courseId;
+
+    // fetch course with req id
+    const [courseRows] = await pool.query(getCourseFromIdQuery, [
+      requestedCourseId,
+    ]);
+
+    const course = courseRows[0];
+    console.log("\n---Course:", course); // Log the course object to check if it's defined
+
+    let courseId; // Define courseId variable
+
+    if (course) {
+      courseId = course.id;
+      console.log("Course ID:", courseId); // Log the course ID if it exists
+    }
+
+    // Get data from form - handle multiple modules
+    const { title, description, video_link } = req.body;
+
+    // If there are multiple titles, descriptions, and video links sent as arrays
+    if (
+      Array.isArray(title) &&
+      Array.isArray(description) &&
+      Array.isArray(video_link) &&
+      title.length === description.length &&
+      description.length === video_link.length
+    ) {
+      for (let i = 0; i < title.length; i++) {
+        const moduleData = [courseId, title[i], description[i], video_link[i]];
+
+        // Execute the query to create a module with title, description, and video link
+        await pool.query(moduleUpdateQuery, moduleData);
+        console.log("\n--- Module updated in DB:", i + 1);
+      }
+    } else {
+      // If only a single module is being added
+      const moduleData = [courseId, title, description, video_link];
+
+      // Execute the query to create a module with title, description, and video link
+      await pool.query(moduleUpdateQuery, moduleData);
+      console.log("\n--- Module Updated");
+    }
+
+    // Redirect to video creation of modules
+    res.status(201).redirect(`/api/course/${courseId}/modules`);
   } catch (error) {
     res
       .status(500)
@@ -263,96 +429,7 @@ const postVideoCreate = async (req, res) => {
 };
 
 // --- COURSE UPDATE --------------------------
-const getCourseUpdate = async (req, res) => {
-  console.log(`\n\n*** courseUpdate\n\n`);
 
-  const message = req.query.message;
-  const user = req.session.user || null;
-  const courseId = req.params.id;
-
-  try {
-    console.log("\nCourse Id:", courseId);
-    const [courseRows] = await pool.query(getCourseFromIdQuery, courseId);
-    const course = courseRows[0];
-    console.log("\n---Fetched course:", course);
-
-    if (!course) {
-      return res.status(404).send("Course not found");
-    }
-
-    res.render("courseUpdate", { course, message, user });
-  } catch (error) {
-    console.error("Error fetching the course:", error);
-    res.status(500).send("Error fetching the course");
-  }
-};
-
-const postCourseUpdate = async (req, res) => {
-  console.log("\n\n*** PostCourseUpdate\n\n");
-  const courseId = req.params.id; // Assuming the ID is coming from the request body
-  console.log(`\n--- courseId: ${courseId}\n`);
-
-  try {
-    const {
-      title,
-      description,
-      ars_price,
-      usd_price,
-      discount,
-      active,
-      thumbnail,
-      length,
-    } = req.body;
-
-    let courseSlug;
-
-    if (typeof title === "string" && title.trim() !== "") {
-      courseSlug = slugify(title, { lower: true, strict: true });
-    }
-
-    const discountValue = discount !== "" ? discount : null;
-    const thumbnailPath = req.file ? req.file.path : "";
-
-    const updateParams = [
-      title,
-      courseSlug,
-      description,
-      ars_price,
-      usd_price,
-      discountValue,
-      active === "true" ? true : false,
-      thumbnailPath,
-      length,
-      courseId, // where course.id
-    ];
-
-    console.log("\n\n---Update Parameters:", updateParams); // Log the update parameters
-
-    const result = await pool.query(updateCourseQuery, updateParams);
-    console.log("\n\n---Update Query:", updateCourseQuery);
-    console.log("\n\n---Query Result:", result); // Log the result of the query execution
-
-    if (result && result[0].affectedRows !== undefined) {
-      const affectedRows = parseInt(result[0].affectedRows);
-      console.log("\n\n---Affected Rows:", affectedRows);
-
-      const user = req.session.user || null;
-
-      if (affectedRows > 0) {
-        const message = "course updated correctly";
-        console.log(`\n\n\→ Go to courseDetail: ${message}`);
-        res.redirect(`/api/course/${courseId}/modules`);
-      } else {
-        const message = "no changes made to course";
-        console.log(`\n\n\→ Go to courseDetail: ${message}`);
-        res.redirect(`/api/course/${courseId}/modules`);
-      }
-    }
-  } catch (error) {
-    console.error("Error updating course:", error);
-    res.status(500).json({ message: "Error updating the course" });
-  }
-};
 
 // --- COURSE LIST , ENROLL, & DETAILS --------------------------
 
@@ -626,6 +703,8 @@ export default {
   postCourseCreate,
   getCourseUpdate,
   postCourseUpdate,
+  postModuleUpdate,
+  getModuleUpdate,
   getModuleCreate,
   postModuleCreate,
   getVideoCreate,

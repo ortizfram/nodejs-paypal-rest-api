@@ -4,19 +4,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add Modules</title>
+    <title>Update Modules</title>
     <link rel="stylesheet" href="/css/courseCreateModule.css">
 </head>
 
 <body>
 
     <!-- Create Modules Form -->
-    <form id="moduleForm" action="/api/course/<%= course.id %>/module/create" method="POST">
+    <form id="moduleForm" action="/api/course/<%= course.id %>/module/update" method="POST">
         <!-- Module details section -->
         <h1>
             <%= course.title %> 
         </h1>
-        <h3>Add Modules</h3>
+        <h3>Update Modules</h3>
         <div id="moduleFields">
             <div class="moduleField">
                 <label for="title">Title:</label><br>
@@ -35,7 +35,7 @@
 
         <!-- Button to submit module creation -->
         <input type="hidden" name="courseId" value="<%= courseId %>">
-        <button type="submit">Update Modules</button>
+        <button type="submit">Create Modules</button>
         <!-- Include error handling for any form submission errors -->
     </form>
 

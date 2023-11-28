@@ -44,6 +44,12 @@ INSERT INTO modules (courseId, title, description, video_link)
 VALUES (?, ?, ?, ?);
 `;
 
+export const moduleUpdateQuery = `
+UPDATE modules
+SET title = ?, description = ?, video_link = ?
+WHERE courseId = ?;
+`;
+
 export const modulesListQuery = `SELECT * FROM modules WHERE courseId = ?`;
 // -----// -----------------
 
