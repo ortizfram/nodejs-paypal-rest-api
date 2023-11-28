@@ -10,6 +10,7 @@ import {
   getCourseFromIdQuery,
   getCourseFromSlugQuery,
   getCourseListQuery,
+  getExistingModulesQuery,
   getUserEnrolledCoursesQuery,
   listCourseVideosQuery,
   moduleCreateQuery,
@@ -220,7 +221,11 @@ const getModuleCreate = async (req, res) => {
     const course = courseRows[0];
     const user = req.session.user || null;
 
-    res.render("courseCreate/courseModules", { course, courseId, user });
+    // Fetch existing modules for the course
+    const [moduleRows] = await pool.query(modulesListQuery, courseId);
+    const modules = moduleRows || [];
+
+    res.render("courseCreate/courseModules", { course, modules, courseId, user });
   } catch (error) {
     res.status(500).json({
       message: "Error fetching course data for module creation",
@@ -238,12 +243,9 @@ const postModuleCreate = async (req, res) => {
     const [courseRows] = await pool.query(getCourseFromIdQuery, [
       requestedCourseId,
     ]);
-
     const course = courseRows[0];
     console.log("\n---Course:", course); // Log the course object to check if it's defined
-
     let courseId; // Define courseId variable
-
     if (course) {
       courseId = course.id;
       console.log("Course ID:", courseId); // Log the course ID if it exists
@@ -295,7 +297,11 @@ const getModuleUpdate = async (req, res) => {
   const user = req.session.user || null;
   const message = req.query.message;
 
-  res.render("courseUpdate/courseModuleUpdate", {course, courseId, user, message});
+  // Fetch existing modules associated with the course
+  const [existingModulesRows] = await pool.query(getExistingModulesQuery, [courseId]);
+  const existingModules = existingModulesRows || [];
+
+  res.render("courseUpdate/courseModuleUpdate", {course, courseId, user, message, existingModules});
 };
 
 const postModuleUpdate = async (req, res) => {
@@ -319,18 +325,20 @@ const postModuleUpdate = async (req, res) => {
     }
 
     // Get data from form - handle multiple modules
-    const { title, description, video_link } = req.body;
+    const { title, description, video_link, moduleId } = req.body;
 
     // If there are multiple titles, descriptions, and video links sent as arrays
     if (
       Array.isArray(title) &&
       Array.isArray(description) &&
       Array.isArray(video_link) &&
+      Array.isArray(moduleId) &&  // Add check for moduleId array
       title.length === description.length &&
-      description.length === video_link.length
+      description.length === video_link.length &&
+      video_link.length === moduleId.length // Ensure lengths match
     ) {
       for (let i = 0; i < title.length; i++) {
-        const moduleData = [courseId, title[i], description[i], video_link[i]];
+        const moduleData = [title[i], description[i], video_link[i], moduleId[i]];
 
         // Execute the query to create a module with title, description, and video link
         await pool.query(moduleUpdateQuery, moduleData);
@@ -338,15 +346,19 @@ const postModuleUpdate = async (req, res) => {
       }
     } else {
       // If only a single module is being added
-      const moduleData = [courseId, title, description, video_link];
+      const moduleData = [title, description, video_link, courseId];
 
       // Execute the query to create a module with title, description, and video link
       await pool.query(moduleUpdateQuery, moduleData);
-      console.log("\n--- Module Updated");
+      console.log("\n--- Module Updated in DB");
     }
 
+    // Fetch existing modules associated with the course
+    const [existingModulesRows] = await pool.query(getExistingModulesQuery, [courseId]);
+    const existingModules = existingModulesRows || [];
+
     // Redirect to video creation of modules
-    res.status(201).redirect(`/api/course/${courseId}/modules`);
+    res.status(201).redirect(`/api/course/${courseId}/modules?courseId=${courseId}`);
   } catch (error) {
     res
       .status(500)

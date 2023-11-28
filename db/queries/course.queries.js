@@ -47,10 +47,15 @@ VALUES (?, ?, ?, ?);
 export const moduleUpdateQuery = `
 UPDATE modules
 SET title = ?, description = ?, video_link = ?
-WHERE courseId = ?;
+WHERE id = ?;
 `;
 
 export const modulesListQuery = `SELECT * FROM modules WHERE courseId = ?`;
+
+export const getExistingModulesQuery = `SELECT id, title, description, video_link
+FROM modules
+WHERE courseId = ?
+`;
 // -----// -----------------
 
 // -----VIdeo Queries ------------------

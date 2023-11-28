@@ -14,19 +14,25 @@
     <form id="moduleForm" action="/api/course/<%= course.id %>/module/update" method="POST">
         <!-- Module details section -->
         <h1>
-            <%= course.title %> 
+            <%= course.title %>
         </h1>
         <h3>Update Modules</h3>
         <div id="moduleFields">
-            <div class="moduleField">
-                <label for="title">Title:</label><br>
-                <input type="text" class="title" name="title[]"><br><br>
-                <label for="description">Description:</label><br>
-                <input type="text" class="description" name="description[]"><br><br>
-                <label for="video_link">Video Link:</label><br>
-                <input type="text" class="video_link" name="video_link[]"><br><br>
-                <button type="button" class="removeModule">X</button>
-            </div>
+            <% existingModules.forEach(module=> { %>
+                <div class="moduleField">
+                    <!-- Add hidden input for moduleId -->
+                    <input type="hidden" name="moduleId[]" value="<%= module.id %>">
+                    <!-- Rest of the module fields -->
+                    <label for="title">Title:</label><br>
+                    <input type="text" class="title" name="title[]" value="<%= module.title %>"><br><br>
+                    <label for="description">Description:</label><br>
+                    <input type="text" class="description" name="description[]"
+                        value="<%= module.description %>"><br><br>
+                    <label for="video_link">Video Link:</label><br>
+                    <input type="text" class="video_link" name="video_link[]" value="<%= module.video_link %>"><br><br>
+                    <button type="button" class="removeModule">X</button>
+                </div>
+                <% }); %>
         </div>
         <button type="button" id="addMore">
             <p>add more</p>
@@ -35,7 +41,7 @@
 
         <!-- Button to submit module creation -->
         <input type="hidden" name="courseId" value="<%= courseId %>">
-        <button type="submit">Create Modules</button>
+        <button type="submit">Update Modules</button>
         <!-- Include error handling for any form submission errors -->
     </form>
 
@@ -47,14 +53,14 @@
                 moduleField.remove();
             }
         }
-    
+
         // Event listener to handle removing module fields
-        document.getElementById('moduleFields').addEventListener('click', function(event) {
+        document.getElementById('moduleFields').addEventListener('click', function (event) {
             if (event.target.classList.contains('removeModule')) {
                 removeModuleField(event);
             }
         });
-    
+
         // Event listener to add more module fields
         document.getElementById('addMore').addEventListener('click', function () {
             const moduleFields = document.getElementById('moduleFields');
@@ -65,7 +71,7 @@
             moduleFields.appendChild(newModuleField);
         });
     </script>
-    
+
 </body>
 
 </html>
