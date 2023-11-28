@@ -258,7 +258,7 @@ const postModuleCreate = async (req, res) => {
 
     // Get data from form - handle multiple modules
     const { title, description, video_link } = req.body;
-    const thumbnail = req.file.path || null;
+    const thumbnails = req.files ? (Array.isArray(req.files.thumbnail) ? req.files.thumbnail : [req.files.thumbnail]) : [];
 
     // If there are multiple titles, descriptions, and video links sent as arrays
     if (
@@ -269,19 +269,21 @@ const postModuleCreate = async (req, res) => {
       description.length === video_link.length
     ) {
       for (let i = 0; i < title.length; i++) {
-        const moduleData = [courseId, title[i], description[i], video_link[i], thumbnail[i]];
+        const thumbnailPath = thumbnails[i] ? thumbnails[i].path : null; // Get the path of the i-th thumbnail or set to null if it doesn't exist
+        const moduleData = [courseId, title[i], description[i], video_link[i], thumbnailPath];
 
         // Execute the query to create a module with title, description, video link, and thumbnail
         await pool.query(moduleCreateQuery, moduleData);
-        console.log("\n--- Module created in DB:", i + 1, title[i], thumbnail[i]);
+        console.log("\n--- Module created in DB:", i + 1, title[i], thumbnailPath);
       }
     } else {
       // If only a single module is being added
-      const moduleData = [courseId, title, description, video_link, thumbnail];
+      const thumbnailPath = thumbnails[0] ? thumbnails[0].path : null; // Get the path of the first thumbnail or set to null if it doesn't exist
+      const moduleData = [courseId, title, description, video_link, thumbnailPath];
 
       // Execute the query to create a module with title, description, video link, and thumbnail
       await pool.query(moduleCreateQuery, moduleData);
-      console.log("\n--- Module created", title, thumbnail);
+      console.log("\n--- Module created", title, thumbnailPath);
     }
 
     // Redirect to video creation of modules
