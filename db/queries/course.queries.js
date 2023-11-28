@@ -58,29 +58,29 @@ WHERE courseId = ?
 `;
 // -----// -----------------
 
-// -----VIdeo Queries ------------------
-export const createVideosTableQuery = `
-CREATE TABLE IF NOT EXISTS videos (
-    id INT NOT NULL AUTO_INCREMENT,
-    courseId INT NOT NULL,
-    module_id INT NOT NULL,
-    video_id VARCHAR(100) NOT NULL,
-    PRIMARY KEY(id),
-    FOREIGN KEY(courseId) REFERENCES courses(id) ON DELETE CASCADE,
-    FOREIGN KEY (module_id) REFERENCES modules(id) ON DELETE CASCADE
-)
-`;
+// // -----VIdeo Queries ------------------
+// export const createVideosTableQuery = `
+// CREATE TABLE IF NOT EXISTS videos (
+//     id INT NOT NULL AUTO_INCREMENT,
+//     courseId INT NOT NULL,
+//     module_id INT NOT NULL,
+//     video_id VARCHAR(100) NOT NULL,
+//     PRIMARY KEY(id),
+//     FOREIGN KEY(courseId) REFERENCES courses(id) ON DELETE CASCADE,
+//     FOREIGN KEY (module_id) REFERENCES modules(id) ON DELETE CASCADE
+// )
+// `;
 
-export const createVideoQuery = `
-INSERT INTO videos (courseId, module_id, video_id)
-VALUES (?, ?, ?, ?);
-`;
+// export const createVideoQuery = `
+// INSERT INTO videos (courseId, module_id, video_id)
+// VALUES (?, ?, ?, ?);
+// `;
 
-export const listCourseVideosQuery = `SELECT * FROM videos WHERE courseId = ?`;
+// export const listCourseVideosQuery = `SELECT * FROM videos WHERE courseId = ?`;
 
-export const listModuleVideosQuery = `
-SELECT * FROM videos WHERE courseId = ? AND moduleId = ?;
-`;
+// export const listModuleVideosQuery = `
+// SELECT * FROM videos WHERE courseId = ? AND moduleId = ?;
+// `;
 // -----// -----------------
 
 // -----Get course queries-----------------

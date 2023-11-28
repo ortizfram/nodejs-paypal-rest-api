@@ -4,15 +4,11 @@ import { pool } from "../db.js";
 import {
   createCourseQuery,
   createCourseTableQuery,
-  createTableModuleQuery,
-  createVideoQuery,
-  createVideosTableQuery,
   getCourseFromIdQuery,
   getCourseFromSlugQuery,
   getCourseListQuery,
   getExistingModulesQuery,
   getUserEnrolledCoursesQuery,
-  listCourseVideosQuery,
   moduleCreateQuery,
   moduleUpdateQuery,
   modulesListQuery,
@@ -366,79 +362,79 @@ const postModuleUpdate = async (req, res) => {
   }
 };
 
-// --- VIDEO CREATE--------------------------
-const getVideoCreate = async (req, res) => {
-  console.log("\n\n*** getVideoCreate\n\n");
-  // Fetch necessary data for creating videos and render the video creation form
-  try {
-    let courseId = req.query.courseId; // Extract the course ID from the request parameters
-    const [courseRows] = await pool.query(getCourseFromIdQuery, [courseId]);
-    const course = courseRows[0];
-    courseId = course.id;
+// // --- VIDEO CREATE--------------------------
+// const getVideoCreate = async (req, res) => {
+//   console.log("\n\n*** getVideoCreate\n\n");
+//   // Fetch necessary data for creating videos and render the video creation form
+//   try {
+//     let courseId = req.query.courseId; // Extract the course ID from the request parameters
+//     const [courseRows] = await pool.query(getCourseFromIdQuery, [courseId]);
+//     const course = courseRows[0];
+//     courseId = course.id;
 
-    // Fetch modules for the selected course
-    const [moduleRows] = await pool.query(modulesListQuery, [courseId]);
-    const modules = moduleRows.map((module) => {
-      return {
-        id: module.id,
-        title: module.title,
-      };
-    });
+//     // Fetch modules for the selected course
+//     const [moduleRows] = await pool.query(modulesListQuery, [courseId]);
+//     const modules = moduleRows.map((module) => {
+//       return {
+//         id: module.id,
+//         title: module.title,
+//       };
+//     });
 
-    res.render("courseCreate/courseVideos", { courseId, course, modules }); // Render the video creation form with necessary data
-  } catch (error) {
-    // Handle errors appropriately
-    res.status(500).json({
-      message: "Error fetching course data for video creation",
-      error: error.message,
-    });
-  }
-};
+//     res.render("courseCreate/courseVideos", { courseId, course, modules }); // Render the video creation form with necessary data
+//   } catch (error) {
+//     // Handle errors appropriately
+//     res.status(500).json({
+//       message: "Error fetching course data for video creation",
+//       error: error.message,
+//     });
+//   }
+// };
 
-const postVideoCreate = async (req, res) => {
-  console.log("\n\n*** PostVideoCreate\n\n");
-  try {
-    let courseId = req.body.courseId;
-    const [courseRows] = await pool.query(getCourseFromIdQuery, [courseId]);
-    const course = courseRows[0];
-    courseId = course.id;
+// const postVideoCreate = async (req, res) => {
+//   console.log("\n\n*** PostVideoCreate\n\n");
+//   try {
+//     let courseId = req.body.courseId;
+//     const [courseRows] = await pool.query(getCourseFromIdQuery, [courseId]);
+//     const course = courseRows[0];
+//     courseId = course.id;
 
-    const [tableCheck] = await pool.query(tableCheckQuery, "videos");
+//     const [tableCheck] = await pool.query(tableCheckQuery, "videos");
 
-    if (tableCheck.length === 0) {
-      const [createTableResult] = await pool.query(createCourseTableQuery);
-      console.log("\n--- 'videos' table created: ", createTableResult);
-    } else {
-      console.log("\n---'videos' table already exists.");
-    }
+//     if (tableCheck.length === 0) {
+//       const [createTableResult] = await pool.query(createCourseTableQuery);
+//       console.log("\n--- 'videos' table created: ", createTableResult);
+//     } else {
+//       console.log("\n---'videos' table already exists.");
+//     }
 
-    // Request data and ensure they are arrays
-    let { moduleId, videoId } = req.body;
-    if (!Array.isArray(moduleId)) {
-      moduleId = [moduleId];
-    }
-    if (!Array.isArray(videoId)) {
-      videoId = [videoId];
-    }
+//     // Request data and ensure they are arrays
+//     let { moduleId, videoId } = req.body;
+//     if (!Array.isArray(moduleId)) {
+//       moduleId = [moduleId];
+//     }
+//     if (!Array.isArray(videoId)) {
+//       videoId = [videoId];
+//     }
 
-    // Prepare data for insertion into the table
-    for (let i = 0; i < moduleId.length; i++) {
-      const createVideoData = [courseId, moduleId[i], videoId[i]];
-      console.log(`\n ---requested body data:\n ${createVideoData}\n`);
+//     // Prepare data for insertion into the table
+//     for (let i = 0; i < moduleId.length; i++) {
+//       const createVideoData = [courseId, moduleId[i], videoId[i]];
+//       console.log(`\n ---requested body data:\n ${createVideoData}\n`);
 
-      // Execute the query to insert the video into the videos table
-      await pool.query(createVideoQuery, createVideoData);
-    }
+//       // Execute the query to insert the video into the videos table
+//       await pool.query(createVideoQuery, createVideoData);
+//     }
 
-    // Redirect after creating the course
-    res.status(201).redirect("/api/courses");
-  } catch (error) {
-    // Handle errors appropriately
-    res
-      .status(500)
-      .json({ message: "Error creating video", error: error.message });
-  }
-};
+//     // Redirect after creating the course
+//     res.status(201).redirect("/api/courses");
+//   } catch (error) {
+//     // Handle errors appropriately
+//     res
+//       .status(500)
+//       .json({ message: "Error creating video", error: error.message });
+//   }
+// };
 
 // --- COURSE UPDATE --------------------------
 
@@ -719,6 +715,4 @@ export default {
   getModuleUpdate,
   getModuleCreate,
   postModuleCreate,
-  getVideoCreate,
-  postVideoCreate,
 };
