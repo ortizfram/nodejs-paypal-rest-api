@@ -17,15 +17,17 @@
         <%- include ('navbar') -%>
             <%- include ('alert') -%>
                 <div>
-                    <button>
-                        <a href="/api/courses">Go back to All Courses</a>
-                    </button>
-                    <button>
-                        <p><a href="/api/course/<%= course.id %>/update">Edit</a></p>
-                    </button>
-                    <button>
-                        <p><a href="#">Delete</a></p>
-                    </button>
+                    <div>
+                        <button>
+                            <p><a href="/api/course/<%= course.id %>/update?courseId=<%= course.id %>">Edit course</a></p>
+                        </button>
+                        <button>
+                            <p><a href="/api/course/<%= course.id %>/module/create?courseId=<%= course.id %>">add more modules</a></p>
+                        </button>
+                        <button>
+                            <p><a href="#">Delete course</a></p>
+                        </button>
+                    </div>
                 </div>
     </div>
     <!---------------------------------------------------------------------------------------------------------------------->
