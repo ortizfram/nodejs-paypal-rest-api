@@ -9,7 +9,7 @@
 .first-module {
   /* Styles for the first module */
   /* You can adjust the width, height, borders, etc. */
-  flex-basis: 60%;
+  flex-basis: 80%;
   padding: 20px;
   border: 1px solid #ccc;
 }
@@ -18,7 +18,7 @@
 .modules-list {
   /* Styles for the list of modules */
   /* You can adjust the width, height, margins, etc. */
-  flex-basis: 35%;
+  flex-basis: 20%;
   padding: 20px;
   border: 1px solid #ccc;
 }

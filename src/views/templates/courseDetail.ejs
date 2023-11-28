@@ -12,89 +12,90 @@
 </head>
 
 <body>
-    <%- include ('navbar') -%>
-        <%- include ('alert') -%>
-            <div>
-                <button>
-                    <a href="/api/courses">Go back to All Courses</a>
-                </button>
-                <button>
-                    <p><a href="/api/course/<%= course.id %>/update">Edit</a></p>
-                </button>
-                <button>
-                    <p><a href="#">Delete</a></p>
-                </button>
-            </div>
-
-
-
-            <div class="course-container">
-                <!-- PLAYER -->
-                <!-- ========================================================= -->
-                <% if (modules.length> 0) { %>
-                    <div class="first-module">
-                        <div class='course-detail'>
-                            <h1>
-                                <%= modules[0].title %>
-                            </h1>
-                            <!-- Video player container for the first module -->
-                            <div class="plyr__video-embed" id="player<%= modules[0].id %>">
-                                <!-- Embedded video link -->
-                                <iframe src="<%= modules[0].video_link %>" allowfullscreen allowtransparency
-                                    allow="autoplay"></iframe>
-                            </div>
-                        </div>
+    <!--NAV BUTTONS-------------------------------------------------------------------------------------------------------------------->
+    <div class="navigation">
+        <%- include ('navbar') -%>
+            <%- include ('alert') -%>
+                <div>
+                    <button>
+                        <a href="/api/courses">Go back to All Courses</a>
+                    </button>
+                    <button>
+                        <p><a href="/api/course/<%= course.id %>/update">Edit</a></p>
+                    </button>
+                    <button>
+                        <p><a href="#">Delete</a></p>
+                    </button>
+                </div>
+    </div>
+    <!---------------------------------------------------------------------------------------------------------------------->
+    <!-- PLAYER -->
+    <!-- ========================================================= -->
+    <div class="course-container">
+        <% if (modules.length> 0) { %>
+            <div class="first-module">
+                <div class='course-detail'>
+                    <h1>
+                        <%= modules[0].title %>
+                    </h1>
+                    <!-- Video player container for the first module -->
+                    <div class="plyr__video-embed" id="player<%= modules[0].id %>">
+                        <!-- Embedded video link -->
+                        <iframe src="<%= modules[0].video_link %>" allowfullscreen allowtransparency
+                            allow="autoplay"></iframe>
                     </div>
-                    <% } %>
-                        <!-- ========================================================= -->
-                        <!-- Include Plyr.js CSS -->
-                        <link rel="stylesheet" href="https://cdn.plyr.io/3.6.4/plyr.css" />
-                        <!-- ========================================================= -->
-                        <!-- MODULES LIST --------------->
-                        <div class="modules-list">
-                            <!-- Render modules for the current course -->
-                            <h2>Modules</h2>
-                            <ul>
-                                <% modules.slice(1).forEach((module)=> { %>
-                                    <li>
-                                        <h3>
-                                            <%= module.title %>
-                                        </h3>
-                                        <!-- Video player container -->
-                                        <div class="plyr__video-embed" id="player<%= module.id %>">
-                                            <!-- Embedded video link -->
-                                            <iframe src="<%= module.video_link %>" allowfullscreen allowtransparency
-                                                allow="autoplay"></iframe>
-                                        </div>
-                                    </li>
-                                    <% }) %>
-                            </ul>
-                        </div>
+                </div>
             </div>
-
-            <div class="course-detail">
-                <!-- COURSE DETAIL -->
+            <% } %>
                 <!-- ========================================================= -->
-                <h1>
-                    <%= course.title %>
-                </h1>
-                <h3>
-                    <%= course.description %>
-                </h3>
-                <br>
-            </div>
+                <!-- Include Plyr.js CSS -->
+                <link rel="stylesheet" href="https://cdn.plyr.io/3.6.4/plyr.css" />
+                <!-- MODULES LIST --------------->
+                <!-- ========================================================= -->
+                <div class="modules-list">
+                    <!-- Render modules for the current course -->
+                    <h2>Modules</h2>
+                    <ul>
+                        <% modules.slice(1).forEach((module)=> { %>
+                            <li>
+                                <h3>
+                                    <%= module.title %>
+                                </h3>
+                                <!-- Video player container -->
+                                <div class="plyr__video-embed" id="player<%= module.id %>">
+                                    <!-- Embedded video link -->
+                                    <iframe src="<%= module.video_link %>" allowfullscreen allowtransparency
+                                        allow="autoplay"></iframe>
+                                </div>
+                            </li>
+                            <% }) %>
+                    </ul>
+                </div>
+    </div>
 
-            <!--SCRIPTS-------------------------------------------------------------------------------------------------------------------->
-            <!-- Include Plyr.js library -->
-            <script src="https://cdn.plyr.io/3.6.4/plyr.js"></script>
+    <!-- COURSE DETAIL -->
+    <!-- ========================================================= -->
+    <div class="course-detail">
+        <h1>
+            <%= course.title %>
+        </h1>
+        <h3>
+            <%= course.description %>
+        </h3>
+        <br>
+    </div>
 
-            <!-- Initialize Plyr.js -->
-            <script>
-                document.addEventListener('DOMContentLoaded', () => {
-                    // Select all video players with class 'plyr__video-embed' and initialize Plyr
-                    const players = Array.from(document.querySelectorAll('.plyr__video-embed')).map(p => new Plyr(p));
-                });
-            </script>
+    <!--SCRIPTS-------------------------------------------------------------------------------------------------------------------->
+    <!-- Include Plyr.js library -->
+    <script src="https://cdn.plyr.io/3.6.4/plyr.js"></script>
+
+    <!-- Initialize Plyr.js -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Select all video players with class 'plyr__video-embed' and initialize Plyr
+            const players = Array.from(document.querySelectorAll('.plyr__video-embed')).map(p => new Plyr(p));
+        });
+    </script>
 </body>
 
 </html>
