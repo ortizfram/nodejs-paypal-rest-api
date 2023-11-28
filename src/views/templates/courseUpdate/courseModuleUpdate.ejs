@@ -11,7 +11,8 @@
 <body>
 
     <!-- Create Modules Form -->
-    <form id="moduleForm" action="/api/course/<%= course.id %>/module/update" method="POST">
+    <form id="moduleForm" action="/api/course/<%= course.id %>/module/update" method="POST"
+        enctype="multipart/form-data">
         <!-- Module details section -->
         <h1>
             <%= course.title %>
@@ -30,6 +31,8 @@
                         value="<%= module.description %>"><br><br>
                     <label for="video_link">Video Link:</label><br>
                     <input type="text" class="video_link" name="video_link[]" value="<%= module.video_link %>"><br><br>
+                    <label for="thumbnail">Thumbnail:</label><br>
+                    <input type="file" id="thumbnail" class="thumbnail" name="thumbnail"><br><br>
                     <button type="button" class="removeModule">X</button>
                 </div>
                 <% }); %>

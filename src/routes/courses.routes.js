@@ -12,9 +12,9 @@ router.get('/course/:id/update', controllers.getCourseUpdate);//get update
 router.post('/course/:id/update', upload.single('thumbnail'), controllers.postCourseUpdate);// post update
 /////---------module-------------------------
 router.get("/course/:id/module/create", controllers.getModuleCreate);//get
-router.post('/course/:id/module/create', controllers.postModuleCreate);//post
+router.post('/course/:id/module/create', upload.single('thumbnail'), controllers.postModuleCreate);//post
 router.get('/course/:id/module/update', controllers.getModuleUpdate);//get update
-router.post('/course/:id/module/update', controllers.postModuleUpdate);//post update
+router.post('/course/:id/module/update', upload.single('thumbnail'), controllers.postModuleUpdate);//post update
 // /////---------video-------------------------
 // router.get("/course/:id/video/create", controllers.getVideoCreate);
 // router.post('/course/:id/video/create', controllers.postVideoCreate);

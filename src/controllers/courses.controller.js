@@ -212,7 +212,7 @@ const postCourseUpdate = async (req, res) => {
 };
 // --- MODULE CREATE/UPDATE --------------------------
 const getModuleCreate = async (req, res) => {
-  console.log("\n\n*** getVideoCreate\n\n");
+  console.log("\n\n*** getModuleCreate\n\n");
   try {
     const courseId = parseInt(req.query.courseId);
     const [courseRows] = await pool.query(getCourseFromIdQuery, [courseId]);
@@ -242,20 +242,23 @@ const postModuleCreate = async (req, res) => {
   try {
     const requestedCourseId = req.body.courseId;
 
-    // fetch course with req id
+    // Fetch course with req id
     const [courseRows] = await pool.query(getCourseFromIdQuery, [
       requestedCourseId,
     ]);
     const course = courseRows[0];
-    console.log("\n---Course:", course); // Log the course object to check if it's defined
-    let courseId; // Define courseId variable
-    if (course) {
-      courseId = course.id;
-      console.log("Course ID:", courseId); // Log the course ID if it exists
+    console.log("\n--- Course:", course); // Log the course object to check if it's defined
+
+    if (!course) {
+      return res.status(404).json({ message: "Course not found" });
     }
+
+    const courseId = course.id;
+    console.log("Course ID:", courseId); // Log the course ID
 
     // Get data from form - handle multiple modules
     const { title, description, video_link } = req.body;
+    const thumbnail = req.file.path || null;
 
     // If there are multiple titles, descriptions, and video links sent as arrays
     if (
@@ -266,29 +269,29 @@ const postModuleCreate = async (req, res) => {
       description.length === video_link.length
     ) {
       for (let i = 0; i < title.length; i++) {
-        const moduleData = [courseId, title[i], description[i], video_link[i]];
+        const moduleData = [courseId, title[i], description[i], video_link[i], thumbnail[i]];
 
-        // Execute the query to create a module with title, description, and video link
+        // Execute the query to create a module with title, description, video link, and thumbnail
         await pool.query(moduleCreateQuery, moduleData);
-        console.log("\n--- Module created in DB:", i + 1);
+        console.log("\n--- Module created in DB:", i + 1, title[i], thumbnail[i]);
       }
     } else {
       // If only a single module is being added
-      const moduleData = [courseId, title, description, video_link];
+      const moduleData = [courseId, title, description, video_link, thumbnail];
 
-      // Execute the query to create a module with title, description, and video link
+      // Execute the query to create a module with title, description, video link, and thumbnail
       await pool.query(moduleCreateQuery, moduleData);
-      console.log("\n--- Module created");
+      console.log("\n--- Module created", title, thumbnail);
     }
 
     // Redirect to video creation of modules
     res.status(201).redirect(`/api/course/${courseId}/modules`);
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Error creating module", error: error.message });
+    res.status(500).json({ message: "Error creating module", error: error.message });
   }
 };
+
+
 
 const getModuleUpdate = async (req, res) => {
   console.log("\n\n*** getModuleUpdate\n\n");

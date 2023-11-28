@@ -29,7 +29,7 @@ app.set("views", [path.join(__dirname, "views", "templates")]);
 // config static files
 app.use(express.static(path.join(__dirname, "public")));
 // config user upload files
-app.use("/src/uploads", express.static(path.join(__dirname, "uploads")));
+app.use("src/uploads", express.static(path.join(__dirname, "uploads")));
 
 
 // db use JSON
