@@ -10,27 +10,28 @@ import coursesRoutes from "./routes/courses.routes.js";
 import indexRoutes from "./routes/index.routes.js";
 import morgan from "morgan";
 import methodOverride from "method-override";
+import fileUpload from "express-fileupload";
 
+// load .ENV
+config();
+
+// call express
 const app = express();
 
 // configure methodOverride
 app.use(methodOverride('_method'));
 
-config();// load .ENV
-
+// shortcuts for files/dirs
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
 
 // config templates and EJS
 app.set("view engine", "ejs");
 app.set("views", [path.join(__dirname, "views", "templates")]);
 
-// config static files
+//Set up serving static files in Express:
 app.use(express.static(path.join(__dirname, "public")));
-// config user upload files
-app.use("src/uploads", express.static(path.join(__dirname, "uploads")));
-
+app.use("/uploads", express.static(path.join(__dirname, "src", "uploads")));
 
 // db use JSON
 app.use(express.urlencoded({ extended: true }));
@@ -48,16 +49,7 @@ app.use(
   })
 );
 
-// app middleware :for Logged-in needed
-export const LogInNeeded = (req, res, next) => {
-  if (req.session.user) {
-    next();
-  } else {
-    res.redirect('/api/login');
-  }
-};
-
-// Use routes
+// Use routes app
 app.use(indexRoutes);
 app.use("/api", authRoutes);
 app.use("/api", paymentRoutes);
