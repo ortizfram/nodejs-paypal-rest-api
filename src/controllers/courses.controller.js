@@ -258,7 +258,7 @@ const postModuleCreate = async (req, res) => {
 
     // Get data from form - handle multiple modules
     const { title, description, video_link } = req.body;
-    const thumbnails = req.files ? (Array.isArray(req.files.thumbnail) ? req.files.thumbnail : [req.files.thumbnail]) : [];
+    const thumbnails = req.files ? (Array.isArray(req.file.fieldname) ? req.files.fieldname : [req.files.fieldname]) : [];
 
     // If there are multiple titles, descriptions, and video links sent as arrays
     if (
@@ -274,7 +274,7 @@ const postModuleCreate = async (req, res) => {
 
         // Execute the query to create a module with title, description, video link, and thumbnail
         await pool.query(moduleCreateQuery, moduleData);
-        console.log("\n--- Module created in DB:", i + 1, title[i], thumbnailPath);
+        console.log("\n\n--- Module created in DB:", i + 1, title[i], thumbnailPath);
       }
     } else {
       // If only a single module is being added
