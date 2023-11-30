@@ -44,8 +44,8 @@ const postCourseCreate = async (req, res) => {
     // req thumbnail
     thumbnail = req.files ? req.files.thumbnail : "";
     timestamp = Date.now();
-    filename = encodeURIComponent(thumbnail.name);
-    uniqueFilename = `${timestamp}_${filename}`;
+    filename = thumbnail.name;
+    uniqueFilename = encodeURIComponent(`${timestamp}_${filename}`);
     relativePath = "./src/uploads/" + uniqueFilename;
 
     // msgs
