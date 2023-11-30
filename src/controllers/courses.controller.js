@@ -67,6 +67,9 @@ const postCourseCreate = async (req, res) => {
       .then(([tableCheck]) => {
         if (tableCheck.length === 0) {
           // Table doesn't exist, create it
+          console.log(" ");
+          console.log(" ");
+          console.log("course table created");
           return pool.query(createCourseTableQuery);
         } else {
           console.log(" ");
@@ -75,13 +78,7 @@ const postCourseCreate = async (req, res) => {
           return Promise.resolve(); // Resolve promise to continue the chain
         }
       })
-      .then(([createTableResult]) => {
-        if (createTableResult) {
-          console.log(" ");
-          console.log(" ");
-          console.log("course table created: ", createTableResult);
-        }
-
+      .then(() => {
         // req fields
         let {
           title,
@@ -128,12 +125,18 @@ const postCourseCreate = async (req, res) => {
       .then(([courseRows]) => {
         const course = courseRows[0];
         const courseId = course.id;
-
+        
+        console.log(" ")
+        console.log(" ")
         console.log("\n◘ Creating course...");
+        console.log(" ")
+        console.log(" ")
         console.log("course :", course);
 
         // Redirect after creating the course
-        res.redirect(`/api/course/${courseId}/module/create?courseId=${courseId}`);
+        res.redirect(
+          `/api/course/${courseId}/module/create?courseId=${courseId}`
+        );
       })
       .catch((error) => {
         if (error.code === 11000 && error.keyPattern && error.keyPattern.slug) {
@@ -143,7 +146,9 @@ const postCourseCreate = async (req, res) => {
         }
 
         // If the error is due to other reasons
-        return res.status(500).json({ message: "Error creating the course", error: error.message });
+        return res
+          .status(500)
+          .json({ message: "Error creating the course", error: error.message });
       });
   } catch (error) {
     return res.status(500).send(error);
