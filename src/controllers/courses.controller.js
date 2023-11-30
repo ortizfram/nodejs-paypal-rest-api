@@ -27,124 +27,118 @@ const getCourseCreate = async (req, res) => {
 const postCourseCreate = async (req, res) => {
   console.log("\n\n*** PostCourseCreate\n\n");
 
-  // Declare
-  let thumbnail;
-  let relativePath;
-  let courseSlug;
-  let filename;
-
-  // file upload check
-  if (!req.files || Object.keys(req.files).length === 0) {
-    return res.status(400).send("No files were uploaded");
-  }
-
-  // req thumbnail
-  thumbnail = req.files ? req.files.thumbnail : "";
-  filename = encodeURIComponent(thumbnail.name);
-  relativePath = "./src/uploads/" + filename;
-  // msgs
-  console.log(" ");
-  console.log("thumbnail :", thumbnail);
-  console.log(" ");
-  console.log("relativePath :", relativePath);
-
-  // Use mv() to place file on the server
-  thumbnail.mv(
-    path.join(__dirname, "src", "uploads", filename),
-    async function (err) {
-      // error => error
-      if (err) return res.status(500).send(err);
-
-      // if OK. send msg
-      console.log(" ");
-      console.log(" ");
-      console.log(`File uploaded!`);
-    }
-  );
-
   try {
-    // table check
-    const [tableCheck] = await pool.query(tableCheckQuery, "courses");
-    if (tableCheck.length === 0) {
-      // Table doesn't exist, create it
-      const [createTableResult] = await pool.query(createCourseTableQuery);
-      console.log(" ");
-      console.log(" ");
-      console.log("course table created: ", createTableResult);
-    } else {
-      console.log(" ");
-      console.log(" ");
-      console.log("Course table already exists.");
+    // Declare
+    let thumbnail;
+    let relativePath;
+    let courseSlug;
+    let filename;
+
+    // file upload check
+    if (!req.files || Object.keys(req.files).length === 0) {
+      return res.status(400).send("No files were uploaded");
     }
 
-    // req fields
-    let {
-      title,
-      slug,
-      description,
-      ars_price,
-      usd_price,
-      discount,
-      active,
-      length,
-    } = req.body;
-
-    // Parse String 'title'
-    if (typeof title !== "string") {
-      title = String(title);
-    }
-
-    // assing
-    courseSlug = slug;
-
-    // Autogenerate slug from title
-    if (!courseSlug) {
-      courseSlug = slugify(title, { lower: true, strict: true }); // Generate the slug from the name
-    }
-
-    // !if discount: null
-    const discountValue = discount !== "" ? discount : null;
-
-    // Create an object with column names and values
-    const courseData = [
-      title,
-      courseSlug,
-      description,
-      ars_price,
-      usd_price,
-      discountValue,
-      active === "true" ? true : false,
-      relativePath, //this is thumbnail
-      length,
-    ];
-
-    // Create the new course using the SQL query
-    await pool.query(createCourseQuery, courseData);
-    // get the course
-    const [courseRows] = await pool.query(getCourseFromSlugQuery, courseSlug);
-    const course = courseRows[0];
-    const courseId = course.id;
-
-    console.log("\n◘ Creating course...");
+    // req thumbnail
+    thumbnail = req.files ? req.files.thumbnail : "";
+    filename = encodeURIComponent(thumbnail.name);
+    relativePath = "./src/uploads/" + filename;
+    // msgs
     console.log(" ");
+    console.log("thumbnail :", thumbnail);
     console.log(" ");
-    console.log("course :", course);
+    console.log("relativePath :", relativePath);
 
-    // Redirect after creating the course
-    res.redirect(`/api/course/${courseId}/module/create?courseId=${courseId}`);
+    // Use mv() to place file on the server
+    thumbnail.mv(path.join(__dirname, "src", "uploads", filename))
+      .then(() => {
+        console.log("File uploaded!");
+
+        // table check
+        return pool.query(tableCheckQuery, "courses");
+      })
+      .then(([tableCheck]) => {
+        if (tableCheck.length === 0) {
+          // Table doesn't exist, create it
+          return pool.query(createCourseTableQuery);
+        } else {
+          console.log("Course table already exists.");
+          return Promise.resolve(); // Resolve promise to continue the chain
+        }
+      })
+      .then(([createTableResult]) => {
+        if (createTableResult) {
+          console.log("course table created: ", createTableResult);
+        }
+
+        // req fields
+        let {
+          title,
+          slug,
+          description,
+          ars_price,
+          usd_price,
+          discount,
+          active,
+          length,
+        } = req.body;
+
+        // Parse String 'title'
+        if (typeof title !== "string") {
+          title = String(title);
+        }
+
+        // assign
+        courseSlug = slug || slugify(title, { lower: true, strict: true });
+
+        // !if discount: null
+        const discountValue = discount !== "" ? discount : null;
+
+        // Create an object with column names and values
+        const courseData = [
+          title,
+          courseSlug,
+          description,
+          ars_price,
+          usd_price,
+          discountValue,
+          active === "true" ? true : false,
+          relativePath, //this is thumbnail
+          length,
+        ];
+
+        // Create the new course using the SQL query
+        return pool.query(createCourseQuery, courseData);
+      })
+      .then(() => {
+        // get the course
+        return pool.query(getCourseFromSlugQuery, courseSlug);
+      })
+      .then(([courseRows]) => {
+        const course = courseRows[0];
+        const courseId = course.id;
+
+        console.log("\n◘ Creating course...");
+        console.log("course :", course);
+
+        // Redirect after creating the course
+        res.redirect(`/api/course/${courseId}/module/create?courseId=${courseId}`);
+      })
+      .catch((error) => {
+        if (error.code === 11000 && error.keyPattern && error.keyPattern.slug) {
+          // If the error is due to the unique constraint on the slug field
+          const errorMessage = "Slug must be unique";
+          return res.render("courseCreate/courseCreate", { errorMessage });
+        }
+
+        // If the error is due to other reasons
+        return res.status(500).json({ message: "Error creating the course", error: error.message });
+      });
   } catch (error) {
-    if (error.code === 11000 && error.keyPattern && error.keyPattern.slug) {
-      // If the error is due to the unique constraint on the slug field
-      const errorMessage = "Slug must be unique";
-      return res.render("courseCreate/courseCreate", { errorMessage });
-    }
-    
-    // If the error is due to other reasons
-    res
-      .status(500)
-      .json({ message: "Error creating the course", error: error.message });
+    return res.status(500).send(error);
   }
 };
+
 
 const getCourseUpdate = async (req, res) => {
   console.log(`\n\n*** getCourseUpdate\n\n`);
