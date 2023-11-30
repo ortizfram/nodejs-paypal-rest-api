@@ -55,7 +55,7 @@ const postCourseCreate = async (req, res) => {
     console.log("relativePath :", relativePath);
 
     // Use mv() to place file on the server
-    thumbnail.mv(path.join(__dirname, "src", "uploads", filename))
+    thumbnail.mv(path.join(__dirname, "uploads", filename))
       .then(() => {
         console.log("File uploaded!");
 
