@@ -39,12 +39,23 @@ const postCourseCreate = async (req, res) => {
   // req thumbnail
   thumbnail = req.files ? req.files.thumbnail : "";
   filename = encodeURIComponent(thumbnail.name);
-  relativePath = "/uploads/" + filename;
+  relativePath = "./src/uploads/" + filename;
   // msgs
   console.log(" "); 
   console.log("thumbnail :", thumbnail); 
   console.log(" "); 
   console.log("relativePath :", relativePath); 
+
+  // Use mv() to place file on the server
+  thumbnail.mv(path.join(__dirname, "src","uploads", filename), async function (err) {
+    // error => error
+    if (err) return res.status(500).send(err);
+
+    // if OK. send msg
+    console.log(" ");
+    console.log(" ");
+    console.log(`File uploaded!`);
+  });
 
   try {
 
