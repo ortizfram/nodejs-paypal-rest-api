@@ -29,6 +29,7 @@ const postCourseCreate = async (req, res) => {
   let thumbnail;
   let relativePath;
   let courseSlug;
+  let filename;
 
   // file upload check
   if (!req.files || Object.keys(req.files).length === 0) {
@@ -52,8 +53,12 @@ const postCourseCreate = async (req, res) => {
     if (tableCheck.length === 0) {
       // Table doesn't exist, create it
       const [createTableResult] = await pool.query(createCourseTableQuery);
+      console.log(" ");
+      console.log(" ");
       console.log("course table created: ", createTableResult);
     } else {
+      console.log(" ");
+      console.log(" ");
       console.log("Course table already exists.");
     }
 
@@ -107,6 +112,9 @@ const postCourseCreate = async (req, res) => {
     const courseId = course.id;
 
     console.log("\n◘ Creating course...");
+    console.log(" ");
+    console.log(" ");
+    console.log("course :", course);
 
     
     // Redirect after creating the course
