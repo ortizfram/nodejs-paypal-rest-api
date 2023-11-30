@@ -43,24 +43,26 @@ const postCourseCreate = async (req, res) => {
   filename = encodeURIComponent(thumbnail.name);
   relativePath = "./src/uploads/" + filename;
   // msgs
-  console.log(" "); 
-  console.log("thumbnail :", thumbnail); 
-  console.log(" "); 
-  console.log("relativePath :", relativePath); 
+  console.log(" ");
+  console.log("thumbnail :", thumbnail);
+  console.log(" ");
+  console.log("relativePath :", relativePath);
 
   // Use mv() to place file on the server
-  thumbnail.mv(path.join(__dirname, "src","uploads", filename), async function (err) {
-    // error => error
-    if (err) return res.status(500).send(err);
+  thumbnail.mv(
+    path.join(__dirname, "src", "uploads", filename),
+    async function (err) {
+      // error => error
+      if (err) return res.status(500).send(err);
 
-    // if OK. send msg
-    console.log(" ");
-    console.log(" ");
-    console.log(`File uploaded!`);
-  });
+      // if OK. send msg
+      console.log(" ");
+      console.log(" ");
+      console.log(`File uploaded!`);
+    }
+  );
 
   try {
-
     // table check
     const [tableCheck] = await pool.query(tableCheckQuery, "courses");
     if (tableCheck.length === 0) {
@@ -103,7 +105,6 @@ const postCourseCreate = async (req, res) => {
     // !if discount: null
     const discountValue = discount !== "" ? discount : null;
 
-    
     // Create an object with column names and values
     const courseData = [
       title,
@@ -129,11 +130,9 @@ const postCourseCreate = async (req, res) => {
     console.log(" ");
     console.log("course :", course);
 
-    
     // Redirect after creating the course
-    res
-      .status(201)
-      .redirect(`/api/course/${courseId}/module/create?courseId=${courseId}`);
+    res.redirect(`/api/course/${courseId}/module/create?courseId=${courseId}`);
+    
   } catch (error) {
     if (error.code === 11000 && error.keyPattern && error.keyPattern.slug) {
       // If the error is due to the unique constraint on the slug field
