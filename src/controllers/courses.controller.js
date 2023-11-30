@@ -57,6 +57,8 @@ const postCourseCreate = async (req, res) => {
     // Use mv() to place file on the server
     thumbnail.mv(path.join(__dirname, "uploads", filename))
       .then(() => {
+        console.log(" ");
+        console.log(" ");
         console.log("File uploaded!");
 
         // table check
@@ -67,12 +69,16 @@ const postCourseCreate = async (req, res) => {
           // Table doesn't exist, create it
           return pool.query(createCourseTableQuery);
         } else {
+          console.log(" ");
+          console.log(" ");
           console.log("Course table already exists.");
           return Promise.resolve(); // Resolve promise to continue the chain
         }
       })
       .then(([createTableResult]) => {
         if (createTableResult) {
+          console.log(" ");
+          console.log(" ");
           console.log("course table created: ", createTableResult);
         }
 
