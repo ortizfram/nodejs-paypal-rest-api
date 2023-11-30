@@ -1,6 +1,7 @@
 //src/controllers/courses.controller.js
 import slugify from "slugify";
 import { pool } from "../db.js";
+import path from "path";
 import {
   createCourseQuery,
   createCourseTableQuery,
@@ -15,6 +16,7 @@ import {
   tableCheckQuery,
   updateCourseQuery,
 } from "../../db/queries/course.queries.js";
+import { __dirname } from "../apps.js";
 
 // --- COURSE CREATE/UPDATE --------------------------
 const getCourseCreate = async (req, res) => {
