@@ -33,6 +33,7 @@ const postCourseCreate = async (req, res) => {
     let relativePath;
     let courseSlug;
     let filename;
+    let timestamp;
 
     // file upload check
     if (!req.files || Object.keys(req.files).length === 0) {
@@ -41,8 +42,10 @@ const postCourseCreate = async (req, res) => {
 
     // req thumbnail
     thumbnail = req.files ? req.files.thumbnail : "";
-    filename = encodeURIComponent(thumbnail.name);
+    timestamp = Date.now(); // Get current timestamp
+    filename = `${timestamp}_${filename}`;
     relativePath = "./src/uploads/" + filename;
+    
     // msgs
     console.log(" ");
     console.log("thumbnail :", thumbnail);
