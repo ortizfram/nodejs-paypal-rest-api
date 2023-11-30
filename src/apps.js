@@ -25,13 +25,16 @@ app.use(methodOverride('_method'));
 export const __filename = fileURLToPath(import.meta.url);
 export const __dirname = path.dirname(__filename);
 
-// config templates and EJS
-app.set("view engine", "ejs");
-app.set("views", [path.join(__dirname, "views", "templates")]);
+//default option
+app.use(fileUpload());
 
 //Set up serving static files in Express:
 app.use(express.static(path.join(__dirname, "public")));
 app.use("/uploads", express.static(path.join(__dirname, "src", "uploads")));
+
+// config templates and EJS
+app.set("view engine", "ejs");
+app.set("views", [path.join(__dirname, "views", "templates")]);
 
 // db use JSON
 app.use(express.urlencoded({ extended: true }));
