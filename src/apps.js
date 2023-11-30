@@ -22,8 +22,8 @@ const app = express();
 app.use(methodOverride('_method'));
 
 // shortcuts for files/dirs
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+export const __filename = fileURLToPath(import.meta.url);
+export const __dirname = path.dirname(__filename);
 
 // config templates and EJS
 app.set("view engine", "ejs");

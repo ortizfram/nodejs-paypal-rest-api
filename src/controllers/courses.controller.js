@@ -30,16 +30,25 @@ const postCourseCreate = async (req, res) => {
   let relativePath;
   let courseSlug;
 
-  // file uploadd check
+  // file upload check
   if (!req.files || Object.keys(req.files).length === 0) {
     return res.status(400).send("No files were uploaded");
   }
 
+  // req thumbnail
+  thumbnail = req.files ? req.files.thumbnail : "";
+  filename = encodeURIComponent(thumbnail.name);
+  relativePath = "/uploads/" + filename;
+  // msgs
+  console.log(" "); 
+  console.log("thumbnail :", thumbnail); 
+  console.log(" "); 
+  console.log("relativePath :", relativePath); 
+
   try {
 
-    // Check if the table exists
+    // table check
     const [tableCheck] = await pool.query(tableCheckQuery, "courses");
-
     if (tableCheck.length === 0) {
       // Table doesn't exist, create it
       const [createTableResult] = await pool.query(createCourseTableQuery);
@@ -48,6 +57,7 @@ const postCourseCreate = async (req, res) => {
       console.log("Course table already exists.");
     }
 
+    // req fields
     let {
       title,
       slug,
@@ -59,25 +69,23 @@ const postCourseCreate = async (req, res) => {
       length,
     } = req.body;
 
-    // Check if title is a string before using it to generate a slug
+    // Parse String 'title'
     if (typeof title !== "string") {
       title = String(title);
     }
 
-    // Set courseSlug as the provided slug, if any
+    // assing
     courseSlug = slug;
 
-    // If no slug is provided, generate it from the name
+    // Autogenerate slug from title
     if (!courseSlug) {
       courseSlug = slugify(title, { lower: true, strict: true }); // Generate the slug from the name
     }
 
-    // Convert empty string to NULL for discount
+    // !if discount: null
     const discountValue = discount !== "" ? discount : null;
 
-    // Get the file path of the uploaded thumbnail
-    const thumbnailPath = req.files ? req.files.thumbnail : "";
-
+    
     // Create an object with column names and values
     const courseData = [
       title,
@@ -87,7 +95,7 @@ const postCourseCreate = async (req, res) => {
       usd_price,
       discountValue,
       active === "true" ? true : false,
-      thumbnailPath,
+      relativePath, //this is thumbnail
       length,
     ];
 
