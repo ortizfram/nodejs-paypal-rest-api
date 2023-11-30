@@ -24,7 +24,19 @@ const getCourseCreate = async (req, res) => {
 
 const postCourseCreate = async (req, res) => {
   console.log("\n\n*** PostCourseCreate\n\n");
+
+  // Declare
+  let thumbnail;
+  let relativePath;
+  let courseSlug;
+
+  // file uploadd check
+  if (!req.files || Object.keys(req.files).length === 0) {
+    return res.status(400).send("No files were uploaded");
+  }
+
   try {
+
     // Check if the table exists
     const [tableCheck] = await pool.query(tableCheckQuery, "courses");
 
@@ -36,7 +48,7 @@ const postCourseCreate = async (req, res) => {
       console.log("Course table already exists.");
     }
 
-    const {
+    let {
       title,
       slug,
       description,
@@ -44,12 +56,16 @@ const postCourseCreate = async (req, res) => {
       usd_price,
       discount,
       active,
-      thumbnail,
       length,
     } = req.body;
 
+    // Check if title is a string before using it to generate a slug
+    if (typeof title !== "string") {
+      title = String(title);
+    }
+
     // Set courseSlug as the provided slug, if any
-    let courseSlug = slug;
+    courseSlug = slug;
 
     // If no slug is provided, generate it from the name
     if (!courseSlug) {
@@ -60,7 +76,7 @@ const postCourseCreate = async (req, res) => {
     const discountValue = discount !== "" ? discount : null;
 
     // Get the file path of the uploaded thumbnail
-    const thumbnailPath = req.file ? req.file.path : "";
+    const thumbnailPath = req.files ? req.files.thumbnail : "";
 
     // Create an object with column names and values
     const courseData = [
@@ -84,17 +100,7 @@ const postCourseCreate = async (req, res) => {
 
     console.log("\n◘ Creating course...");
 
-    // Check if the table exists
-    const [tableCheck2] = await pool.query(tableCheckQuery, "videos");
-
-    if (tableCheck2.length === 0) {
-      // Table doesn't exist, create it
-      const [createTableResult] = await pool.query(createVideosTableQuery);
-      console.log("\n◘ course video table created: ", createTableResult);
-    } else {
-      console.log("\n---Course video table already exists.");
-    }
-
+    
     // Redirect after creating the course
     res
       .status(201)
@@ -258,7 +264,11 @@ const postModuleCreate = async (req, res) => {
 
     // Get data from form - handle multiple modules
     const { title, description, video_link } = req.body;
-    const thumbnails = req.files ? (Array.isArray(req.file.fieldname) ? req.files.fieldname : [req.files.fieldname]) : [];
+    const thumbnails = req.files
+      ? Array.isArray(req.file.fieldname)
+        ? req.files.fieldname
+        : [req.files.fieldname]
+      : [];
 
     // If there are multiple titles, descriptions, and video links sent as arrays
     if (
@@ -270,16 +280,33 @@ const postModuleCreate = async (req, res) => {
     ) {
       for (let i = 0; i < title.length; i++) {
         const thumbnailPath = thumbnails[i] ? thumbnails[i].path : null; // Get the path of the i-th thumbnail or set to null if it doesn't exist
-        const moduleData = [courseId, title[i], description[i], video_link[i], thumbnailPath];
+        const moduleData = [
+          courseId,
+          title[i],
+          description[i],
+          video_link[i],
+          thumbnailPath,
+        ];
 
         // Execute the query to create a module with title, description, video link, and thumbnail
         await pool.query(moduleCreateQuery, moduleData);
-        console.log("\n\n--- Module created in DB:", i + 1, title[i], thumbnailPath);
+        console.log(
+          "\n\n--- Module created in DB:",
+          i + 1,
+          title[i],
+          thumbnailPath
+        );
       }
     } else {
       // If only a single module is being added
       const thumbnailPath = thumbnails[0] ? thumbnails[0].path : null; // Get the path of the first thumbnail or set to null if it doesn't exist
-      const moduleData = [courseId, title, description, video_link, thumbnailPath];
+      const moduleData = [
+        courseId,
+        title,
+        description,
+        video_link,
+        thumbnailPath,
+      ];
 
       // Execute the query to create a module with title, description, video link, and thumbnail
       await pool.query(moduleCreateQuery, moduleData);
@@ -289,11 +316,11 @@ const postModuleCreate = async (req, res) => {
     // Redirect to video creation of modules
     res.status(201).redirect(`/api/course/${courseId}/modules`);
   } catch (error) {
-    res.status(500).json({ message: "Error creating module", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Error creating module", error: error.message });
   }
 };
-
-
 
 const getModuleUpdate = async (req, res) => {
   console.log("\n\n*** getModuleUpdate\n\n");
@@ -326,7 +353,9 @@ const postModuleUpdate = async (req, res) => {
     const requestedCourseId = req.body.courseId;
 
     // Fetch course with req id
-    const [courseRows] = await pool.query(getCourseFromIdQuery, [requestedCourseId]);
+    const [courseRows] = await pool.query(getCourseFromIdQuery, [
+      requestedCourseId,
+    ]);
     const course = courseRows[0];
     console.log("\n---Course:", course); // Log the course object to check if it's defined
 
@@ -344,7 +373,7 @@ const postModuleUpdate = async (req, res) => {
       Array.isArray(title) &&
       Array.isArray(description) &&
       Array.isArray(video_link) &&
-      Array.isArray(moduleId) && 
+      Array.isArray(moduleId) &&
       title.length === description.length &&
       description.length === video_link.length &&
       video_link.length === moduleId.length
@@ -358,14 +387,20 @@ const postModuleUpdate = async (req, res) => {
         ];
 
         // Check if module exists based on moduleId for updates
-        const [moduleUpdateRows] = await pool.query(moduleUpdateQuery, moduleData);
+        const [moduleUpdateRows] = await pool.query(
+          moduleUpdateQuery,
+          moduleData
+        );
         const affectedRows = moduleUpdateRows.affectedRows;
-        
+
         if (affectedRows > 0) {
           console.log(`\n--- Module updated in DB: ${moduleId[i]}`);
         } else {
           // If no rows were affected, create module
-          const [moduleCreateRows] = await pool.query(moduleCreateQuery, moduleData);
+          const [moduleCreateRows] = await pool.query(
+            moduleCreateQuery,
+            moduleData
+          );
           console.log(`\n--- Module ${i + 1} created in DB`);
         }
       }
@@ -377,13 +412,19 @@ const postModuleUpdate = async (req, res) => {
     }
 
     // Fetch existing modules associated with the course
-    const [existingModulesRows] = await pool.query(getExistingModulesQuery, [courseId]);
+    const [existingModulesRows] = await pool.query(getExistingModulesQuery, [
+      courseId,
+    ]);
     const existingModules = existingModulesRows || [];
 
     // Redirect to video creation of modules
-    res.status(201).redirect(`/api/course/${courseId}/modules?courseId=${courseId}`);
+    res
+      .status(201)
+      .redirect(`/api/course/${courseId}/modules?courseId=${courseId}`);
   } catch (error) {
-    res.status(500).json({ message: "Error creating module", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Error creating module", error: error.message });
   }
 };
 
@@ -405,6 +446,7 @@ const coursesList = async (req, res) => {
         usd_price: course.usd_price,
         thumbnail: course.thumbnail,
         id: course.id.toString(), // Ensure ID is converted to string for comparison
+        thumbnailPath: `/uploads/${course.thumbnail}`, // Construct the thumbnail path
       };
     });
 
@@ -428,7 +470,7 @@ const coursesList = async (req, res) => {
         (course) => !enrolledCourseIds.includes(course.id)
       );
 
-      // if user enrolled sm course
+      // If user enrolled in some course
       if (availableCourses.length > 0) {
         // Render available courses for the user
         res.render("courses", { courses: availableCourses, user, message });
@@ -437,7 +479,7 @@ const coursesList = async (req, res) => {
         res.render("courses", {
           courses: [],
           user,
-          message: "You haven't enrolled to any courses yet.",
+          message: "You haven't enrolled in any courses yet.",
         });
       }
     } else {
