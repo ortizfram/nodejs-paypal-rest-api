@@ -132,18 +132,17 @@ const postCourseCreate = async (req, res) => {
 
     // Redirect after creating the course
     res.redirect(`/api/course/${courseId}/module/create?courseId=${courseId}`);
-    
   } catch (error) {
     if (error.code === 11000 && error.keyPattern && error.keyPattern.slug) {
       // If the error is due to the unique constraint on the slug field
       const errorMessage = "Slug must be unique";
-      res.render("courseCreate/courseCreate", { errorMessage });
-    } else {
-      // If the error is due to other reasons
-      res
-        .status(500)
-        .json({ message: "Error creating the course", error: error.message });
+      return res.render("courseCreate/courseCreate", { errorMessage });
     }
+    
+    // If the error is due to other reasons
+    res
+      .status(500)
+      .json({ message: "Error creating the course", error: error.message });
   }
 };
 
