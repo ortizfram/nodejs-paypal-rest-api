@@ -30,7 +30,7 @@
                     </div>
                 </div>
     </div>
-    <!---------------------------------------------------------------------------------------------------------------------->
+    
     <!-- PLAYER -->
     <!-- ========================================================= -->
     <div class="course-container">
@@ -52,6 +52,7 @@
                 <!-- ========================================================= -->
                 <!-- Include Plyr.js CSS -->
                 <link rel="stylesheet" href="https://cdn.plyr.io/3.6.4/plyr.css" />
+
                 <!-- MODULES LIST --------------->
                 <!-- ========================================================= -->
                 <div class="modules-list">
@@ -63,7 +64,7 @@
                                 <h3>
                                     <%= module.title %>
                                 </h3>
-                                <img src="/uploads/<%= module.thumbnail %>" alt="Thumbnail-<%= module.title%>">
+                                <img src="<%= module.thumbnail %>" alt="Thumbnail-<%= module.title%>">
                                 <!-- Video player container -->
                                 <!-- <div class="plyr__video-embed" id="player<%= module.id %>"> -->
                                     <!-- Embedded video link -->

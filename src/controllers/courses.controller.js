@@ -364,6 +364,36 @@ const getModuleCreate = async (req, res) => {
 
 const postModuleCreate = async (req, res) => {
   console.log("\n\n*** PostModuleCreate\n\n");
+
+  //Declare
+  let thumbnailPath;
+  let thumbnail;
+  let timestamp;
+  let filename;
+  let uniqueFilename;
+  let relativePath;
+
+  // ! uploaded file
+  if (!req.files || Object.keys(req.files).length === 0) {
+    return res.status(400).send("No files were uploaded");
+  }
+
+  // Retrieve the thumbnail file from the request
+  thumbnail = req.files.thumbnail;
+  timestamp = Date.now();
+  filename = thumbnail.name;
+  uniqueFilename = encodeURIComponent(`${timestamp}_${filename}`);
+  relativePath = "/uploads/" + uniqueFilename;
+
+  // Move the thumbnail file to the specified directory
+  thumbnail.mv(path.join(__dirname, "uploads", uniqueFilename), (err) => {
+    if (err) {
+      return res.status(500).send(err);
+    }
+    console.log("\n\nThumbnail uploaded !");
+    thumbnailPath = relativePath; // Set the thumbnailPath variable
+  });
+
   try {
     //get course
     const requestedCourseId = req.body.courseId;
@@ -372,8 +402,9 @@ const postModuleCreate = async (req, res) => {
     ]);
     const course = courseRows[0];
     const courseId = course.id;
-    console.log("\n--- Course:", course); // Log the course object to check if it's defined
+    console.log("\n--- Course:", course.title); // Log the course object to check if it's defined
 
+    // !course
     if (!course) {
       return res.status(404).json({ message: "Course not found" });
     }
@@ -381,10 +412,10 @@ const postModuleCreate = async (req, res) => {
 
     // Get data from form - handle multiple modules
     const { title, description, video_link } = req.body;
-    const thumbnails = req.files && req.files.thumbnail
-      ? Array.isArray(req.files.thumbnail)
-        ? req.files.thumbnail
-        : [req.files.thumbnail]
+    const thumbnails = req.files && thumbnail
+      ? Array.isArray(thumbnail)
+        ? thumbnail
+        : [thumbnail]
       : [];
 
     // If there are multiple titles, descriptions, and video links sent as arrays
@@ -777,7 +808,7 @@ const courseDetail = async (req, res) => {
     const [courseRows] = await pool.query(getCourseFromIdQuery, courseId);
     const course = courseRows[0];
     courseId = course.id;
-    console.log("\nFetched course:", course);
+    console.log("\nFetched course:", course.title);
 
     if (!course) {
       return res.status(404).send("Course not found");
