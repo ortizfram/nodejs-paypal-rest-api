@@ -9,6 +9,8 @@ router.get("/course/create", controllers.getCourseCreate);//get
 router.post('/course/create',  controllers.postCourseCreate);//post
 router.get('/course/:id/update', controllers.getCourseUpdate);//get update
 router.post('/course/:id/update',  controllers.postCourseUpdate);// post update
+router.get('/course/:id/delete',  controllers.getCourseDelete);// get del
+router.post('/course/:id/delete',  controllers.postCourseDelete);// post del
 /////---------module-------------------------
 router.get("/course/:id/module/create", controllers.getModuleCreate);//get
 router.post('/course/:id/module/create', controllers.postModuleCreate);//post

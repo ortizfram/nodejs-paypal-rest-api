@@ -18,7 +18,8 @@ import {
 } from "../../db/queries/course.queries.js";
 import { __dirname } from "../apps.js";
 
-// --- COURSE CREATE/UPDATE --------------------------
+//COURSE CREATE/UPDATE/DELETE
+// ===========================================================
 const getCourseCreate = async (req, res) => {
   console.log("\n\n*** getCourseCreate\n\n");
   res.render("courseCreate/courseCreate");
@@ -155,7 +156,6 @@ const postCourseCreate = async (req, res) => {
   }
 };
 
-
 const getCourseUpdate = async (req, res) => {
   console.log(`\n\n*** getCourseUpdate\n\n`);
 
@@ -253,7 +253,28 @@ const postCourseUpdate = async (req, res) => {
     res.status(500).json({ message: "Error updating the course" });
   }
 };
-// --- MODULE CREATE/UPDATE --------------------------
+
+const getCourseDelete = async (req, res) => {
+  res.send("\n\n*** getCourseDelete\n\n")
+  try {
+    // course from id
+    const courseId = req.params.id;
+    const [courseRows] = await pool.query(getCourseByIdQuery, [courseId]);
+    const course = courseRows[0];
+    
+    // render template 
+    res.render("deleteConfirmation", { course });
+  } catch (error) {
+    console.log("Error fetching course for deletion:", error);
+    res.redirect(`/api/course/${req.params.id}`);
+  }
+};
+
+const postCourseDelete = async (req, res) => {
+  res.send("\n\n*** postCourseDelete\n\n")
+};
+// MODULE CREATE/UPDATE 
+// ===========================================================
 const getModuleCreate = async (req, res) => {
   console.log("\n\n*** getModuleCreate\n\n");
   try {
@@ -465,7 +486,8 @@ const postModuleUpdate = async (req, res) => {
   }
 };
 
-// --- COURSE LIST , ENROLL, & DETAILS --------------------------
+// --- COURSE LIST , ENROLL, & DETAILS 
+// ===========================================================
 
 const coursesList = async (req, res) => {
   console.log("\n*** coursesList\n");
@@ -742,4 +764,6 @@ export default {
   getModuleUpdate,
   getModuleCreate,
   postModuleCreate,
+  getCourseDelete,
+  postCourseDelete,
 };
