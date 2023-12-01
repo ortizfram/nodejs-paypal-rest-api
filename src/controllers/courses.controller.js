@@ -46,7 +46,7 @@ const postCourseCreate = async (req, res) => {
     timestamp = Date.now();
     filename = thumbnail.name;
     uniqueFilename = encodeURIComponent(`${timestamp}_${filename}`);
-    relativePath = "./src/uploads/" + uniqueFilename;
+    relativePath = "/src/uploads/" + uniqueFilename;
 
     // msgs
     console.log(" ");
@@ -55,7 +55,7 @@ const postCourseCreate = async (req, res) => {
     console.log("relativePath :", relativePath);
 
     // Use mv() to place file on the server
-    thumbnail.mv(path.join(__dirname, "uploads", filename))
+    thumbnail.mv(path.join(__dirname, "uploads", uniqueFilename))
       .then(() => {
         console.log(" ");
         console.log(" ");
