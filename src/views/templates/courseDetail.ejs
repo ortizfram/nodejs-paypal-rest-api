@@ -34,14 +34,12 @@
     <!-- PLAYER -->
     <!-- ========================================================= -->
     <div class="course-container">
-        <img src="<%= course.thumbnail %>" alt="<%= course.slug %>-thumbnail">
         <% if (modules.length> 0) { %>
             <div class="first-module">
                 <div class='course-detail'>
                     <h1>
                         <%= modules[0].title %>
                     </h1>
-                    <img src="<%= course.thumbnail %>" alt="thumbnail-<%= course.slug %>">
                     <!-- Video player container for the first module -->
                     <div class="plyr__video-embed" id="player<%= modules[0].id %>">
                         <!-- Embedded video link -->
@@ -67,11 +65,11 @@
                                 </h3>
                                 <img src="/uploads/<%= module.thumbnail %>" alt="Thumbnail-<%= module.title%>">
                                 <!-- Video player container -->
-                                <div class="plyr__video-embed" id="player<%= module.id %>">
+                                <!-- <div class="plyr__video-embed" id="player<%= module.id %>"> -->
                                     <!-- Embedded video link -->
-                                    <iframe src="<%= module.video_link %>" allowfullscreen allowtransparency
-                                        allow="autoplay"></iframe>
-                                </div>
+                                    <!-- <iframe src="<%= module.video_link %>" allowfullscreen allowtransparency
+                                        allow="autoplay"></iframe> -->
+                                <!-- </div> -->
                             </li>
                             <% }) %>
                     </ul>

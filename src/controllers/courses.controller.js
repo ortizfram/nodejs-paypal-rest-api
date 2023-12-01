@@ -365,28 +365,26 @@ const getModuleCreate = async (req, res) => {
 const postModuleCreate = async (req, res) => {
   console.log("\n\n*** PostModuleCreate\n\n");
   try {
+    //get course
     const requestedCourseId = req.body.courseId;
-
-    // Fetch course with req id
     const [courseRows] = await pool.query(getCourseFromIdQuery, [
       requestedCourseId,
     ]);
     const course = courseRows[0];
+    const courseId = course.id;
     console.log("\n--- Course:", course); // Log the course object to check if it's defined
 
     if (!course) {
       return res.status(404).json({ message: "Course not found" });
     }
-
-    const courseId = course.id;
-    console.log("Course ID:", courseId); // Log the course ID
+   
 
     // Get data from form - handle multiple modules
     const { title, description, video_link } = req.body;
-    const thumbnails = req.files
-      ? Array.isArray(req.file.fieldname)
-        ? req.files.fieldname
-        : [req.files.fieldname]
+    const thumbnails = req.files && req.files.thumbnail
+      ? Array.isArray(req.files.thumbnail)
+        ? req.files.thumbnail
+        : [req.files.thumbnail]
       : [];
 
     // If there are multiple titles, descriptions, and video links sent as arrays
