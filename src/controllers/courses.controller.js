@@ -365,108 +365,93 @@ const getModuleCreate = async (req, res) => {
 const postModuleCreate = async (req, res) => {
   console.log("\n\n*** PostModuleCreate\n\n");
 
-  //Declare
-  let thumbnailPath;
-  let thumbnail;
-  let timestamp;
-  let filename;
-  let uniqueFilename;
-  let relativePath;
-
-  // ! uploaded file
-  if (!req.files || Object.keys(req.files).length === 0) {
-    return res.status(400).send("No files were uploaded");
-  }
-
-  // Retrieve the thumbnail file from the request
-  thumbnail = req.files.thumbnail;
-  timestamp = Date.now();
-  filename = thumbnail.name;
-  uniqueFilename = encodeURIComponent(`${timestamp}_${filename}`);
-  relativePath = "/uploads/" + uniqueFilename;
-
-  // Move the thumbnail file to the specified directory
-  thumbnail.mv(path.join(__dirname, "uploads", uniqueFilename), (err) => {
-    if (err) {
-      return res.status(500).send(err);
-    }
-    console.log("\n\nThumbnail uploaded !");
-    thumbnailPath = relativePath; // Set the thumbnailPath variable
-  });
-
   try {
-    //get course
-    const requestedCourseId = req.body.courseId;
-    const [courseRows] = await pool.query(getCourseFromIdQuery, [
-      requestedCourseId,
-    ]);
-    const course = courseRows[0];
-    const courseId = course.id;
-    console.log("\n--- Course:", course.title); // Log the course object to check if it's defined
-
-    // !course
-    if (!course) {
-      return res.status(404).json({ message: "Course not found" });
+    // ! uploaded file
+    if (!req.files || Object.keys(req.files).length === 0) {
+      return res.status(400).send("No files were uploaded");
     }
-   
 
-    // Get data from form - handle multiple modules
-    const { title, description, video_link } = req.body;
-    const thumbnails = req.files && thumbnail
-      ? Array.isArray(thumbnail)
-        ? thumbnail
-        : [thumbnail]
-      : [];
+    // Retrieve the thumbnail file from the request
+    const thumbnail = req.files.thumbnail;
+    const timestamp = Date.now();
+    const filename = thumbnail.name;
+    const uniqueFilename = encodeURIComponent(`${timestamp}_${filename}`);
+    const relativePath = "/uploads/" + uniqueFilename;
 
-    // If there are multiple titles, descriptions, and video links sent as arrays
-    if (
-      Array.isArray(title) &&
-      Array.isArray(description) &&
-      Array.isArray(video_link) &&
-      title.length === description.length &&
-      description.length === video_link.length
-    ) {
-      for (let i = 0; i < title.length; i++) {
-        const thumbnailPath = thumbnails[i] ? thumbnails[i].path : null; // Get the path of the i-th thumbnail or set to null if it doesn't exist
+    // Move the thumbnail file to the specified directory
+    thumbnail.mv(path.join(__dirname, "uploads", uniqueFilename), async (err) => {
+      if (err) {
+        return res.status(500).send(err);
+      }
+
+      console.log("\n\nThumbnail uploaded !");
+      const thumbnailPath = relativePath; // Set the thumbnailPath variable
+      console.log(`\n\nthumbnailPath: ${thumbnailPath}`);
+      
+      // Get course details
+      const requestedCourseId = req.body.courseId;
+      const [courseRows] = await pool.query(getCourseFromIdQuery, [requestedCourseId]);
+      const course = courseRows[0];
+      const courseId = course.id;
+
+      console.log("\n--- Course:", course.title); // Log the course object to check if it's defined
+
+      // Check if the course exists
+      if (!course) {
+        return res.status(404).json({ message: "Course not found" });
+      }
+
+      // Get data from form - handle multiple modules
+      const { title, description, video_link } = req.body;
+      const thumbnails = req.files && thumbnail ? Array.isArray(thumbnail) ? thumbnail : [thumbnail] : [];
+
+      // If there are multiple titles, descriptions, and video links sent as arrays
+      if (
+        Array.isArray(title) &&
+        Array.isArray(description) &&
+        Array.isArray(video_link) &&
+        title.length === description.length &&
+        description.length === video_link.length
+      ) {
+        for (let i = 0; i < title.length; i++) {
+          const thumbnailPath = thumbnails[i] ? thumbnails[i].name : null; // Get the path of the i-th thumbnail or set to null if it doesn't exist
+          const moduleData = [
+            courseId,
+            title[i],
+            description[i],
+            video_link[i],
+            thumbnailPath,
+          ];
+
+          // Execute the query to create a module with title, description, video link, and thumbnail
+          await pool.query(moduleCreateQuery, moduleData);
+          console.log(
+            "\n\n--- Module created in DB:",
+            i + 1,
+            title[i],
+            thumbnailPath
+          );
+        }
+      } else {
+        const thumbnailPath = thumbnails[0] ? thumbnails[0].name : null; // Get the path of the first thumbnail or set to null if it doesn't exist
         const moduleData = [
           courseId,
-          title[i],
-          description[i],
-          video_link[i],
+          title,
+          description,
+          video_link,
           thumbnailPath,
         ];
 
         // Execute the query to create a module with title, description, video link, and thumbnail
         await pool.query(moduleCreateQuery, moduleData);
-        console.log(
-          "\n\n--- Module created in DB:",
-          i + 1,
-          title[i],
-          thumbnailPath
-        );
+        console.log("\n--- Module created", title, thumbnailPath);
       }
-    } else {
-      // If only a single module is being added
-      const thumbnailPath = thumbnails[0] ? thumbnails[0].path : null; // Get the path of the first thumbnail or set to null if it doesn't exist
-      const moduleData = [
-        courseId,
-        title,
-        description,
-        video_link,
-        thumbnailPath,
-      ];
 
-      // Execute the query to create a module with title, description, video link, and thumbnail
-      await pool.query(moduleCreateQuery, moduleData);
-      console.log("\n--- Module created", title, thumbnailPath);
-    }
-
-    // Redirect to video creation of modules
-    res.status(201).redirect(`/api/course/${courseId}/modules`);
+      // Redirect to video creation of modules
+      res.status(201).redirect(`/api/course/${courseId}/modules`);
+    });
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Error creating module", error: error.message });
+    res.status(500).json({ message: "Error creating module", error: error.message });
   }
 };
 
