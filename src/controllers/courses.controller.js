@@ -364,6 +364,13 @@ const getModuleCreate = async (req, res) => {
 
 const postModuleCreate = async (req, res) => {
   console.log("\n\n*** PostModuleCreate\n\n");
+      // Declare
+      let thumbnail;
+      let relativePath;
+      let courseSlug;
+      let filename;
+      let uniqueFilename;
+      let timestamp;
 
   try {
     // ! uploaded file
@@ -372,11 +379,17 @@ const postModuleCreate = async (req, res) => {
     }
 
     // Retrieve the thumbnail file from the request
-    const thumbnail = req.files.thumbnail;
-    const timestamp = Date.now();
-    const filename = thumbnail.name;
-    const uniqueFilename = encodeURIComponent(`${timestamp}_${filename}`);
-    const relativePath = "/uploads/" + uniqueFilename;
+    thumbnail = req.files.thumbnail;
+    timestamp = Date.now();
+    filename = thumbnail.name;
+    uniqueFilename = encodeURIComponent(`${timestamp}_${filename}`);
+    relativePath = "/uploads/" + uniqueFilename;
+
+    // msgs
+    console.log(" ");
+    console.log("thumbnail :", thumbnail);
+    console.log(" ");
+    console.log("relativePath :", relativePath);
 
     // Move the thumbnail file to the specified directory
     thumbnail.mv(path.join(__dirname, "uploads", uniqueFilename), async (err) => {
@@ -414,7 +427,7 @@ const postModuleCreate = async (req, res) => {
         description.length === video_link.length
       ) {
         for (let i = 0; i < title.length; i++) {
-          const thumbnailPath = thumbnails[i] ? thumbnails[i].name : null; // Get the path of the i-th thumbnail or set to null if it doesn't exist
+          const thumbnailPath = thumbnails[i] ? encodeURIComponent(`${timestamp}_${thumbnails[i].name}`) : null; // Get the path of the i-th thumbnail or set to null if it doesn't exist
           const moduleData = [
             courseId,
             title[i],
