@@ -315,7 +315,7 @@ const postCourseDelete = async (req, res) => {
   courseId = course.id;
 
   //msg
-  console.log("\n\n${course.title}\n\n")
+  console.log(`\n\n${course.title}\n\n`)
 
   // Perform deletion query
   await pool.query(deleteUserCourseQuery, [courseId]);
@@ -323,13 +323,13 @@ const postCourseDelete = async (req, res) => {
 
   //msgs
   const message = `course deleted successfully`;
-  console.log("\n\n${message}");
+  console.log(`\n\n${message}`);
 
   // Redirect after successful deletion
   res.redirect(`/api/courses?message=${message}`);
   } catch (error){
     const message = `Error deleting course: ${error}`;
-    console.log("\n\n${message}");
+    console.log(`\n\n${message}`);
     res.redirect(`/api/courses?message=${message}`);
   }
 };
