@@ -56,7 +56,8 @@ const postCourseCreate = async (req, res) => {
     console.log("relativePath :", relativePath);
 
     // Use mv() to place file on the server
-    thumbnail.mv(path.join(__dirname, "uploads", uniqueFilename))
+    thumbnail
+      .mv(path.join(__dirname, "uploads", uniqueFilename))
       .then(() => {
         console.log(" ");
         console.log(" ");
@@ -126,12 +127,12 @@ const postCourseCreate = async (req, res) => {
       .then(([courseRows]) => {
         const course = courseRows[0];
         const courseId = course.id;
-        
-        console.log(" ")
-        console.log(" ")
+
+        console.log(" ");
+        console.log(" ");
         console.log("\n◘ Creating course...");
-        console.log(" ")
-        console.log(" ")
+        console.log(" ");
+        console.log(" ");
         console.log("course :", course);
 
         // Redirect after creating the course
@@ -183,10 +184,18 @@ const getCourseUpdate = async (req, res) => {
 const postCourseUpdate = async (req, res) => {
   console.log("\n\n*** PostCourseUpdate\n\n");
 
+  // get courseId
   const courseId = req.params.id; // Assuming the ID is coming from the request body
   console.log(`\n--- courseId: ${courseId}\n`);
 
+  // Declare
+  let courseSlug;
+  let thumbnailPath;
+  let thumbnail;
+  let discountValue;
+
   try {
+    // req fields
     const {
       title,
       description,
@@ -194,18 +203,29 @@ const postCourseUpdate = async (req, res) => {
       usd_price,
       discount,
       active,
-      thumbnail,
       length,
     } = req.body;
 
-    let courseSlug;
-
+    // Autogenerate slug from title
     if (typeof title === "string" && title.trim() !== "") {
       courseSlug = slugify(title, { lower: true, strict: true });
     }
 
-    const discountValue = discount !== "" ? discount : null;
-    const thumbnailPath = req.file ? req.file.path : "";
+    // !if discount : null
+    discountValue = discount !== "" ? discount : null;
+    // req thumbnail
+    thumbnail = req.files.thumbnail;
+
+    // Check if thumbnail uploaded, encode, move
+    if (req.files && req.files.thumbnail) {
+      const timestamp = Date.now();
+      const filename = req.files.thumbnail.name;
+      const uniqueFilename = encodeURIComponent(`${timestamp}_${filename}`);
+      thumbnailPath = "/uploads/" + uniqueFilename;
+
+      // Use mv() to place file on the server
+      await thumbnail.mv(path.join(__dirname, "uploads", uniqueFilename));
+    }
 
     const updateParams = [
       title,
@@ -220,13 +240,19 @@ const postCourseUpdate = async (req, res) => {
       courseId, // where course.id
     ];
 
+    // msg
     console.log("\n\n---Update Parameters:", updateParams); // Log the update parameters
 
+    // query
     const result = await pool.query(updateCourseQuery, updateParams);
+
+    //msg of query & result of query
     console.log("\n\n---Update Query:", updateCourseQuery);
     console.log("\n\n---Query Result:", result); // Log the result of the query execution
 
+    // update check msg
     if (result && result[0].affectedRows !== undefined) {
+      //show if affected rows
       const affectedRows = parseInt(result[0].affectedRows);
       console.log("\n\n---Affected Rows:", affectedRows);
 
@@ -234,17 +260,19 @@ const postCourseUpdate = async (req, res) => {
 
       if (affectedRows > 0) {
         const message = "course updated correctly";
-        console.log(`\n\n\→ Go to courseModuleUpdate: ${message}`);
+        console.log(`\n\n\→ Go to courseModules: ${message}`);
         res.redirect(
-          `/api/course/${courseId}/module/update?courseId=${courseId}`
+          `/api/course/${courseId}/modules`
+          // `/api/course/${courseId}/module/update?courseId=${courseId}`
         );
       } else {
         const message = "no changes made to course";
-        console.log(`\n\n\→ Go to courseModuleUpdate: ${message}`);
+        console.log(`\n\n\→ Go to courseModules: ${message}`);
         res
           .status(201)
           .redirect(
-            `/api/course/${courseId}/module/update?courseId=${courseId}`
+            `/api/course/${courseId}/modules`
+            // `/api/course/${courseId}/module/update?courseId=${courseId}`
           );
       }
     }
@@ -255,14 +283,14 @@ const postCourseUpdate = async (req, res) => {
 };
 
 const getCourseDelete = async (req, res) => {
-  res.send("\n\n*** getCourseDelete\n\n")
+  res.send("\n\n*** getCourseDelete\n\n");
   try {
     // course from id
     const courseId = req.params.id;
     const [courseRows] = await pool.query(getCourseByIdQuery, [courseId]);
     const course = courseRows[0];
-    
-    // render template 
+
+    // render template
     res.render("deleteConfirmation", { course });
   } catch (error) {
     console.log("Error fetching course for deletion:", error);
@@ -271,9 +299,10 @@ const getCourseDelete = async (req, res) => {
 };
 
 const postCourseDelete = async (req, res) => {
-  res.send("\n\n*** postCourseDelete\n\n")
+  res.send("\n\n*** postCourseDelete\n\n");
 };
-// MODULE CREATE/UPDATE 
+
+// MODULE CREATE/UPDATE
 // ===========================================================
 const getModuleCreate = async (req, res) => {
   console.log("\n\n*** getModuleCreate\n\n");
@@ -486,7 +515,7 @@ const postModuleUpdate = async (req, res) => {
   }
 };
 
-// --- COURSE LIST , ENROLL, & DETAILS 
+// --- COURSE LIST , ENROLL, & DETAILS
 // ===========================================================
 
 const coursesList = async (req, res) => {
