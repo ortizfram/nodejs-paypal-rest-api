@@ -196,6 +196,12 @@ const postCourseUpdate = async (req, res) => {
   let thumbnail;
   let discountValue;
 
+  // file upload check
+  if (!req.files || Object.keys(req.files).length === 0) {
+    const message = `(ERROR): no Thumbnail was uploaded, try again uploading a file.`;
+    return res.redirect(`/api/course/${courseId}/update?courseId=${courseId}&message=${message}`);
+  }
+
   try {
     // req fields
     const {
