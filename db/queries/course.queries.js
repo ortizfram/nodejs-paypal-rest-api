@@ -24,6 +24,9 @@ export const createCourseQuery = `
 INSERT INTO courses (title, slug, description, ars_price, usd_price , discount, active, thumbnail, length)
 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
 `;
+export const deleteCourseQuery = `DELETE FROM courses WHERE id = ?;`;
+export const deleteUserCourseQuery = `DELETE FROM user_courses WHERE course_id = ?;`;
+
 // -----// -----------------
 
 // ----- Module Queries ------------------

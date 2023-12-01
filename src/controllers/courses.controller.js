@@ -5,6 +5,8 @@ import path from "path";
 import {
   createCourseQuery,
   createCourseTableQuery,
+  deleteCourseQuery,
+  deleteUserCourseQuery,
   getCourseFromIdQuery,
   getCourseFromSlugQuery,
   getCourseListQuery,
@@ -283,23 +285,53 @@ const postCourseUpdate = async (req, res) => {
 };
 
 const getCourseDelete = async (req, res) => {
-  res.send("\n\n*** getCourseDelete\n\n");
+  console.log("\n\n*** getCourseDelete\n\n");
   try {
     // course from id
-    const courseId = req.params.id;
-    const [courseRows] = await pool.query(getCourseByIdQuery, [courseId]);
+    const courseId = req.query.courseId;
+    const [courseRows] = await pool.query(getCourseFromIdQuery, [courseId]);
     const course = courseRows[0];
 
+    //msg
+    console.log(`\n\ncourse: ${course.title}\n\n`);
+
     // render template
-    res.render("deleteConfirmation", { course });
+    res.render("courseDelete/courseDeleteConfirmation", { course });
   } catch (error) {
     console.log("Error fetching course for deletion:", error);
-    res.redirect(`/api/course/${req.params.id}`);
+    res.redirect(`/api/courses/`);
   }
 };
 
 const postCourseDelete = async (req, res) => {
-  res.send("\n\n*** postCourseDelete\n\n");
+  // Deletes course from Id of tables: courses user_courses
+  console.log("\n\n*** postCourseDelete\n\n");
+
+  try {
+  // get course
+  let courseId = req.body.courseId;
+  const [courseRows] = await pool.query(getCourseFromIdQuery, [courseId]);
+  const course = courseRows[0];
+  courseId = course.id;
+
+  //msg
+  console.log("\n\n${course.title}\n\n")
+
+  // Perform deletion query
+  await pool.query(deleteUserCourseQuery, [courseId]);
+  await pool.query(deleteCourseQuery, [courseId]);
+
+  //msgs
+  const message = `course deleted successfully`;
+  console.log("\n\n${message}");
+
+  // Redirect after successful deletion
+  res.redirect(`/api/courses?message=${message}`);
+  } catch (error){
+    const message = `Error deleting course: ${error}`;
+    console.log("\n\n${message}");
+    res.redirect(`/api/courses?message=${message}`);
+  }
 };
 
 // MODULE CREATE/UPDATE

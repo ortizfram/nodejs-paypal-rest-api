@@ -28,7 +28,7 @@
                         </a>
                         <div>
                             <p><a href="/api/course/<%= course.id %>/update">Edit</a></p>
-                            <p><a href="#">Delete</a></p>
+                            <p><a href="/api/course/<%= course.id %>/delete?courseId=<%= course.id %>">Delete</a></p>
                         </div>
                     </li>
                 <% }); %>
