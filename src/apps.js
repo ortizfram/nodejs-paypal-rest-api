@@ -30,7 +30,7 @@ app.use(fileUpload());
 
 //Set up serving static files in Express:
 app.use(express.static(path.join(__dirname, "public")));
-app.use("/uploads", express.static(path.join(__dirname, "src", "uploads")));
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // config templates and EJS
 app.set("view engine", "ejs");
