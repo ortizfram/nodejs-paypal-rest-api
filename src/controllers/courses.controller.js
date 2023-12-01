@@ -446,7 +446,7 @@ const postModuleCreate = async (req, res) => {
           );
         }
       } else {
-        const thumbnailPath = thumbnails[0] ? thumbnails[0].name : null; // Get the path of the first thumbnail or set to null if it doesn't exist
+        const thumbnailPath = thumbnails[0] ? encodeURIComponent(`${timestamp}_${thumbnails[0].name}`) : null; // Get the path of the first thumbnail or set to null if it doesn't exist
         const moduleData = [
           courseId,
           title,
