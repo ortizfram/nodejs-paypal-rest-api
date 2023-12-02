@@ -5,7 +5,7 @@ export const createCourseTableQuery = `CREATE TABLE IF NOT EXISTS courses (
     id INT NOT NULL AUTO_INCREMENT,
     title VARCHAR(255) NOT NULL,
     slug VARCHAR(255) NOT NULL,
-    description VARCHAR(255 DEFAULT NULL,
+    description VARCHAR(255) DEFAULT NULL,
     text_content TEXT DEFAULT NULL,
     video_link VARCHAR(255) NOT NULL,
     ars_price DECIMAL(10, 2) NOT NULL,
