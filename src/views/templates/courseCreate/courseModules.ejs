@@ -16,23 +16,15 @@
         <h1>
             <%= course.title %> 
         </h1>
-        <h3>Add Modules</h3>
+        <h3>Add a video</h3>
         <div id="moduleFields">
             <div class="moduleField">
-                <label for="title">Title:</label><br>
-                <input type="text" class="title" name="title"><br><br>
-                <label for="description">Description:</label><br>
-                <input type="text" class="description" name="description"><br><br>
+                
                 <label for="video_link">Video Link:</label><br>
                 <input type="text" class="video_link" name="video_link"><br><br>
-                <label for="thumbnail">Thumbnail:</label><br>
-                    <input type="file" id="thumbnail" class="thumbnail" name="thumbnail"><br><br>
-                <button type="button" class="removeModule">X</button>
             </div>
         </div>
-        <button type="button" id="addMore">
-            <p>add more</p>
-        </button>
+        
         <!-- Use appropriate input fields, labels, and elements -->
 
         <!-- Button to submit module creation -->
@@ -40,33 +32,6 @@
         <button type="submit">Update Modules</button>
         <!-- Include error handling for any form submission errors -->
     </form>
-
-    <script>
-        // Function to remove a module field when clicking on the "X" button
-        function removeModuleField(event) {
-            const moduleField = event.target.closest('.moduleField');
-            if (moduleField) {
-                moduleField.remove();
-            }
-        }
-    
-        // Event listener to handle removing module fields
-        document.getElementById('moduleFields').addEventListener('click', function(event) {
-            if (event.target.classList.contains('removeModule')) {
-                removeModuleField(event);
-            }
-        });
-    
-        // Event listener to add more module fields
-        document.getElementById('addMore').addEventListener('click', function () {
-            const moduleFields = document.getElementById('moduleFields');
-            const newModuleField = document.querySelector('.moduleField').cloneNode(true);
-            newModuleField.querySelector('.title').value = ''; // Clear the cloned field value
-            newModuleField.querySelector('.description').value = ''; // Clear the cloned field value
-            newModuleField.querySelector('.video_link').value = ''; // Clear the cloned field value
-            moduleFields.appendChild(newModuleField);
-        });
-    </script>
     
 </body>
 

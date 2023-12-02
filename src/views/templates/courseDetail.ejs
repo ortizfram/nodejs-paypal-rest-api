@@ -19,27 +19,26 @@
                 <div>
                     <div>
                         <button>
-                            <p><a href="/api/course/<%= course.id %>/update?courseId=<%= course.id %>">Edit course</a></p>
+                            <p><a href="/api/course/<%= course.id %>/update?courseId=<%= course.id %>">Edit course</a>
+                            </p>
                         </button>
                         <button>
-                            <p><a href="/api/course/<%= course.id %>/module/create?courseId=<%= course.id %>">add more modules</a></p>
+                            <p><a href="/api/course/<%= course.id %>/module/update?courseId=<%= course.id %>">Change Video</a></p>
                         </button>
                         <button>
-                            <p><a href="/api/course/<%= course.id %>/delete?courseId=<%= course.id %>">Delete course</a></p>
+                            <p><a href="/api/course/<%= course.id %>/delete?courseId=<%= course.id %>">Delete course</a>
+                            </p>
                         </button>
                     </div>
                 </div>
     </div>
-    
+
     <!-- PLAYER -->
     <!-- ========================================================= -->
     <div class="course-container">
         <% if (modules.length> 0) { %>
             <div class="first-module">
                 <div class='course-detail'>
-                    <h1>
-                        <%= modules[0].title %>
-                    </h1>
                     <!-- Video player container for the first module -->
                     <div class="plyr__video-embed" id="player<%= modules[0].id %>">
                         <!-- Embedded video link -->
@@ -53,28 +52,7 @@
                 <!-- Include Plyr.js CSS -->
                 <link rel="stylesheet" href="https://cdn.plyr.io/3.6.4/plyr.css" />
 
-                <!-- MODULES LIST --------------->
-                <!-- ========================================================= -->
-                <div class="modules-list">
-                    <!-- Render modules for the current course -->
-                    <h2>Modules</h2>
-                    <ul>
-                        <% modules.slice(1).forEach((module)=> { %>
-                            <li>
-                                <h3>
-                                    <%= module.title %>
-                                </h3>
-                                <img src="/uploads/<%= module.thumbnail %>" alt="Thumbnail-<%= module.title%>">
-                                <!-- Video player container -->
-                                <!-- <div class="plyr__video-embed" id="player<%= module.id %>"> -->
-                                    <!-- Embedded video link -->
-                                    <!-- <iframe src="<%= module.video_link %>" allowfullscreen allowtransparency
-                                        allow="autoplay"></iframe> -->
-                                <!-- </div> -->
-                            </li>
-                            <% }) %>
-                    </ul>
-                </div>
+              
     </div>
 
     <!-- COURSE DETAIL -->
