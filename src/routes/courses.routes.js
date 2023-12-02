@@ -13,9 +13,9 @@ router.get('/course/:id/delete',  controllers.getCourseDelete);// get del
 router.post('/course/:id/delete',  controllers.postCourseDelete);// post del
 
 //------------courseDetail  -------------------------
-router.get("/course/:id", controllers.courseOverview);
+router.get("/course/:id/overview", controllers.courseOverview);
 router.get("/course/:id/enroll", controllers.courseEnroll);
-router.get("/course/:id/modules", controllers.courseDetail); // This route should fetch course detail
+router.get("/course/:id/", controllers.courseDetail); // This route should fetch course detail
 //------------coursesList-------------------------
 router.get("/courses", controllers.coursesList);
 router.get("/courses-owned", controllers.coursesListOwned);
