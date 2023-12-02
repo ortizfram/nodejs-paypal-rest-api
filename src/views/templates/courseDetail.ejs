@@ -36,18 +36,15 @@
     <!-- PLAYER -->
     <!-- ========================================================= -->
     <div class="course-container">
-        <% if (modules.length> 0) { %>
             <div class="first-module">
                 <div class='course-detail'>
-                    <!-- Video player container for the first module -->
-                    <div class="plyr__video-embed" id="player<%= modules[0].id %>">
+                    <div class="plyr__video-embed" id="player<%= course.id %>">
                         <!-- Embedded video link -->
-                        <iframe src="<%= modules[0].video_link %>" allowfullscreen allowtransparency
+                        <iframe src="<%= course.video_link %>" allowfullscreen allowtransparency
                             allow="autoplay"></iframe>
                     </div>
                 </div>
             </div>
-            <% } %>
                 <!-- ========================================================= -->
                 <!-- Include Plyr.js CSS -->
                 <link rel="stylesheet" href="https://cdn.plyr.io/3.6.4/plyr.css" />

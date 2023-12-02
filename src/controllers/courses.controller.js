@@ -34,6 +34,7 @@ const postCourseCreate = async (req, res) => {
     let filename;
     let uniqueFilename;
     let timestamp;
+    let slug;
 
     // file upload check
     if (!req.files || Object.keys(req.files).length === 0) {
@@ -82,8 +83,9 @@ const postCourseCreate = async (req, res) => {
         // req fields
         let {
           title,
-          slug,
           description,
+          text_content,
+          video_link,
           ars_price,
           usd_price,
           discount,
@@ -97,7 +99,8 @@ const postCourseCreate = async (req, res) => {
         }
 
         // assign
-        courseSlug = slug || slugify(title, { lower: true, strict: true });
+        courseSlug = slugify(title, { lower: true, strict: true });
+        courseSlug = `courseSlug_${timestamp}`;
 
         // !if discount: null
         const discountValue = discount !== "" ? discount : null;
@@ -107,6 +110,8 @@ const postCourseCreate = async (req, res) => {
           title,
           courseSlug,
           description,
+          text_content,
+          video_link,
           ars_price,
           usd_price,
           discountValue,
@@ -126,16 +131,13 @@ const postCourseCreate = async (req, res) => {
         const course = courseRows[0];
         const courseId = course.id;
 
-        console.log(" ");
-        console.log(" ");
-        console.log("\n◘ Creating course...");
-        console.log(" ");
-        console.log(" ");
-        console.log("course :", course);
+
+        console.log("\n\n◘ Creating course...");
+        console.log("\n\ncourse :", course.title);
 
         // Redirect after creating the course
         res.redirect(
-          `/api/course/${courseId}/module/create?courseId=${courseId}`
+          `/api/course/${courseId}/modules`
         );
       })
       .catch((error) => {
@@ -575,10 +577,6 @@ const courseDetail = async (req, res) => {
       return res.status(404).send("Course not found");
     }
 
-    // Fetch modules associated with the current course
-    const [moduleRows] = await pool.query(modulesListQuery, courseId);
-    const modules = moduleRows || []; // Assuming moduleRows contain the modules for the course
-
     // Fetch the enrolled courses for the current user
     let enrolledCourses = [];
     if (user) {
@@ -592,7 +590,6 @@ const courseDetail = async (req, res) => {
       course,
       message,
       user,
-      modules,
       enrolledCourses,
     });
   } catch (error) {

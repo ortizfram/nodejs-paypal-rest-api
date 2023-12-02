@@ -23,8 +23,8 @@ SET title = ?, slug=?, description = ?, text_content = ?, video_link =?, ars_pri
 WHERE id = ?;
 `;
 export const createCourseQuery = `
-INSERT INTO courses (title, slug, description, text_content, video_link=?, ars_price, usd_price , discount, active, thumbnail, length)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
+INSERT INTO courses (title, slug, description, text_content, video_link, ars_price, usd_price , discount, active, thumbnail, length)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 `;
 export const deleteCourseQuery = `DELETE FROM courses WHERE id = ?;`;
 export const deleteUserCourseQuery = `DELETE FROM user_courses WHERE course_id = ?;`;
