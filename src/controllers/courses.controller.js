@@ -100,7 +100,6 @@ const postCourseCreate = async (req, res) => {
 
         // assign
         courseSlug = slugify(title, { lower: true, strict: true });
-        courseSlug = `courseSlug_${timestamp}`;
 
         // !if discount: null
         const discountValue = discount !== "" ? discount : null;
@@ -137,7 +136,7 @@ const postCourseCreate = async (req, res) => {
 
         // Redirect after creating the course
         res.redirect(
-          `/api/course/${courseId}/modules`
+          `/api/course/${courseId}`
         );
       })
       .catch((error) => {
