@@ -204,6 +204,8 @@ const postCourseUpdate = async (req, res) => {
     const {
       title,
       description,
+      text_content,
+      video_link,
       ars_price,
       usd_price,
       discount,
@@ -236,6 +238,8 @@ const postCourseUpdate = async (req, res) => {
       title,
       courseSlug,
       description,
+      text_content,
+      video_link,
       ars_price,
       usd_price,
       discountValue,
@@ -267,7 +271,7 @@ const postCourseUpdate = async (req, res) => {
         const message = "course updated correctly";
         console.log(`\n\n\→ Go to courseModules: ${message}`);
         res.redirect(
-          `/api/course/${courseId}/modules`
+          `/api/course/${courseId}`
           // `/api/course/${courseId}/module/update?courseId=${courseId}`
         );
       } else {
@@ -276,7 +280,7 @@ const postCourseUpdate = async (req, res) => {
         res
           .status(201)
           .redirect(
-            `/api/course/${courseId}/modules`
+            `/api/course/${courseId}`
             // `/api/course/${courseId}/module/update?courseId=${courseId}`
           );
       }
