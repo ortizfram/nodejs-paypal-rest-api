@@ -22,7 +22,7 @@
               <ul>
                 <% courses.forEach(course => { %>
                   <li>
-                    <a href="/api/course/<%= course.id %>/modules" target="_blank" >
+                    <a href="/api/course/<%= course.id %>" >
                         <img src="<%= course.thumbnail %>" alt="<%= course.title %> Image">
                         <h2><%= course.title %></h2>
                         <p><%= course.description %></p>
