@@ -39,13 +39,22 @@
                                 </p>
                             </div>
                         </div>
-                        <% if ((index + 1) % 4 === 0 && index !== courses.length - 1) { %>
+                        <% if ((index + 1) % 4===0 && index !==courses.length - 1) { %>
                 </div>
                 <div class="courses-grid">
                     <% } %>
                         <% }); %>
                 </div>
             </div>
+            <!-- Add pagination controls -->
+            <div class="pagination">
+                <% for (let i=1; i <=Math.ceil(totalItems / pageSize); i++) { %>
+                    <a href="/api/courses?page=<%= i %>">
+                        <%= i %>
+                    </a>
+                    <% } %>
+            </div>
+
 </body>
 
 </html>

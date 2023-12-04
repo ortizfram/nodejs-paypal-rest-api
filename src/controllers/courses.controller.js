@@ -346,6 +346,11 @@ const coursesList = async (req, res) => {
 
   try {
     const message = req.query.message;
+    const page = req.query.page || 1; // Get the requested page from query params, default to 1
+    const pageSize = 8; // Number of courses per page
+
+    // Calculate the offset based on the requested page
+    const offset = (page - 1) * pageSize;
 
     // Fetch total count of courses for pagination
     const [totalCountRows] = await pool.query(
@@ -355,7 +360,7 @@ const coursesList = async (req, res) => {
 
     
     // Fetch all courses based on the offset
-    const [coursesRows] = await pool.query(getCourseListQuery);
+    const [coursesRows] = await pool.query(getCourseListQuery, [offset, pageSize]);
 
     // Map queried courses fields for each course
     const courses = coursesRows.map((course) => ({
@@ -375,6 +380,8 @@ const coursesList = async (req, res) => {
     // Render paginated courses for the user
     res.render("courses", {
       courses,
+      totalItems,
+      pageSize,
       user,
       message: user ? "These courses are available for today, enjoy!" : "All courses",
     });
