@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="/css/alert.css">
     <link rel="stylesheet" href="/css/navbar.css">
     <link rel="stylesheet" href="/css/courses.css">
+    <link rel="stylesheet" href="/css/pagination.css">
 </head>
 
 <body>
@@ -50,7 +51,7 @@
             <div class="pagination">
                 <!-- Math.ceil: rounds up and returns the smallest integer greater than or equal to a given number -->
                 <% for (let i=1; i <=Math.ceil(totalItems / pageSize); i++) { %>
-                    <a href="/api/courses?page=<%= i %>">
+                    <a href="/api/courses?page=<%= i %>" class="page-link">
                         <%= i %>
                     </a>
                 <% } %>
