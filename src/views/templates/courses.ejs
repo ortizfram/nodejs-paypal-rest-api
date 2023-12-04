@@ -39,30 +39,13 @@
                                 </p>
                             </div>
                         </div>
-                        <% if ((index + 1) % 4===0) { %>
+                        <% if ((index + 1) % 4 === 0 && index !== courses.length - 1) { %>
                 </div>
                 <div class="courses-grid">
                     <% } %>
                         <% }); %>
                 </div>
             </div>
-
-            <!-- Pagination -->
-            <div class="pagination">
-                <% if (currentPage> 1) { %>
-                    <a href="/api/courses?page=<%= currentPage - 1 %>">Previous</a>
-                    <% } %>
-
-                        <% for (let i=1; i <=pageCount; i++) { %>
-                            <a href="/api/courses?page=<%= i %>" <% if (currentPage===i) { %>class="active"<% } %>><%= i %>
-                                        </a>
-                            <% } %>
-
-                                <% if (currentPage < pageCount) { %>
-                                    <a href="/api/courses?page=<%= currentPage + 1 %>">Next</a>
-                                    <% } %>
-            </div>
-            <!-- End Pagination -->
 
 </body>
 

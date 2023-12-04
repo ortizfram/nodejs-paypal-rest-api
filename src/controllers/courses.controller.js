@@ -344,9 +344,6 @@ const postCourseDelete = async (req, res) => {
 const coursesList = async (req, res) => {
   console.log("\n*** coursesList\n");
 
-  const page = parseInt(req.query.page) || 1;
-  const ITEMS_PER_PAGE = 8;
-
   try {
     const message = req.query.message;
 
@@ -356,14 +353,9 @@ const coursesList = async (req, res) => {
     );
     const totalItems = totalCountRows[0].total;
 
-    // Calculate the offset based on the current page
-    const offset = (page - 1) * ITEMS_PER_PAGE;
-
-    // Fetch courses for the current page
-    const [coursesRows] = await pool.query(getCourseListQuery, [
-      ITEMS_PER_PAGE,
-      offset,
-    ]);
+    
+    // Fetch all courses based on the offset
+    const [coursesRows] = await pool.query(getCourseListQuery);
 
     // Map queried courses fields for each course
     const courses = coursesRows.map((course) => ({
@@ -378,58 +370,20 @@ const coursesList = async (req, res) => {
     }));
 
     const user = req.session.user || null;
-    let enrolledCourseIds = [];
 
-    // Fetch Not enrolled courses if logged in
-    if (user) {
-      const [enrolledCoursesRows] = await pool.query(
-        getUserEnrolledCoursesQuery,
-        [user.id]
-      );
 
-      enrolledCourseIds = enrolledCoursesRows.map((enrolledCourse) =>
-        enrolledCourse.course_id.toString()
-      );
-
-      // Filter out enrolled courses from the default courses view
-      const availableCourses = courses.filter(
-        (course) => !enrolledCourseIds.includes(course.id)
-      );
-
-      // Calculate total pages for pagination
-      const pageCount = Math.ceil(totalItems / ITEMS_PER_PAGE);
-
-      // Render paginated courses for the user
-      res.render("courses", {
-        ITEMS_PER_PAGE,
-        courses: availableCourses,
-        user,
-        message: "These courses are available for today, enjoy!",
-        totalItems,
-        currentPage: page,
-        pageCount, // Include pageCount for frontend pagination
-      });
-    } else {
-      // Not logged in
-      const pageCount = Math.ceil(totalItems / ITEMS_PER_PAGE);
-
-      res.render("courses", {
-        courses: courses,
-        currentPage: page,
-        pageCount,
-        ITEMS_PER_PAGE,
-        totalItems,
-        user,
-        message: user
-          ? "These courses are available for today, enjoy!"
-          : "All courses",
-      });
-    }
+    // Render paginated courses for the user
+    res.render("courses", {
+      courses,
+      user,
+      message: user ? "These courses are available for today, enjoy!" : "All courses",
+    });
   } catch (error) {
     console.log("Error fetching courses:", error);
     res.redirect("/api/courses?message=Error fetching courses");
   }
 };
+
 
 const coursesListOwned = async (req, res) => {
   console.log("\n*** courseListOwned\n");
