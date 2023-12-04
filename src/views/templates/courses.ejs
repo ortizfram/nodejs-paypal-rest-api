@@ -48,11 +48,12 @@
             </div>
             <!-- Add pagination controls -->
             <div class="pagination">
+                <!-- Math.ceil: rounds up and returns the smallest integer greater than or equal to a given number -->
                 <% for (let i=1; i <=Math.ceil(totalItems / pageSize); i++) { %>
                     <a href="/api/courses?page=<%= i %>">
                         <%= i %>
                     </a>
-                    <% } %>
+                <% } %>
             </div>
 
 </body>
