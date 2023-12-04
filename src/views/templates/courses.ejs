@@ -47,31 +47,6 @@
                 </div>
             </div>
 
-            <!-- Pagination Links -->
-            <div class="pagination">
-                <% if (hasPreviousPage) { %>
-                    <button>
-                        <a href="?page=<%= previousPage %>">Previous</a>
-                    </button>
-                <% } %>
-            
-                <% for (let i = 1; i <= Math.ceil(totalItems / ITEMS_PER_PAGE); i++) { %>
-                    <% if (i === currentPage) { %>
-                        <span><%= i %></span>
-                    <% } else { %>
-                        <a href="?page=<%= i %>"><%= i %></a>
-                    <% } %>
-                <% } %>
-            
-                <% if (hasNextPage) { %>
-                    <button>
-                        <a href="?page=<%= nextPage %>">Next</a>
-                    </button>
-                <% } %>
-            </div>
-            
-            <!-- End Pagination Links -->
-
 </body>
 
 </html>

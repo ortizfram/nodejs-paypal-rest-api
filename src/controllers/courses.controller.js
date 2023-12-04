@@ -345,12 +345,7 @@ const coursesList = async (req, res) => {
   console.log("\n*** coursesList\n");
 
   const page = req.query.page || 1;
-
   const ITEMS_PER_PAGE = 8;
-  const hasPreviousPage = page > 1; // Check if there's a previous page
-  const nextPage = page + 1; // Calculate next page number
-  const previousPage = page - 1; // Calculate previous page number
-  const offset = (page - 1) * ITEMS_PER_PAGE; // Offset for pagination
 
   try {
     const message = req.query.message;
@@ -361,86 +356,66 @@ const coursesList = async (req, res) => {
     );
     const totalItems = totalCountRows[0].total;
 
-    // Fetch courses for the current page
-    const [coursesRows] = await pool.query(getCourseListQuery, [
-      offset,
-      ITEMS_PER_PAGE,
-    ]);
+    // Fetch courses
+    const [coursesRows] = await pool.query(getCourseListQuery);
 
     // Map queried courses fields for each course
-    const courses = coursesRows.map((course) => {
-      return {
-        title: course.title,
-        slug: course.slug,
-        description: course.description,
-        ars_price: course.ars_price,
-        usd_price: course.usd_price,
-        thumbnail: course.thumbnail,
-        id: course.id.toString(), // Ensure ID is converted to string for comparison
-        thumbnailPath: `/uploads/${course.thumbnail}`, // Construct the thumbnail path
-      };
-    });
+    const courses = coursesRows.map((course) => ({
+      title: course.title,
+      slug: course.slug,
+      description: course.description,
+      ars_price: course.ars_price,
+      usd_price: course.usd_price,
+      thumbnail: course.thumbnail,
+      id: course.id.toString(), // Ensure ID is converted to string for comparison
+      thumbnailPath: `/uploads/${course.thumbnail}`, // Construct the thumbnail path
+    }));
 
     const user = req.session.user || null;
     let enrolledCourseIds = [];
 
-    // Fetch enrolled courses for the user if logged in
+    // Fetch Not enrolled courses if logged in
     if (user) {
       const [enrolledCoursesRows] = await pool.query(
         getUserEnrolledCoursesQuery,
         [user.id]
       );
 
-      enrolledCourseIds = enrolledCoursesRows.map((enrolledCourse) =>
-        enrolledCourse.course_id.toString()
+      enrolledCourseIds = enrolledCoursesRows.map(
+        (enrolledCourse) => enrolledCourse.course_id.toString()
       );
-    }
 
-    // Filter out enrolled courses from the default courses view
-    const availableCourses = courses.filter(
-      (course) => !enrolledCourseIds.includes(course.id)
-    );
-
-    // Paginate the available courses
-    const paginatedCourses = availableCourses.slice(
-      offset,
-      offset + ITEMS_PER_PAGE
-    );
-
-    if (paginatedCourses.length > 0) {
+      // Filter out enrolled courses from the default courses view
+      const availableCourses = courses.filter(
+        (course) => !enrolledCourseIds.includes(course.id)
+      );
       // Render paginated courses for the user
       res.render("courses", {
         ITEMS_PER_PAGE,
-        courses: paginatedCourses,
+        courses: availableCourses,
         user,
-        message,
+        message: "These courses are available for today, enjoy!",
         totalItems,
         currentPage: page,
-        hasNextPage: ITEMS_PER_PAGE * page < totalItems,
-        hasPreviousPage,
-        nextPage,
-        previousPage,
-      });
-    } else {
-      // If no courses available on the current page
-      res.render("courses", {
-        ITEMS_PER_PAGE,
-        courses: [],
-        user,
-        message: "You haven't enrolled in any courses yet.",
-        totalItems,
-        currentPage: page,
-        hasNextPage: ITEMS_PER_PAGE * page < totalItems,
-        hasPreviousPage,
-        nextPage,
-        previousPage,
       });
     }
+
+    // Not logged in
+    res.render("courses", {
+      courses: courses,
+      user,
+      message: user
+        ? "These courses are available for today, enjoy!"
+        : "All courses",
+      totalItems,
+    });
+
   } catch (error) {
     console.log("Error fetching courses:", error);
     res.redirect("/api/courses?message=Error fetching courses");
   }
 };
+
 
 const coursesListOwned = async (req, res) => {
   console.log("\n*** courseListOwned\n");
