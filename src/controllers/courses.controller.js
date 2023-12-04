@@ -344,7 +344,7 @@ const postCourseDelete = async (req, res) => {
 const coursesList = async (req, res) => {
   console.log("\n*** coursesList\n");
 
-  const page = req.query.page || 1;
+  const page = parseInt(req.query.page) || 1;
   const ITEMS_PER_PAGE = 8;
 
   try {
@@ -356,8 +356,14 @@ const coursesList = async (req, res) => {
     );
     const totalItems = totalCountRows[0].total;
 
-    // Fetch courses
-    const [coursesRows] = await pool.query(getCourseListQuery);
+    // Calculate the offset based on the current page
+    const offset = (page - 1) * ITEMS_PER_PAGE;
+
+    // Fetch courses for the current page
+    const [coursesRows] = await pool.query(getCourseListQuery, [
+      ITEMS_PER_PAGE,
+      offset,
+    ]);
 
     // Map queried courses fields for each course
     const courses = coursesRows.map((course) => ({
@@ -367,8 +373,8 @@ const coursesList = async (req, res) => {
       ars_price: course.ars_price,
       usd_price: course.usd_price,
       thumbnail: course.thumbnail,
-      id: course.id.toString(), // Ensure ID is converted to string for comparison
-      thumbnailPath: `/uploads/${course.thumbnail}`, // Construct the thumbnail path
+      id: course.id.toString(),
+      thumbnailPath: `/uploads/${course.thumbnail}`,
     }));
 
     const user = req.session.user || null;
@@ -381,14 +387,18 @@ const coursesList = async (req, res) => {
         [user.id]
       );
 
-      enrolledCourseIds = enrolledCoursesRows.map(
-        (enrolledCourse) => enrolledCourse.course_id.toString()
+      enrolledCourseIds = enrolledCoursesRows.map((enrolledCourse) =>
+        enrolledCourse.course_id.toString()
       );
 
       // Filter out enrolled courses from the default courses view
       const availableCourses = courses.filter(
         (course) => !enrolledCourseIds.includes(course.id)
       );
+
+      // Calculate total pages for pagination
+      const pageCount = Math.ceil(totalItems / ITEMS_PER_PAGE);
+
       // Render paginated courses for the user
       res.render("courses", {
         ITEMS_PER_PAGE,
@@ -397,25 +407,29 @@ const coursesList = async (req, res) => {
         message: "These courses are available for today, enjoy!",
         totalItems,
         currentPage: page,
+        pageCount, // Include pageCount for frontend pagination
+      });
+    } else {
+      // Not logged in
+      const pageCount = Math.ceil(totalItems / ITEMS_PER_PAGE);
+
+      res.render("courses", {
+        courses: courses,
+        currentPage: page,
+        pageCount,
+        ITEMS_PER_PAGE,
+        totalItems,
+        user,
+        message: user
+          ? "These courses are available for today, enjoy!"
+          : "All courses",
       });
     }
-
-    // Not logged in
-    res.render("courses", {
-      courses: courses,
-      user,
-      message: user
-        ? "These courses are available for today, enjoy!"
-        : "All courses",
-      totalItems,
-    });
-
   } catch (error) {
     console.log("Error fetching courses:", error);
     res.redirect("/api/courses?message=Error fetching courses");
   }
 };
-
 
 const coursesListOwned = async (req, res) => {
   console.log("\n*** courseListOwned\n");
