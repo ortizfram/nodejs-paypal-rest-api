@@ -130,14 +130,11 @@ const postCourseCreate = async (req, res) => {
         const course = courseRows[0];
         const courseId = course.id;
 
-
         console.log("\n\n◘ Creating course...");
         console.log("\n\ncourse :", course.title);
 
         // Redirect after creating the course
-        res.redirect(
-          `/api/course/${courseId}`
-        );
+        res.redirect(`/api/course/${courseId}`);
       })
       .catch((error) => {
         if (error.code === 11000 && error.keyPattern && error.keyPattern.slug) {
@@ -196,7 +193,9 @@ const postCourseUpdate = async (req, res) => {
   // file upload check
   if (!req.files || Object.keys(req.files).length === 0) {
     const message = `(ERROR): no Thumbnail was uploaded, try again uploading a file.`;
-    return res.redirect(`/api/course/${courseId}/update?courseId=${courseId}&message=${message}`);
+    return res.redirect(
+      `/api/course/${courseId}/update?courseId=${courseId}&message=${message}`
+    );
   }
 
   try {
@@ -277,12 +276,10 @@ const postCourseUpdate = async (req, res) => {
       } else {
         const message = "no changes made to course";
         console.log(`\n\n\→ Go to courseModules: ${message}`);
-        res
-          .status(201)
-          .redirect(
-            `/api/course/${courseId}`
-            // `/api/course/${courseId}/module/update?courseId=${courseId}`
-          );
+        res.status(201).redirect(
+          `/api/course/${courseId}`
+          // `/api/course/${courseId}/module/update?courseId=${courseId}`
+        );
       }
     }
   } catch (error) {
@@ -315,43 +312,62 @@ const postCourseDelete = async (req, res) => {
   console.log("\n\n*** postCourseDelete\n\n");
 
   try {
-  // get course
-  let courseId = req.body.courseId;
-  const [courseRows] = await pool.query(getCourseFromIdQuery, [courseId]);
-  const course = courseRows[0];
-  courseId = course.id;
+    // get course
+    let courseId = req.body.courseId;
+    const [courseRows] = await pool.query(getCourseFromIdQuery, [courseId]);
+    const course = courseRows[0];
+    courseId = course.id;
 
-  //msg
-  console.log(`\n\n${course.title}\n\n`)
+    //msg
+    console.log(`\n\n${course.title}\n\n`);
 
-  // Perform deletion query
-  await pool.query(deleteUserCourseQuery, [courseId]);
-  await pool.query(deleteCourseQuery, [courseId]);
+    // Perform deletion query
+    await pool.query(deleteUserCourseQuery, [courseId]);
+    await pool.query(deleteCourseQuery, [courseId]);
 
-  //msgs
-  const message = `course deleted successfully`;
-  console.log(`\n\n${message}`);
+    //msgs
+    const message = `course deleted successfully`;
+    console.log(`\n\n${message}`);
 
-  // Redirect after successful deletion
-  res.redirect(`/api/courses?message=${message}`);
-  } catch (error){
+    // Redirect after successful deletion
+    res.redirect(`/api/courses?message=${message}`);
+  } catch (error) {
     const message = `Error deleting course: ${error}`;
     console.log(`\n\n${message}`);
     res.redirect(`/api/courses?message=${message}`);
   }
 };
 
-
 // --- COURSE LIST , ENROLL, & DETAILS
 // ===========================================================
 
 const coursesList = async (req, res) => {
   console.log("\n*** coursesList\n");
+
+  const page = req.query.page || 1;
+
+  const ITEMS_PER_PAGE = 8;
+  const hasPreviousPage = page > 1; // Check if there's a previous page
+  const nextPage = page + 1; // Calculate next page number
+  const previousPage = page - 1; // Calculate previous page number
+  const offset = (page - 1) * ITEMS_PER_PAGE; // Offset for pagination
+
   try {
     const message = req.query.message;
-    const [coursesRows] = await pool.query(getCourseListQuery);
 
-    // Map from query courses fields for each course
+    // Fetch total count of courses for pagination
+    const [totalCountRows] = await pool.query(
+      "SELECT COUNT(*) AS total FROM courses"
+    );
+    const totalItems = totalCountRows[0].total;
+
+    // Fetch courses for the current page
+    const [coursesRows] = await pool.query(getCourseListQuery, [
+      offset,
+      ITEMS_PER_PAGE,
+    ]);
+
+    // Map queried courses fields for each course
     const courses = coursesRows.map((course) => {
       return {
         title: course.title,
@@ -366,40 +382,59 @@ const coursesList = async (req, res) => {
     });
 
     const user = req.session.user || null;
-
-    // Fetch enrolled courses for the user
     let enrolledCourseIds = [];
-    // If user is logged in, render all courses
+
+    // Fetch enrolled courses for the user if logged in
     if (user) {
-      // Fetch enrolled courses for the user to later exclude them from default Courses view
       const [enrolledCoursesRows] = await pool.query(
         getUserEnrolledCoursesQuery,
         [user.id]
-      ); //get from query
-      enrolledCourseIds = enrolledCoursesRows.map((enrolledCourse) =>
-        enrolledCourse.course_id.toString()
-      ); // extract enrolled [str(course_id)]
-
-      // Filter out enrolled courses from the default courses view
-      const availableCourses = courses.filter(
-        (course) => !enrolledCourseIds.includes(course.id)
       );
 
-      // If user enrolled in some course
-      if (availableCourses.length > 0) {
-        // Render available courses for the user
-        res.render("courses", { courses: availableCourses, user, message });
-      } else {
-        // If enrolled = none, []
-        res.render("courses", {
-          courses: [],
-          user,
-          message: "You haven't enrolled in any courses yet.",
-        });
-      }
+      enrolledCourseIds = enrolledCoursesRows.map((enrolledCourse) =>
+        enrolledCourse.course_id.toString()
+      );
+    }
+
+    // Filter out enrolled courses from the default courses view
+    const availableCourses = courses.filter(
+      (course) => !enrolledCourseIds.includes(course.id)
+    );
+
+    // Paginate the available courses
+    const paginatedCourses = availableCourses.slice(
+      offset,
+      offset + ITEMS_PER_PAGE
+    );
+
+    if (paginatedCourses.length > 0) {
+      // Render paginated courses for the user
+      res.render("courses", {
+        ITEMS_PER_PAGE,
+        courses: paginatedCourses,
+        user,
+        message,
+        totalItems,
+        currentPage: page,
+        hasNextPage: ITEMS_PER_PAGE * page < totalItems,
+        hasPreviousPage,
+        nextPage,
+        previousPage,
+      });
     } else {
-      // not logged in
-      res.render("courses", { courses: courses, user, message });
+      // If no courses available on the current page
+      res.render("courses", {
+        ITEMS_PER_PAGE,
+        courses: [],
+        user,
+        message: "You haven't enrolled in any courses yet.",
+        totalItems,
+        currentPage: page,
+        hasNextPage: ITEMS_PER_PAGE * page < totalItems,
+        hasPreviousPage,
+        nextPage,
+        previousPage,
+      });
     }
   } catch (error) {
     console.log("Error fetching courses:", error);

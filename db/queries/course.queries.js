@@ -33,12 +33,12 @@ export const deleteUserCourseQuery = `DELETE FROM user_courses WHERE course_id =
 export const getCourseFromSlugQuery = `SELECT * FROM courses WHERE slug = ?`;
 export const getCourseFromIdQuery = `SELECT * FROM courses WHERE id = ?`;
 
-export const getCourseListQuery = `SELECT * FROM courses`;
+export const getCourseListQuery = `SELECT * FROM courses LIMIT ?,?`;
 
 export const getUserEnrolledCoursesQuery = `
   SELECT course_id 
   FROM user_courses 
-  WHERE user_id = ?;
+  WHERE user_id = ?
 `;
 
 // -----Enroll course queries-----------------

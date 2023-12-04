@@ -1,42 +1,77 @@
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>All Courses</title>
-        <link rel="stylesheet" href="/css/alert.css">
-        <link rel="stylesheet" href="/css/navbar.css">
-        <link rel="stylesheet" href="/css/courses.css"> 
-    </head>
-    <body>
-        <%- include ('navbar') -%>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Courses</title>
+    <link rel="stylesheet" href="/css/alert.css">
+    <link rel="stylesheet" href="/css/navbar.css">
+    <link rel="stylesheet" href="/css/courses.css">
+</head>
+
+<body>
+    <%- include ('navbar') -%>
         <%- include ('alert') -%>
-        <div class="courses-container">
-            <button>
-                <a href="/">Go back Home</a>
-            </button>
-            <hr>
-            <h1>All Courses</h1>
-            <div class="courses-grid">
-                <% courses.forEach((course, index) => { %>
-                    <div class="course-item">
-                        <a href="/api/course/<%= course.id %>/overview">
-                            <img src="<%= course.thumbnail %>" alt="thumbnail-<%= course.slug %>">
-                            <h2><%= course.title %></h2>
-                            <p>USD <%= course.usd_price %> | ARS <%= course.ars_price %></p>
-                            <p><%= course.description %></p>
-                        </a>
-                        <div>
-                            <p><a href="/api/course/<%= course.id %>/update">Edit</a></p>
-                            <p><a href="/api/course/<%= course.id %>/delete?courseId=<%= course.id %>">Delete</a></p>
+            <div class="courses-container">
+                <button>
+                    <a href="/">Go back Home</a>
+                </button>
+                <hr>
+                <h1>All Courses</h1>
+                <div class="courses-grid">
+                    <% courses.forEach((course, index)=> { %>
+                        <div class="course-item">
+                            <a href="/api/course/<%= course.id %>/overview">
+                                <img src="<%= course.thumbnail %>" alt="thumbnail-<%= course.slug %>">
+                                <h2>
+                                    <%= course.title %>
+                                </h2>
+                                <p>USD <%= course.usd_price %> | ARS <%= course.ars_price %>
+                                </p>
+                                <p>
+                                    <%= course.description %>
+                                </p>
+                            </a>
+                            <div>
+                                <p><a href="/api/course/<%= course.id %>/update">Edit</a></p>
+                                <p><a href="/api/course/<%= course.id %>/delete?courseId=<%= course.id %>">Delete</a>
+                                </p>
+                            </div>
                         </div>
-                    </div>
-                    <% if ((index + 1) % 4 === 0) { %>
-                        </div><div class="courses-grid">
+                        <% if ((index + 1) % 4===0) { %>
+                </div>
+                <div class="courses-grid">
                     <% } %>
-                <% }); %>
+                        <% }); %>
+                </div>
             </div>
-        </div>
-        
-    </body>
-    </html>
+
+            <!-- Pagination Links -->
+            <div class="pagination">
+                <% if (hasPreviousPage) { %>
+                    <button>
+                        <a href="?page=<%= previousPage %>">Previous</a>
+                    </button>
+                <% } %>
+            
+                <% for (let i = 1; i <= Math.ceil(totalItems / ITEMS_PER_PAGE); i++) { %>
+                    <% if (i === currentPage) { %>
+                        <span><%= i %></span>
+                    <% } else { %>
+                        <a href="?page=<%= i %>"><%= i %></a>
+                    <% } %>
+                <% } %>
+            
+                <% if (hasNextPage) { %>
+                    <button>
+                        <a href="?page=<%= nextPage %>">Next</a>
+                    </button>
+                <% } %>
+            </div>
+            
+            <!-- End Pagination Links -->
+
+</body>
+
+</html>
