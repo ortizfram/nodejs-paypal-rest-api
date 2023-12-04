@@ -16,43 +16,63 @@
     border: none;
     cursor: pointer;
 }
-.courses-container a {
-    color:#333 ;
-}
-.courses-container a:hover {
-    color:#9e35e4 ;
-}
 
 /* Style for the courses list */
-.courses-container ul {
-    list-style: none;
-    padding: 0;
+.courses-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); /* Maximum of 4 columns */
+    gap: 20px; /* Adjust spacing between items */
 }
 
-.courses-container li {
+.course-item {
     border: 1px solid #ccc;
-    margin-bottom: 20px;
     padding: 20px;
+    overflow: hidden; /* Ensure content doesn't overflow */
 }
 
-.courses-container h1 {
-    text-align: center;
-    color: #333;
-}
-
-.courses-container h2 {
+/* Adjust individual course item styles */
+.course-item h2 {
     color: #555;
+    margin-top: 0;
 }
 
-.courses-container p {
+.course-item p {
     color: #777;
     margin-bottom: 10px;
 }
 
-.courses-container img {
+.course-item img {
     width: 100%;
     height: auto;
     object-fit: cover;
     display: block;
     margin-top: 10px;
+}
+
+/* Style links */
+.courses-container a {
+    color: #333;
+}
+
+.courses-container a:hover {
+    color: #9e35e4;
+}
+
+/* Media query for responsive layout */
+@media screen and (max-width: 960px) {
+    .courses-grid {
+        grid-template-columns: repeat(3, 1fr); /* Adjust to 3 columns for smaller screens */
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .courses-grid {
+        grid-template-columns: repeat(2, 1fr); /* Adjust to 2 columns for even smaller screens */
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .courses-grid {
+        grid-template-columns: 1fr; /* Single column for very small screens */
+    }
 }

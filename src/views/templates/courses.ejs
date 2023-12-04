@@ -11,16 +11,16 @@
     <body>
         <%- include ('navbar') -%>
         <%- include ('alert') -%>
-        <div class="courses-container"> <!-- New container for courses -->
+        <div class="courses-container">
             <button>
                 <a href="/">Go back Home</a>
             </button>
             <hr>
             <h1>All Courses</h1>
-            <ul>
-                <% courses.forEach(course => { %>
-                    <li>
-                        <a href="/api/course/<%= course.id %>/overview" >
+            <div class="courses-grid">
+                <% courses.forEach((course, index) => { %>
+                    <div class="course-item">
+                        <a href="/api/course/<%= course.id %>/overview">
                             <img src="<%= course.thumbnail %>" alt="thumbnail-<%= course.slug %>">
                             <h2><%= course.title %></h2>
                             <p>USD <%= course.usd_price %> | ARS <%= course.ars_price %></p>
@@ -30,9 +30,13 @@
                             <p><a href="/api/course/<%= course.id %>/update">Edit</a></p>
                             <p><a href="/api/course/<%= course.id %>/delete?courseId=<%= course.id %>">Delete</a></p>
                         </div>
-                    </li>
+                    </div>
+                    <% if ((index + 1) % 4 === 0) { %>
+                        </div><div class="courses-grid">
+                    <% } %>
                 <% }); %>
-            </ul>
+            </div>
         </div>
+        
     </body>
     </html>
