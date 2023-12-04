@@ -1,0 +1,31 @@
+<!-- adminUsers.ejs -->
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Admin Panel - Users</title>
+</head>
+<body>
+  <h1>Admin Panel - Users</h1>
+  <table>
+    <thead>
+      <tr>
+        <th>Username</th>
+        <th>Name</th>
+        <th>Email</th>
+        <!-- Add more columns as needed -->
+      </tr>
+    </thead>
+    <tbody>
+      <% users.forEach(user => { %>
+        <tr>
+          <td><%= user.username %></td>
+          <td><%= user.name %></td>
+          <td><%= user.email %></td>
+          <!-- Display more user information -->
+        </tr>
+      <% }); %>
+    </tbody>
+  </table>
+</body>
+</html>

@@ -4,6 +4,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import { config } from "dotenv";
 import authRoutes from "./routes/auth.routes.js";
+import adminRoutes from "./routes/admin.routes.js";
 import paymentRoutes from "./routes/payment.routes.js";
 import employeeRoutes from "./routes/employee.routes.js";
 import coursesRoutes from "./routes/courses.routes.js";
@@ -55,6 +56,7 @@ app.use(
 // Use routes app
 app.use(indexRoutes);
 app.use("/api", authRoutes);
+app.use("/api/admin", adminRoutes);
 app.use("/api", paymentRoutes);
 app.use("/api", coursesRoutes);
 app.use("/api", employeeRoutes);
