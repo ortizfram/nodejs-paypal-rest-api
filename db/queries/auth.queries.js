@@ -6,7 +6,8 @@
         name VARCHAR(255),
         email VARCHAR(255) NOT NULL,
         password VARCHAR(255) NOT NULL,
-        enrolled_courses INTEGER[]
+        enrolled_courses INTEGER[],
+        role VARCHAR(255) NOT NULL CHECK (role IN ('user', 'admin', 'staff')),
       );
     `;
 
@@ -18,5 +19,5 @@
       FOREIGN KEY (course_id) REFERENCES courses(id)
     )`;
   
-    export const postSignupQuery = `INSERT INTO users (username, name, email, password) VALUES (?, ?, ?, ?)`;
+    export const postSignupQuery = `INSERT INTO users (username, name, email, password, role) VALUES (?, ?, ?, ?, ?)`;
     export const postLoginQuery= `SELECT * FROM users WHERE username = ?`;
