@@ -10,11 +10,13 @@
     getCourseFromIdQuery,
     getCourseFromSlugQuery,
     insertUserCourseQuery,
+    tableCheckQuery,
   } from "../../db/queries/course.queries.js";
   import { pool } from "../db.js";
-  import { createTableUserCourses } from "../../db/queries/auth.queries.js";
+  import { createTableUserCourses, createUserTableQuery } from "../../db/queries/auth.queries.js";
   import mercadopago from "mercadopago";
   import { config } from "dotenv";
+import createTableIfNotExists from "../public/js/createTable.js";
 
   config(); // load .ENV
 
