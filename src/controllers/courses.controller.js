@@ -353,18 +353,19 @@ const coursesList = async (req, res) => {
     // Calculate the offset based on the requested page
     const offset = (page - 1) * pageSize;
 
-    // Fetch total count of courses for pagination
-    const [totalCountRows] = await pool.query(
-      "SELECT COUNT(*) AS total FROM courses"
-    );
-    const totalItems = totalCountRows[0].total;
+    let enrolledCourseIds = [];
+    const user = req.session.user || null;
 
-    
-    // Fetch all courses based on the offset
+    if (user) {
+      const [enrolledCoursesRows] = await pool.query(getUserEnrolledCoursesQuery, [user.id]);
+      enrolledCourseIds = enrolledCoursesRows.map((enrolledCourse) => enrolledCourse.course_id.toString());
+    }
+
+    // Fetch all courses from the database
     const [coursesRows] = await pool.query(getCourseListQuery, [offset, pageSize]);
 
-    // Map queried courses fields for each course
-    const courses = coursesRows.map((course) => ({
+    // If the user is logged in and has enrolled courses, filter them out
+    let courses = coursesRows.map((course) => ({
       title: course.title,
       slug: course.slug,
       description: course.description,
@@ -375,12 +376,18 @@ const coursesList = async (req, res) => {
       thumbnailPath: `/uploads/${course.thumbnail}`,
     }));
 
-    const user = req.session.user || null;
+    if (user && enrolledCourseIds.length > 0) {
+      courses = courses.filter((course) => !enrolledCourseIds.includes(course.id));
+    }
 
+    const totalItems = courses.length;
+
+    // Paginate the courses based on the offset
+    const paginatedCourses = courses.slice(offset, offset + pageSize);
 
     // Render paginated courses for the user
     res.render("courses", {
-      courses,
+      courses: paginatedCourses,
       totalItems,
       pageSize,
       user,
@@ -391,6 +398,7 @@ const coursesList = async (req, res) => {
     res.redirect("/api/courses?message=Error fetching courses");
   }
 };
+
 
 const coursesListOwned = async (req, res) => {
   console.log("\n*** courseListOwned\n");
