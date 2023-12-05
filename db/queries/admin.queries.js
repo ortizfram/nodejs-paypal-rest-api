@@ -2,7 +2,7 @@ export const listUsers_q = `
 SELECT * FROM users
 `;
 
-export const makeUserAdmin_q = `
+export const setUserRole_q = `
     UPDATE users SET role = ? WHERE email = ?
 `;
 
