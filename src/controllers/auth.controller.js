@@ -4,7 +4,7 @@ import { postSignupQuery, postLoginQuery, createTableUserCourses, createUserTabl
 import { tableCheckQuery } from "../../db/queries/course.queries.js";
 import createTableIfNotExists from "../public/js/createTable.js";
 import {config} from 'dotenv';
-import setUserRole from "../public/js/makeUserAdmin.js";
+import setUserRole from "../public/js/setUserRole.js";
 
 // load .ENV
 config();

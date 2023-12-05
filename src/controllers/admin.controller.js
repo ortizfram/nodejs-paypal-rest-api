@@ -1,4 +1,4 @@
-import makeUserAdmin from "../public/js/makeUserAdmin.js";
+import setUserRole from "../public/js/setUserRole.js";
 import userSearch from "../public/js/userSearch.js";
 
 const getUsers = async (req, res) => {
@@ -35,7 +35,7 @@ const changeUserRole = async (req, res) => {
       setUserRole(newRole, userEmail);// Use the retrieved ID here
     } 
 
-    res.redirect('/api/admin/users'); // Redirect back to the users panel after role change
+    res.redirect(`/api/admin/users?message=${userEmail} is now role:${newRole}`); // Redirect back to the users panel after role change
   } catch (error) {
     console.error("Error while changing user role:", error);
     res.status(500).send("Internal Server Error");
