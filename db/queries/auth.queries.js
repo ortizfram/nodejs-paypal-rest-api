@@ -16,7 +16,7 @@ export const createTableUserCourses = `CREATE TABLE IF NOT EXISTS user_courses (
       PRIMARY KEY (user_id, course_id),
       FOREIGN KEY (user_id) REFERENCES users(id),
       FOREIGN KEY (course_id) REFERENCES courses(id)
-    )`;
+    );`;
 
 export const postSignupQuery = `INSERT INTO users (username, name, email, password, role) VALUES (?, ?, ?, ?, ?)`;
 export const postLoginQuery = `SELECT * FROM users WHERE username = ?`;

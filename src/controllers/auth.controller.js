@@ -4,6 +4,7 @@ import { postSignupQuery, postLoginQuery, createTableUserCourses, createUserTabl
 import { tableCheckQuery } from "../../db/queries/course.queries.js";
 import createTableIfNotExists from "../public/js/createTable.js"
 import {config} from 'dotenv';
+import makeUserAdmin from "../public/js/makeUserAdmin.js";
 
 // load .ENV
 config();
@@ -50,6 +51,8 @@ const getSignup = async (req, res) => {
 
 const postSignup = async (req, res) => {
   console.log("\n\n*** postSignUp\n\n");
+  
+  let role = 'user'; //default role: user
 
   const { username, name, email, password } = req.body;
 
@@ -61,11 +64,6 @@ const postSignup = async (req, res) => {
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    let role = 'user';
-    if (req.session.user && process.env.ADMIN) {
-      role = 'admin';
-    }
-
     const data = [
       username,
       name,
@@ -74,17 +72,28 @@ const postSignup = async (req, res) => {
       role
     ];
 
-    console.log("\n\n*** Before checking users table\n\n");
+    // table check
     const checkTable_users = await createTableIfNotExists(pool, tableCheckQuery, createUserTableQuery, "users");
-    console.log("\n\n*** After checking users table, before checking user_courses table\n\n");
     const checkTable_user_courses = await createTableIfNotExists(pool, tableCheckQuery, createTableUserCourses, "user_courses");
-    console.log("\n\n*** After checking user_courses table\n\n");
 
+    // insert to table: user
     const [rows] = await pool.query(postSignupQuery, data);
-    req.session.user = { username, name, email, role }; 
+    // get inserted user's id 
+    const id = String(rows.insertId);
 
+
+    //signup user & singin
+    req.session.user = { id, username, name, email, role }; 
+
+    //set up role
+    const emailCheck = req.session.email === process.env.ADMIN_EMAIL
+    if (emailCheck) {
+      makeUserAdmin(id);// Use the retrieved ID here
+    } 
+
+    //redirect
     res.redirect("/?message=Signup successful. Logged in automatically.");
-    console.log("\n*** Signed up\n");
+    console.log("\n\n*** Signed up successfully\n\n");
   } catch (error) {
     console.error("Error while saving user:", error);
     res.redirect("/?message=Error during signup or login");
