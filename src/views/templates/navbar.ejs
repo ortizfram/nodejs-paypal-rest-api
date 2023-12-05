@@ -1,18 +1,23 @@
-<nav>
+<nav class="cool-navbar">
     <div class="nav-container">
-        <ul>
-            <li><a href="/">Home</a></li>
-            <li><a href="/api/courses">Courses</a></li>
-            | <% if (user && user.name) { %>
-                <li class="user-info">Welcome, <%= user.name %>!</li>
-                <li><a href="/api/courses-owned">My courses </a></li>
+      <ul>
+        <li><a href="/">Home</a></li>
+        <li><a href="/api/courses">Courses</a></li>
+        <% if (user && user.name) { %>
+            <li class="user-info">Welcome, <%= user.name %>!</li>
+            <li><a href="/api/courses-owned">My courses</a></li>
+            <% if (user.role === "admin") { %>
                 <li><a href="/api/course/create">Create Course</a></li>
                 <li><a href="/api/admin/users">Users Panel |</a></li>
-                <li><a href="/api/logout">Logout</a></li>
-            <% } else { %>
-                <li><a href="/api/login">Singin</a></li>
-                <li><a href="/api/signup">Signup</a></li>
             <% } %>
-        </ul>
+        
+        <li><a href="/api/logout">Logout</a></li>
+
+        <% } else { %>
+            <li><a href="/api/login">Sign in</a></li>
+            <li><a href="/api/signup">Signup</a></li>
+        <% } %>
+      </ul>
     </div>
-</nav>
+  </nav>
+  
