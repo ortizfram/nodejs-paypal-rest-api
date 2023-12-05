@@ -11,7 +11,9 @@ config();
 
 //------------login-------------------------
 const getLogin = async (req, res) => {
-  res.render("login");
+  const user = req.session.user || null; // Get the user from the session or set to null if not logged in
+  const message = req.query.message; // Retrieve success message from query params authcontroller
+  res.render("auth/login", {user,message});
 };
 
 const postLogin = async (req, res) => {
@@ -46,7 +48,9 @@ const postLogin = async (req, res) => {
 };
 //------------signup-------------------------
 const getSignup = async (req, res) => {
-  res.render("signup");
+  const user = req.session.user || null; // Get the user from the session or set to null if not logged in
+  const message = req.query.message; // Retrieve success message from query params authcontroller
+  res.render("auth/signup", {user, message});
 };
 
 const postSignup = async (req, res) => {

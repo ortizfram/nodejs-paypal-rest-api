@@ -6,20 +6,24 @@
     <title>login</title>
     <link rel="stylesheet" href="node_modules/@fortawesome/fontawesome-free/css/all.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="..." crossorigin="anonymous" />
-    <link rel="stylesheet" href="css/form.css">
+    <link rel="stylesheet" href="/css/form.css">
+    <link rel="stylesheet" href="/css/sectionTitle.css">
+    <link rel="stylesheet" href="/css/alert.css">
+    <link rel="stylesheet" href="/css/navbar.css">
 </head>
 <body>
-    <button>
-        <a href="/">Go back Home</a>
-    </button>
+    <%- include ('navbar') -%>
+    <%- include ('alert') -%>
     <hr>
-    <h1>Login</h1>
+    <div class="section-title">
+        <h1>Signin</h1>
+    </div>
 
     <form action="/api/login" method="post"  class="vertical-form">
         <input type="text" name="username" placeholder="Username">
         <input type="password" name="password" placeholder="Password">
         <input type="submit" value="Login">
     </form>
-    <p><a href="/signup">Dont have an account yet.</a></p>
+    <p><a href="/api/signup">Dont have an account yet.</a></p>
 </body>
 </html>

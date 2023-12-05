@@ -6,28 +6,33 @@
     <title>signup</title>
     <link rel="stylesheet" href="node_modules/@fortawesome/fontawesome-free/css/all.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="..." crossorigin="anonymous" />
-    <link rel="stylesheet" href="css/form.css">
+    <link rel="stylesheet" href="/css/form.css">
+    <link rel="stylesheet" href="/css/sectionTitle.css">
+    <link rel="stylesheet" href="/css/alert.css">
+    <link rel="stylesheet" href="/css/navbar.css">
+    
 </head>
 <body>
-    <button>
-        <a href="/">Go back Home</a>
-    </button>
+    <%- include ('navbar') -%>
+    <%- include ('alert') -%>
     <hr>
-    <h1>Signup</h1>
+    <div class="section-title">
+        <h1>Signup</h1>
+    </div>
 
     <form action="/api/signup" method="post" class="vertical-form">
-        <label for="username">Username:</label>
+        <label for="username"></label>
         <input type="text" id="username" name="username" placeholder="Username" required>
-        <label for="name">Firstname:</label>
+        <label for="name"></label>
         <input type="text" id="name" name="name" placeholder="Firstname" required>
-        <label for="email">Email:</label>
+        <label for="email"></label>
         <input type="text" id="email" name="email" placeholder="Email" required>
-        <label for="password">Password:</label>
+        <label for="password"></label>
         <input type="password" id="password" name="password" placeholder="Password" required>
     
         <input type="submit" value="Signup">
     </form>
     
-    <p><a href="/login">Already have an account.</a></p>
+    <p><a href="/api/login">Already have an account.</a></p>
 </body>
 </html>
