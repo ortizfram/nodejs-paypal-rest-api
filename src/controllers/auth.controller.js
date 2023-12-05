@@ -1,7 +1,8 @@
 import bcrypt from "bcrypt";
 import { pool } from "../db.js";
-import { postSignupQuery, postLoginQuery, createTableUserCourses } from "../../db/queries/auth.queries.js";
+import { postSignupQuery, postLoginQuery, createTableUserCourses, createUserTableQuery } from "../../db/queries/auth.queries.js";
 import { tableCheckQuery } from "../../db/queries/course.queries.js";
+import createTableIfNotExists from "../public/js/createTable.js"
 import {config} from 'dotenv';
 
 // load .ENV
@@ -13,6 +14,10 @@ const getLogin = async (req, res) => {
 };
 
 const postLogin = async (req, res) => {
+  //create users table if not exists
+  //...
+  createTableIfNotExists(pool, tableCheckQuery, createUserTableQuery, "users");
+
   try {
     const { username, password } = req.body;
 
@@ -29,15 +34,7 @@ const postLogin = async (req, res) => {
       res.redirect(`/?message=Login successful, user.id:${userId}`);
       console.log("\n*** Logged in\n")
 
-      // Check if the user_courses table exists
-      const [tableCheck] = await pool.query(tableCheckQuery, "user_courses");
-      const tableExists = tableCheck.length > 0;
-
-      if (!tableExists) {
-        // Create user_courses table if it doesn't exist
-        await pool.query(createTableUserCourses);
-        console.log(`\n--- user_courses table created\n`);
-      }
+      
 
     } else {
       res.send("Wrong password or username");
@@ -52,6 +49,10 @@ const getSignup = async (req, res) => {
 };
 
 const postSignup = async (req, res) => {
+  //Check and create tables: [users, user_courses]
+  createTableIfNotExists(pool, tableCheckQuery, createUserTableQuery, "users");
+  createTableIfNotExists(pool, tableCheckQuery, createTableUserCourses, "user_courses");
+
   const { username, name, email, password } = req.body;
 
   // Add validation for required fields
