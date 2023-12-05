@@ -1,6 +1,32 @@
 /* courses.css */
 
-/* Apply styles to the whole courses container */
+/* Reset styles */
+body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+hr {
+    width: 100%;
+    margin: 20px 0;
+    border: none;
+    border-top: 1px solid #ccc;
+}
+
+/* Section title */
+.section-title {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+h1 {
+    margin: 0;
+    padding: 0;
+}
+
+/* Courses container */
 .courses-container {
     max-width: 1200px;
     margin: 0 auto;
@@ -24,31 +50,71 @@
     gap: 20px; /* Adjust spacing between items */
 }
 
+/* Adjust individual course item styles */
 .course-item {
     border: 1px solid #ccc;
     padding: 20px;
     overflow: hidden; /* Ensure content doesn't overflow */
+    margin-bottom: 20px;
+    position: relative; /* Adjust for button positioning */
 }
 
-/* Adjust individual course item styles */
-.course-item h2 {
-    color: #555;
+/* Style for the course image */
+.course-item img {
+    width: 100%;
+    height: 200px; /* Adjust the height as needed */
+    object-fit: cover;
+    display: block;
+    margin-bottom: 10px; /* Space between image and content */
+}
+
+/* Course details */
+.course-item .course-details {
+    color: #333;
+}
+
+/* Style for the course title */
+.course-item .course-details h2 {
     margin-top: 0;
+    margin-bottom: 5px;
+    font-size: 18px;
 }
 
-.course-item p {
-    color: #777;
+/* Style for the course prices */
+.course-item .course-details .prices {
+    font-weight: bold;
     margin-bottom: 10px;
 }
 
-.course-item img {
-    width: 100%;
-    height: auto;
-    object-fit: cover;
-    display: block;
-    margin-top: 10px;
+/* Style for the course description */
+.course-item .course-details p {
+    color: #777;
+    margin-bottom: 10px;
+}
+/* buttons==================================================== */
+.course-item .course-actions {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 15px;
 }
 
+.course-item .course-actions a {
+    padding: 8px 15px;
+    text-decoration: none;
+    color: black;
+    border-radius: 5px;
+}
+
+/* Adjust buttons' colors based on their actions */
+.course-item .course-actions .edit {
+    background-color: #007bff;
+}
+
+.course-item .course-actions .delete {
+    background-color: #dc3545;
+}
+/* ========================================================= */
 /* Style links */
 .courses-container button a {
     color: #FFFF;
@@ -58,13 +124,13 @@
     color: #46c73d;
 }
 
-/* pagination bar */
+/* Pagination bar */
 .pagination a {
     margin-right: 10px;
     background-color: #333;
     color: #ccc;
 }
-
+/* ========================================================= */
 /* Media query for responsive layout */
 @media screen and (max-width: 960px) {
     .courses-grid {
