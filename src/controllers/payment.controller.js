@@ -24,13 +24,13 @@
 
     const courseId = req.body.courseId; // is being passed the courseSlug in the request input
     try {
-      console.log("SQL Query:", getCourseFromIdQuery);
-      console.log("params courseId:", courseId);
+      console.log("\n\nSQL Query:", getCourseFromIdQuery);
+      console.log("\n\nparams courseId:", courseId);
       // Fetch course details based on the courseSlug using MySQL query
       const [rows] = await pool.query(getCourseFromIdQuery, courseId);
       const course = rows[0];
 
-      console.log("Fetched Course Details:", course);
+      console.log("\n\nFetched Course Details:", course);
 
       //create order paypal
       const order = {
@@ -78,15 +78,10 @@
       );
 
       // Log the created order
-      console.log("\n--Created Order:", response.data);
+      console.log("\n\nCreated Order:", response.data);
 
-      // create user_courses table
-      const [table] = await pool.query(createTableUserCourses);
-      if (table.warningStatus === 0) {
-        console.log("\n---user_courses table created.\n");
-      } else {
-        console.log("\n---user_courses table already exists.\n");
-      }
+      // check user_courses table
+      const checkTable_users = await createTableIfNotExists(pool, tableCheckQuery, createUserTableQuery, "users");
 
       // paypal pay link + courseId
       const courseIdParam = `courseId=${courseId}`;
@@ -112,7 +107,7 @@
       // Fetch course details based on the courseSlug using MySQL query
       const [rows] = await pool.query(getCourseFromIdQuery, [courseId]);
       const course = rows[0];
-      console.log("\n--Fetched Course:", course);
+      console.log("\n\nFetched Course:", course);
 
       if (course && user) {
         // Add the user and course relationship in user_courses table
