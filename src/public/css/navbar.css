@@ -1,4 +1,5 @@
-/* Basic reset for list styling */
+/* navbar.css  */
+
 ul {
     list-style: none;
     margin: 0;
@@ -38,7 +39,7 @@ a:hover {
     color: #44c767;
 }
 
-/* Responsive Styles */
+/* Responsive Styles ==============================================*/
 @media screen and (max-width: 600px) {
     .nav-container {
         flex-direction: column;

@@ -50,12 +50,12 @@
 }
 
 /* Style links */
-.courses-container a {
-    color: #333;
+.courses-container button a {
+    color: #FFFF;
 }
 
-.courses-container a:hover {
-    color: #9e35e4;
+.courses-container button a:hover {
+    color: #46c73d;
 }
 
 /* pagination bar */
