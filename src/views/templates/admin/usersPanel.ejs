@@ -14,7 +14,7 @@
     <%- include ('navbar') -%>
       <%- include ('alert') -%>
   </div>
-  
+
   <div class="section-title">
     <h1>Admin Panel - Users</h1>
   </div>
@@ -23,13 +23,13 @@
     <!-- Add a search input field -->
     <form action="/api/admin/users" method="GET">
       <label for="search">Search: </label>
-      <input type="text" id="search" name="search" placeholder="Search by username">
+      <input type="text" id="search" name="search" placeholder="Search users">
       <button type="submit">Search</button>
     </form>
   </div>
 
   <table class="users-table">
-    <thead>
+    <thead class="table-headers">
       <tr>
         <th>Username</th>
         <th></th>
@@ -41,7 +41,7 @@
         <!-- Add more columns as needed -->
       </tr>
     </thead>
-    <tbody>
+    <tbody class="table-rows">
       <% users.forEach(user=> { %>
         <tr>
           <td>
@@ -56,8 +56,20 @@
             <%= user.email %>
           </td>
           <td></td>
-          <td>
+          <!-- <td>
             <%= user.role %>
+          </td> -->
+          <td class="change-role"> <!-- Modified this line -->
+            <!-- Button to change user role -->
+            <form action="/api/admin/users/change-role" method="POST">
+              <input type="hidden" name="userEmail" value="<%= user.email %>">
+              <select name="newRole" onchange="this.form.submit()"> <!-- Changed here -->
+                <option value="user" <% if (user.role === 'user') { %> selected <% } %>>User</option>
+                <option value="admin" <% if (user.role === 'admin') { %> selected <% } %>>Admin</option>
+                <option value="staff" <% if (user.role === 'staff') { %> selected <% } %>>Staff</option>
+                <!-- Add more roles if needed -->
+              </select>
+            </form>
           </td>
           <!-- Display more user information -->
         </tr>
