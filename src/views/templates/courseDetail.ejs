@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Course <%=course.title%>
     </title>
+    <link rel="stylesheet" href="/css/sectionTitle.css">
     <link rel="stylesheet" href="/css/alert.css">
     <link rel="stylesheet" href="/css/navbar.css">
     <link rel="stylesheet" href="/css/courseDetail.css">
@@ -15,20 +16,25 @@
     <!--NAV BUTTONS-------------------------------------------------------------------------------------------------------------------->
     <div class="navigation">
         <%- include ('navbar') -%>
-            <%- include ('alert') -%>
-                <div>
-                    <div>
-                        <button>
-                            <p><a href="/api/course/<%= course.id %>/update?courseId=<%= course.id %>">Edit course</a>
-                            </p>
-                        </button>
-                        <button>
-                            <p><a href="/api/course/<%= course.id %>/delete?courseId=<%= course.id %>">Delete course</a>
-                            </p>
-                        </button>
-                    </div>
-                </div>
+            <%- include ('alert') -%>    
     </div>
+
+    <% if (user.role === "admin") { %>
+    <div class="course-admin-options">
+        <div>
+            <div>
+                <button>
+                    <p><a href="/api/course/<%= course.id %>/update?courseId=<%= course.id %>">Edit course</a>
+                    </p>
+                </button>
+                <button>
+                    <p><a href="/api/course/<%= course.id %>/delete?courseId=<%= course.id %>">Delete course</a>
+                    </p>
+                </button>
+            </div>
+        </div>
+    </div>
+    <% } %>
 
     <!-- PLAYER -->
     <!-- ========================================================= -->
@@ -52,9 +58,11 @@
     <!-- COURSE DETAIL -->
     <!-- ========================================================= -->
     <div class="course-detail">
-        <h1>
-            <%= course.title %>
-        </h1>
+        <div class="section-title">
+            <h1>
+                <%= course.title %>
+            </h1>
+        </div>
         <h3>
             <%= course.description %>
         </h3>

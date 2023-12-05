@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Library</title>
+    <link rel="stylesheet" href="/css/sectionTitle.css">
     <link rel="stylesheet" href="/css/alert.css">
     <link rel="stylesheet" href="/css/navbar.css">
     <link rel="stylesheet" href="/css/courses.css">
@@ -19,7 +20,9 @@
                     <a href="/">Go back Home</a>
                 </button>
                 <hr>
-                <h1>My Courses Library</h1>
+                <div class="section-title">
+                    <h1>My Courses Library</h1>
+                </div>
                 <div class="courses-grid">
                     <% courses.forEach((course, index)=> { %>
                         <div class="course-item">
