@@ -34,6 +34,7 @@ export const getCourseFromSlugQuery = `SELECT * FROM courses WHERE slug = ?`;
 export const getCourseFromIdQuery = `SELECT * FROM courses WHERE id = ?`;
 
 export const getCourseListQuery = `SELECT * FROM courses LIMIT ?, ?`;
+export const getCourseListNoPagination_q = `SELECT * FROM courses`;
 
 export const getUserEnrolledCoursesQuery = `
   SELECT course_id 

@@ -126,7 +126,7 @@
           );
         }
 
-        return res.redirect(`/api/course/${courseId}/modules`);
+        return res.redirect(`/api/course/${courseId}`);
       } else {
         return res.status(404).send("Course or user not found");
       }
@@ -179,12 +179,12 @@
         },
       ],
       back_urls: {
-        success: `http://localhost:3000/api/course/${courseId}/modules`,
+        success: `http://localhost:3000/api/course/${courseId}/`,
         failure: "http://localhost:3000/api/failure-mp",
         pending: "http://localhost:3000/api/pending-mp",
       },
       //here we use NGROK till it's deployed
-      notification_url: `https://9149-190-15-205-177.ngrok.io/api/webhook-mp?courseId=${courseId}&userId=${userId}`,
+      notification_url: `${process.env.MP_NOTIFICATION_URL}/api/webhook-mp?courseId=${courseId}&userId=${userId}`,
     };
 
     const result = await mercadopago.preferences.create(preference);

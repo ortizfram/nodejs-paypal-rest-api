@@ -49,9 +49,7 @@ const getSignup = async (req, res) => {
 };
 
 const postSignup = async (req, res) => {
-  //Check and create tables: [users, user_courses]
-  createTableIfNotExists(pool, tableCheckQuery, createUserTableQuery, "users");
-  createTableIfNotExists(pool, tableCheckQuery, createTableUserCourses, "user_courses");
+  console.log("\n\n*** postSignUp\n\n");
 
   const { username, name, email, password } = req.body;
 
@@ -61,11 +59,9 @@ const postSignup = async (req, res) => {
   }
 
   try {
-    // Hash the password before storing it
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // ...SET DEFAULT ROLES 
-    let role = 'user'; // Default role is 'user'
+    let role = 'user';
     if (req.session.user && process.env.ADMIN) {
       role = 'admin';
     }
@@ -74,25 +70,27 @@ const postSignup = async (req, res) => {
       username,
       name,
       email,
-      hashedPassword, // Save the hashed passwords
+      hashedPassword,
       role
     ];
 
-    // Insert into users db
-    const [rows] = await pool.query(postSignupQuery, data);
+    console.log("\n\n*** Before checking users table\n\n");
+    const checkTable_users = await createTableIfNotExists(pool, tableCheckQuery, createUserTableQuery, "users");
+    console.log("\n\n*** After checking users table, before checking user_courses table\n\n");
+    const checkTable_user_courses = await createTableIfNotExists(pool, tableCheckQuery, createTableUserCourses, "user_courses");
+    console.log("\n\n*** After checking user_courses table\n\n");
 
-    // Set the user in the session
+    const [rows] = await pool.query(postSignupQuery, data);
     req.session.user = { username, name, email, role }; 
 
-    // message on redirect
     res.redirect("/?message=Signup successful. Logged in automatically.");
-    console.log("\n*** Signed ip\n")
-
+    console.log("\n*** Signed up\n");
   } catch (error) {
     console.error("Error while saving user:", error);
     res.redirect("/?message=Error during signup or login");
   }
 };
+
 //------------logout-------------------------
 const logout = (req, res) => {
   // Clear the user session by destroying it
