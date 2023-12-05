@@ -3,8 +3,8 @@ import { pool } from "../db.js";
 import { postSignupQuery, postLoginQuery, createTableUserCourses, createUserTableQuery } from "../../db/queries/auth.queries.js";
 import { tableCheckQuery } from "../../db/queries/course.queries.js";
 import createTableIfNotExists from "../public/js/createTable.js";
-import makeUserAdmin from "../public/js/makeUserAdmin.js";
 import {config} from 'dotenv';
+import setUserRole from "../public/js/makeUserAdmin.js";
 
 // load .ENV
 config();
@@ -88,7 +88,7 @@ const postSignup = async (req, res) => {
     //set up role
     const emailCheck = req.session.user.email === process.env.ADMIN_EMAIL
     if (emailCheck) {
-      makeUserAdmin(req.session.user.email);// Use the retrieved ID here
+      setUserRole('admin', req.session.user.email);// Use the retrieved ID here
     } 
 
     //redirect
