@@ -510,6 +510,9 @@ const courseOverview = async (req, res) => {
 
 const courseEnroll = async (req, res) => {
   console.log("\n***courseEnroll\n");
+
+  const user = req.session.user; // Retrieve the user from the session
+    const message = req.query.message; // Retrieve success message from query params authcontroller
   // Fetch the course slug from the request
   const courseId = req.params.id;
 
@@ -540,7 +543,7 @@ const courseEnroll = async (req, res) => {
         length: course.length,
       };
 
-      res.render("courseEnroll", { course: courseData, userId }); // Pass the courseData object
+      res.render("courseEnroll", { course: courseData, userId, user, message }); // Pass the courseData object
     } else {
       res.status(404).send("Course not found");
     }
