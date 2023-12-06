@@ -18,7 +18,7 @@ hr {
 /* Section title */
 .section-title {
     text-align: center;
-    margin-bottom: 20px;
+    margin-bottom: 2px;
 }
 
 h1 {
@@ -53,6 +53,7 @@ h1 {
 /* Adjust individual course item styles */
 .course-item {
     border: 1px solid #ccc;
+    border-radius: 5%;
     padding: 20px;
     overflow: hidden; /* Ensure content doesn't overflow */
     margin-bottom: 20px;
@@ -65,7 +66,7 @@ h1 {
     height: 200px; /* Adjust the height as needed */
     object-fit: cover;
     display: block;
-    margin-bottom: 10px; /* Space between image and content */
+    margin-bottom: 5px; /* Space between image and content */
 }
 
 /* Course details */
