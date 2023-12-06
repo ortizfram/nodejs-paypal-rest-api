@@ -1,25 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Course <%=course.title%>
-    </title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="..." crossorigin="anonymous" />
-    <link rel="stylesheet" href="node_modules/@fortawesome/fontawesome-free/css/all.min.css" />
-    <link rel="stylesheet" href="/css/sectionTitle.css">
-    <link rel="stylesheet" href="/css/alert.css">
-    <link rel="stylesheet" href="/css/navbar.css">
-    <link rel="stylesheet" href="/css/courseDetail.css">
-</head>
-
-<body>
-    <!--NAV BUTTONS-------------------------------------------------------------------------------------------------------------------->
-    <div class="navigation">
-        <%- include ('navbar') -%>
-            <%- include ('alert') -%>    
-    </div>
 
     <% if (user.role === "admin") { %>
     <div class="course-admin-options">
@@ -40,9 +19,9 @@
 
     <!-- PLAYER -->
     <!-- ========================================================= -->
-    <div class="course-container">
+    <div>
             <div class="first-module">
-                <div class='course-detail'>
+                <div>
                     <div class="plyr__video-embed" id="player<%= course.id %>">
                         <!-- Embedded video link -->
                         <iframe src="<%= course.video_link %>" allowfullscreen allowtransparency
@@ -59,8 +38,8 @@
 
     <!-- COURSE DETAIL -->
     <!-- ========================================================= -->
-    <div class="course-detail">
-        <div class="section-title">
+    <div>
+        <div>
             <h1>
                 <%= course.title %>
             </h1>
@@ -69,7 +48,6 @@
             <%= course.description %>
         </h3>
         <p><%= course.text_content %></p>
-        <br>
     </div>
 
     <!--SCRIPTS-------------------------------------------------------------------------------------------------------------------->
@@ -83,6 +61,3 @@
             const players = Array.from(document.querySelectorAll('.plyr__video-embed')).map(p => new Plyr(p));
         });
     </script>
-</body>
-
-</html>

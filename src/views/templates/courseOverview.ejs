@@ -1,51 +1,29 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Course Overview</title>
-    <link rel="stylesheet" href="node_modules/@fortawesome/fontawesome-free/css/all.min.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="..." crossorigin="anonymous" />
-    <link rel="stylesheet" href="/css/alert.css">
-    <link rel="stylesheet" href="/css/navbar.css">
-    <link rel="stylesheet" href="/css/courseOverview.css">
-    <link rel="stylesheet" href="/css/sectionTitle.css">
-
-</head>
-
-<body>
-    <%- include ('navbar') -%>
-        <%- include ('alert') -%>
-        <div class="course-container">
-            <div class='course-overview'>
-                <div class="section-title">
-                    <h1>Course Overview</h1>
-                </div>
-                <hr>
-                
-                <img src="<%= course.thumbnail %>" alt="<%= course.title %> Image">
-        
-                <h2>
-                    <%= course.title %>
-                </h2>
-                <p>
-                    <%= course.description %>
-                </p>
-                <div class="course-details">
-                    <p>Instructor: <%= course.instructor %></p>
-                    <p>Duration: <%= course.length %></p>
-                    <p>Price: <span class="price-usd">USD<%= course.usd_price %></span> | <span class="price-ars">ARS<%= course.ars_price %></span></p>
-                </div>
-                <br>
-                <div class='course-enrollment'>
-                    <button>
-                        <a href="/api/course/<%= course.id %>/enroll">Enroll</a>
-                    </button>
-                </div>
-            </div>
+<div class="course-container">
+    <div class="course-overview">
+        <div class="section-title">
+            <h1>Course Overview</h1>
         </div>
+        <hr>
         
-</body>
+        <img src="<%= course.thumbnail %>" alt="<%= course.title %> Image">
 
-</html>
+        <h2>
+            <%= course.title %>
+        </h2>
+        <p>
+            <%= course.description %>
+        </p>
+        <div class="course-details">
+            <p>Instructor: <%= course.instructor %></p>
+            <p>Duration: <%= course.length %></p>
+            <p>Price: <span class="price-usd">USD<%= course.usd_price %></span> | <span class="price-ars">ARS<%= course.ars_price %></span></p>
+        </div>
+        <br>
+        <div class='course-enrollment'>
+            <button>
+                <a href="/api/course/<%= course.id %>/enroll">Enroll</a>
+            </button>
+        </div>
+    </div>
+</div>
+        

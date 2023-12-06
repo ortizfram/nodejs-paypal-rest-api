@@ -20,21 +20,21 @@
                 <a class="nav-link" href="/api/courses-owned"><i class="fas fa-graduation-cap"></i> My courses</a>
             </li>
 
-          <!-- admin links -->
+            <!-- admin links -->
             <% if (user.role === "admin") { %>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                     Admin Settings
                     </a>
                     <ul class="dropdown-menu">
-                    <li><a class="dropdown-item" href="/api/course/create"><i class="fas fa-plus-circle"></i> Create course</a></li>
-                    <li><a class="dropdown-item" href="/api/admin/users"><i class="fas fa-users-cog"></i> Users panel</a></li>
+                      <li><a class="dropdown-item" href="/api/course/create"><i class="fas fa-plus-circle"></i> Create course</a></li>
+                      <li><a class="dropdown-item" href="/api/admin/users"><i class="fas fa-users-cog"></i> Users panel</a></li>
                     </ul>
                 </li>
             <% } %>
             <!-- sign out -->
             <li class="nav-item">
-                <a class="nav-link" href="/api/courses-owned"><i class="fas fa-graduation-cap"></i> My courses</a>
+                <a class="nav-link" href="/api/logout"><i class="fas fa-graduation-cap"></i> Signout</a>
             </li>
           <% } %>
         <!-- sign in -->

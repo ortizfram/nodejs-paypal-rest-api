@@ -1,62 +1,31 @@
-<!DOCTYPE html>
-<html lang="en">
+<div class="courses-container">
+  <div class="section-title">
+    <h1>My Courses Library</h1>
+  </div>
+  <div class="courses-grid">
+    <% courses.forEach((course, index)=> { %><div class="course-item">
+      <a href="/api/course/<%= course.id %>">
+        <img src="<%= course.thumbnail %>" alt="thumbnail-<%= course.slug %>" />
+        <h2><%= course.title %></h2>
+        <p><%= course.description %></p>
+      </a>
+      <div>
+        <p>
+          <a href="/api/course/<%= course.id %>/update">Edit</a>
+        </p>
+        <p>
+          <a href="/api/course/<%= course.id %>/delete?courseId=<%= course.id %>">Delete</a>
+        </p>
+      </div>
+    </div><% if ((index + 1) % 4===0 && index !==courses.length - 1) { %>
+  </div>
+  <div class="courses-grid"><% } %> <% }); %></div>
+</div>
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Library</title>
-    <link rel="stylesheet" href="/css/sectionTitle.css">
-    <link rel="stylesheet" href="/css/alert.css">
-    <link rel="stylesheet" href="/css/navbar.css">
-    <link rel="stylesheet" href="/css/courses.css">
-    <link rel="stylesheet" href="/css/pagination.css">
-    <link rel="stylesheet" href="node_modules/@fortawesome/fontawesome-free/css/all.min.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="..." crossorigin="anonymous" />
-</head>
-
-<body>
-    <%- include ('navbar') -%>
-        <%- include ('alert') -%>
-            <div class="courses-container">
-               
-                <div class="section-title">
-                    <h1>My Courses Library</h1>
-                </div>
-                <div class="courses-grid">
-                    <% courses.forEach((course, index)=> { %>
-                        <div class="course-item">
-                            <a href="/api/course/<%= course.id %>">
-                                <img src="<%= course.thumbnail %>" alt="thumbnail-<%= course.slug %>">
-                                <h2>
-                                    <%= course.title %>
-                                </h2>
-                                <p>
-                                    <%= course.description %>
-                                </p>
-                            </a>
-                            <div>
-                                <p><a href="/api/course/<%= course.id %>/update">Edit</a></p>
-                                <p><a href="/api/course/<%= course.id %>/delete?courseId=<%= course.id %>">Delete</a>
-                                </p>
-                            </div>
-                        </div>
-                        <% if ((index + 1) % 4===0 && index !==courses.length - 1) { %>
-                </div>
-                <div class="courses-grid">
-                    <% } %>
-                        <% }); %>
-                </div>
-            </div>
-            <!-- Add pagination controls -->
-            <div class="pagination">
-                <!-- Math.ceil: rounds up and returns the smallest integer greater than or equal to a given number -->
-                <% for (let i=1; i <=Math.ceil(totalItems / pageSize); i++) { %>
-                    <a href="/api/courses-owned?page=<%= i %>" class="page-link">
-                        <%= i %>
-                    </a>
-                <% } %>
-            </div>
-
-</body>
-
-</html>
+<!-- Add pagination controls -->
+<div class="pagination">
+  <!-- Math.ceil: rounds up and returns the smallest integer greater than or equal to a given number -->
+  <% for (let i=1; i <=Math.ceil(totalItems / pageSize); i++) { %>
+  <a href="/api/courses-owned?page=<%= i %>" class="page-link"><%= i %></a>
+  <% } %>
+</div>

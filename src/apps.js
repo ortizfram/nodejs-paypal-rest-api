@@ -1,4 +1,5 @@
 import express from "express";
+import expressEjsLayouts from "express-ejs-layouts";
 import session from "express-session";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -34,6 +35,7 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // config templates and EJS
+app.use(expressEjsLayouts);
 app.set("view engine", "ejs");
 app.set("views", [path.join(__dirname, "views", "templates")]);
 
