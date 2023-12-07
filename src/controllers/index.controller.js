@@ -10,11 +10,7 @@ const getHome = async (req, res) => {
   const message = req.query.message; // Retrieve success message from query params authcontroller
   const user = req.session.user || null; // Get the user from the session or set to null if not logged in
 
-  if (user) {
-    return res.render("home", { user: user, message });
-  } else {
-    res.render("home", { user: null, message }); // Pass user as null
-  }
+  res.render("home", {user, message});
 };
 
 export default {

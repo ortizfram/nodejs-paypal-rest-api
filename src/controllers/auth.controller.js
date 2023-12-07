@@ -1,6 +1,6 @@
 import bcrypt from "bcrypt";
 import { pool } from "../db.js";
-import { postSignupQuery, postLoginQuery, createTableUserCourses, createUserTableQuery } from "../../db/queries/auth.queries.js";
+import { postSignupQuery, postLoginQuery, createTableUserCourses, createUserTableQuery, fetchUserByField } from "../../db/queries/auth.queries.js";
 import { tableCheckQuery } from "../../db/queries/course.queries.js";
 import createTableIfNotExists from "../public/js/createTable.js";
 import {config} from 'dotenv';
@@ -57,15 +57,30 @@ const postSignup = async (req, res) => {
   console.log("\n\n*** postSignUp\n\n");
   
   let role = 'user'; //default role: user
+  const user = req.session.user || null; 
 
   const { username, name, email, password } = req.body;
 
   // Add validation for required fields
-  if (!username || !password) {
-    return res.status(400).send("Username and password are required.");
+  if (!username || !password || !email) {
+    return res.status(400).send("Username, password & email are required.");
   }
 
   try {
+    // Check if the email already exists in the database
+    const fetchUser_q = fetchUserByField('email');
+    const [existingEmail] = await pool.query(fetchUser_q, [email]);
+    const [existingUsername] = await pool.query(fetchUser_q, [username]);
+
+    // If the email already exists, handle the duplicate case
+    if (existingEmail.length > 0) {
+      return res.status(400).render("auth/signup", {user,message:"This email is already registered."});
+    } 
+    // If the username already exists, handle the duplicate case
+    if (existingUsername.length > 0) {
+      return res.status(400).render("auth/signup", {user,message:"This username is already registered."});
+    }
+
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const data = [
