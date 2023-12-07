@@ -74,10 +74,10 @@ app.use((req, res) => {
 });
 
 // middleware for admin&staff
-export const admin_staff_check = (req, res, next) => {
+export function admin_staff_check (req, res, next) {
   const user = req.session.user || null;
   if(!user || (user.role !== 'staff' && user.role !== 'admin')){
-    res.status(403).send('Unauthorized');
+    return res.status(403).send('Unauthorized');
   }
   next();
 }
