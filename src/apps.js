@@ -64,12 +64,23 @@ app.use("/api", paymentRoutes);
 app.use("/api", coursesRoutes);
 app.use("/api", employeeRoutes);
 
-// app middleware for 404
+// MIDDLEWARE
+// =============================================================
+// middleware for 404
 app.use((req, res) => {
   res.status(404).json({
     message: "endpoint Not Found",
   });
 });
+
+// middleware for admin&staff
+export const admin_staff_check = (req, res, next) => {
+  const user = req.session.user || null;
+  if(!user || (user.role !== 'staff' && user.role !== 'admin')){
+    res.status(403).send('Unauthorized');
+  }
+  next();
+}
 
 
 export default app;
