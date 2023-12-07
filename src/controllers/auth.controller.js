@@ -1,10 +1,11 @@
 import bcrypt from "bcrypt";
 import { pool } from "../db.js";
-import { postSignupQuery, postLoginQuery, createTableUserCourses, createUserTableQuery, fetchUserByField } from "../../db/queries/auth.queries.js";
+import { postSignupQuery, postLoginQuery, createTableUserCourses, createUserTableQuery, fetchUserByField, setResetToken } from "../../db/queries/auth.queries.js";
 import { tableCheckQuery } from "../../db/queries/course.queries.js";
 import createTableIfNotExists from "../public/js/createTable.js";
 import {config} from 'dotenv';
 import setUserRole from "../public/js/setUserRole.js";
+import crypto from "crypto";
 
 // load .ENV
 config();
@@ -164,20 +165,28 @@ const postForgotPassword = async (req, res) => {
   const { email } = req.body;
 
   try {
-    // Check if the email exists in the database
+    // 1. GET USER BASED ON POSTED EMAIL
     const [existingUser] = await pool.query(fetchUserByField('email'), [email]);
 
     if (!existingUser || existingUser.length === 0) {
       return res.render("auth/forgot-password", { message: "Email not found" });
     }
 
-    // Generate a reset token (you may use a library like 'crypto' to create a random token)
-    const resetToken = generateResetToken(); // Implement this function
+    // 2. GENERATE RANDOM RESET TOKEN : crypto 
+    const generateResetToken = async () => {
 
-    // Store the reset token in the database for the user
-    await storeResetToken(email, resetToken); // Implement this function
+      // generate the token
+      const resetToken = crypto.randomBytes(20).toString('hex');
 
-    // Send an email to the user with the reset link containing the token
+      // encript the token
+      crypto.createHash('sha256').update(resetToken).digest('hex');
+
+      // store the token in DB
+      const [savedToken] = await pool.query(setResetToken, [resetToken, email]);
+      console.log(`\n\nToken stored in db ${savedToken}`);
+    }; 
+
+    // 3. SEND TOKEN BACK TO THE USER EMAIL
     sendResetEmail(email, resetToken); // Implement this function
 
     res.render("auth/forgot-password", { message: "Password reset email sent, verify your mailbox !" });

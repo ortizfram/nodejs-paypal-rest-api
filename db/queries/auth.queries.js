@@ -6,9 +6,14 @@ export const createUserTableQuery = `
       name VARCHAR(255),
       email VARCHAR(255) NOT NULL,
       password VARCHAR(255) NOT NULL,
-      role ENUM('user', 'admin', 'staff') NOT NULL
+      role ENUM('user', 'admin', 'staff') NOT NULL,
+      resetToken VARCHAR(255) DEFAULT NULL,
   );
     `;
+
+export const setResetToken = `
+  UPDATE users SET resetToken = ? WHERE email = ?
+`;
 
 export const fetchUserByField = (fieldName) =>`
   SELECT * FROM users WHERE ${fieldName} = ?
