@@ -139,6 +139,7 @@ const renderDynamicForm = (res, template, data) => {
 }
 
 const getForgotPassword = (req, res) => {
+  console.log("\n\n*** getForgotPassword\n\n");
   const message = req.query.message;
   const user = req.session.user || null;
 
@@ -158,6 +159,8 @@ const getForgotPassword = (req, res) => {
 };
 
 const postForgotPassword = async (req, res) => {
+  // ♦ send token to email for password changing
+  console.log("\n\n*** postForgotPassword\n\n");
   const { email } = req.body;
 
   try {
@@ -177,18 +180,36 @@ const postForgotPassword = async (req, res) => {
     // Send an email to the user with the reset link containing the token
     sendResetEmail(email, resetToken); // Implement this function
 
-    res.render("auth/forgot-password", { message: "Password reset email sent" });
+    res.render("auth/forgot-password", { message: "Password reset email sent, verify your mailbox !" });
   } catch (error) {
     console.error("Error sending password reset email:", error);
     res.render("auth/forgot-password", { message: "Error sending reset email" });
   }
 };
+
 const getResetPassword = (req, res) => {
-  const { token } = req.params;
-  res.render("auth/reset-password", { token });
+  console.log("\n\n*** getResetPassword\n\n");
+  // const { token } = req.params;
+
+  const message = req.query.message;
+  const user = req.session.user || null;
+  const fields = ['password', 'repeat password'];
+  const titles = ['Reset Password'];
+  const submitBtn = ['Change password'];
+
+  const data = {
+    fields,
+    titles,
+    submitBtn,
+    message,
+    user
+  }
+
+  renderDynamicForm(res, "auth/forgotPassword", data);
 };
 
 const postResetPassword = async (req, res) => {
+  console.log("\n\n*** postResetPassword\n\n");
   const { token, newPassword } = req.body;
 
   try {

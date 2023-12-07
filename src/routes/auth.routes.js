@@ -16,5 +16,6 @@
 
     // ------------forgotPassword-------------------------
     router.get("/forgot-password", controller.getForgotPassword)
+    router.get("/reset-password", controller.getResetPassword)
 
     export default router;
