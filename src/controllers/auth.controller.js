@@ -16,7 +16,7 @@ const getLogin = async (req, res) => {
   res.render("auth/login", {user,message});
 };
 
-const postLogin = async (req, res) => {
+const postLogin = async (req, res, next) => {
   //create users table if not exists
   //...
   createTableIfNotExists(pool, tableCheckQuery, createUserTableQuery, "users");
@@ -36,6 +36,7 @@ const postLogin = async (req, res) => {
       const userId = user.id;
       res.redirect(`/?message=Login successful, user.id:${userId}`);
       console.log("\n*** Logged in\n")
+      next();
 
       
 

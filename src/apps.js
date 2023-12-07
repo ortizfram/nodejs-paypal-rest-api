@@ -77,7 +77,7 @@ app.use((req, res) => {
 export function admin_staff_check (req, res, next) {
   const user = req.session.user || null;
   if(!user || (user.role !== 'staff' && user.role !== 'admin')){
-    return res.status(403).send('Unauthorized');
+    return res.status(403).send(`Forbidden`);
   }
   next();
 }
@@ -87,7 +87,7 @@ export function is_loggedin_check (req, res, next) {
   const user = req.session.user || null;
   if(!user) {
     // Redirect the user to the login page
-    return res.redirect('/api/login');
+    return res.status(403).redirect('/api/login');
   }
   next();
 }
