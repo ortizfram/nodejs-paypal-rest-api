@@ -21,7 +21,10 @@ import { __dirname } from "../apps.js";
 // ===========================================================
 const getCourseCreate = async (req, res) => {
   console.log("\n\n*** getCourseCreate\n\n");
-  res.render("courseCreate/courseCreate");
+
+  const message = req.query.message;
+  const user = req.session.user || null;
+  res.render("courseCreate/courseCreate", {message, user});
 };
 
 const postCourseCreate = async (req, res) => {
