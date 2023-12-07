@@ -1,23 +1,24 @@
 import { Router } from "express";
 import controllers from "../controllers/courses.controller.js";
+import { admin_staff_check, is_loggedin_check } from "../apps.js";
 
 const router = Router();
 
 
 //------------courseCreate/Update-------------------------
-router.get("/course/create", controllers.getCourseCreate);//get
-router.post('/course/create',  controllers.postCourseCreate);//post
-router.get('/course/:id/update', controllers.getCourseUpdate);//get update
-router.post('/course/:id/update',  controllers.postCourseUpdate);// post update
-router.get('/course/:id/delete',  controllers.getCourseDelete);// get del
-router.post('/course/:id/delete',  controllers.postCourseDelete);// post del
+router.get("/course/create", admin_staff_check, controllers.getCourseCreate);//get
+router.post('/course/create',  admin_staff_check, controllers.postCourseCreate);//post
+router.get('/course/:id/update', admin_staff_check, controllers.getCourseUpdate);//get update
+router.post('/course/:id/update',  admin_staff_check, controllers.postCourseUpdate);// post update
+router.get('/course/:id/delete',  admin_staff_check, controllers.getCourseDelete);// get del
+router.post('/course/:id/delete',  admin_staff_check, controllers.postCourseDelete);// post del
 
 //------------courseDetail  -------------------------
-router.get("/course/:id/overview", controllers.courseOverview);
-router.get("/course/:id/enroll", controllers.courseEnroll);
-router.get("/course/:id/", controllers.courseDetail); // This route should fetch course detail
+router.get("/course/:id/overview", is_loggedin_check, controllers.courseOverview);
+router.get("/course/:id/enroll", is_loggedin_check, controllers.courseEnroll);
+router.get("/course/:id/", is_loggedin_check, controllers.courseDetail); // This route should fetch course detail
 //------------coursesList-------------------------
 router.get("/courses", controllers.coursesList);
-router.get("/courses-owned", controllers.coursesListOwned);
+router.get("/courses-owned", is_loggedin_check, controllers.coursesListOwned);
 
 export default router;

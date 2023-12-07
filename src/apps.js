@@ -82,5 +82,15 @@ export function admin_staff_check (req, res, next) {
   next();
 }
 
+// middleware for login user
+export function is_loggedin_check (req, res, next) {
+  const user = req.session.user || null;
+  if(!user) {
+    // Redirect the user to the login page
+    return res.redirect('/api/login');
+  }
+  next();
+}
+
 
 export default app;
