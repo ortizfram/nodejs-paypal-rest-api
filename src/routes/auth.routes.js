@@ -14,4 +14,7 @@
     //------------logout-------------------------
     router.get("/logout", controller.logout);
 
+    // ------------forgotPassword-------------------------
+    router.get("/forgot-password", controller.getForgotPassword)
+
     export default router;

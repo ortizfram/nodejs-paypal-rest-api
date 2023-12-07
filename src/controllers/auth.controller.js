@@ -133,10 +133,91 @@ const logout = (req, res) => {
   });
 };
 
+// -----------forgotPassword-----------------------
+const renderDynamicForm = (res, template, data) => {
+  res.render(template, data);
+}
+
+const getForgotPassword = (req, res) => {
+  const message = req.query.message;
+  const user = req.session.user || null;
+
+  const fields = ['email'];
+  const titles = ['Forgot Password'];
+  const submitBtn = ['Reset password'];
+
+  const data = {
+    fields,
+    titles,
+    submitBtn,
+    message,
+    user
+  }
+
+  renderDynamicForm(res, "auth/forgotPassword", data);
+};
+
+const postForgotPassword = async (req, res) => {
+  const { email } = req.body;
+
+  try {
+    // Check if the email exists in the database
+    const [existingUser] = await pool.query(fetchUserByField('email'), [email]);
+
+    if (!existingUser || existingUser.length === 0) {
+      return res.render("auth/forgot-password", { message: "Email not found" });
+    }
+
+    // Generate a reset token (you may use a library like 'crypto' to create a random token)
+    const resetToken = generateResetToken(); // Implement this function
+
+    // Store the reset token in the database for the user
+    await storeResetToken(email, resetToken); // Implement this function
+
+    // Send an email to the user with the reset link containing the token
+    sendResetEmail(email, resetToken); // Implement this function
+
+    res.render("auth/forgot-password", { message: "Password reset email sent" });
+  } catch (error) {
+    console.error("Error sending password reset email:", error);
+    res.render("auth/forgot-password", { message: "Error sending reset email" });
+  }
+};
+const getResetPassword = (req, res) => {
+  const { token } = req.params;
+  res.render("auth/reset-password", { token });
+};
+
+const postResetPassword = async (req, res) => {
+  const { token, newPassword } = req.body;
+
+  try {
+    // Verify the token from the request
+    const email = await verifyResetToken(token); // Implement this function
+
+    // If the token is valid, update the user's password
+    if (email) {
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
+      await updatePassword(email, hashedPassword); // Implement this function
+      res.render("auth/reset-password", { message: "Password reset successful" });
+    } else {
+      res.render("auth/reset-password", { message: "Invalid or expired token" });
+    }
+  } catch (error) {
+    console.error("Error resetting password:", error);
+    res.render("auth/reset-password", { message: "Error resetting password" });
+  }
+};
+
+
 export default {
   getLogin,
   postLogin,
   getSignup,
   postSignup,
   logout,
+  getForgotPassword,
+  postForgotPassword,
+  getResetPassword,
+  postResetPassword,
 };
