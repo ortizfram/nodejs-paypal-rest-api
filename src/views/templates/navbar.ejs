@@ -23,8 +23,8 @@
             <!-- admin links -->
             <% if (user.role === "admin") { %>
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    Admin Settings
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="fa-solid fa-users-gear"></i>
+                     Admin Settings
                     </a>
                     <ul class="dropdown-menu">
                       <li><a class="dropdown-item" href="/api/course/create"><i class="fas fa-plus-circle"></i> Create course</a></li>
@@ -34,17 +34,19 @@
             <% } %>
             <!-- sign out -->
             <li class="nav-item">
-                <a class="nav-link" href="/api/logout"><i class="fas fa-graduation-cap"></i> Signout</a>
+                <a class="nav-link" href="/api/logout"><i class="fa-solid fa-right-from-bracket"></i> Signout</a>
+            </li>
+          <% } else { %>
+            <!-- sign in -->
+            <li class="nav-item">
+              <a class="nav-link" href="/api/login"><i class="fas fa-graduation-cap"></i><i class="fas fa-sign-in-alt"></i> Signin</a>
+            </li>
+            <!-- sign up -->
+            <li class="nav-item">
+                <a class="nav-link" href="/api/signup"><i class="fas fa-graduation-cap"></i><i class="fas fa-user-plus"></i> Signup</a>
             </li>
           <% } %>
-        <!-- sign in -->
-        <li class="nav-item">
-            <a class="nav-link" href="/api/login"><i class="fas fa-graduation-cap"></i><i class="fas fa-sign-in-alt"></i> Signin</a>
-        </li>
-        <!-- sign up -->
-        <li class="nav-item">
-            <a class="nav-link" href="/api/signup"><i class="fas fa-graduation-cap"></i><i class="fas fa-user-plus"></i> Signup</a>
-        </li>
+        
 
         
         </ul>

@@ -36,6 +36,7 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // config templates and EJS
 app.use(expressEjsLayouts);
+app.set("layout", "../layouts/layout");
 app.set("view engine", "ejs");
 app.set("views", [path.join(__dirname, "views", "templates")]);
 
