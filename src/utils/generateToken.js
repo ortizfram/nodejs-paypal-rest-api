@@ -3,6 +3,7 @@ import { pool } from "../db.js";
 import { setResetToken } from "../../db/queries/auth.queries.js";
 
 const generateResetToken = async (email) => {
+  console.log("\n\n...resetToken() called");
 
     // generate the token.
     const resetToken = crypto.randomBytes(20).toString('hex');

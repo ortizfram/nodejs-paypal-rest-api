@@ -139,7 +139,7 @@ const logout = (req, res) => {
 // -----------forgotPassword-----------------------
 const renderDynamicForm = (res, template, data) => {
   res.render(template, data);
-}
+};
 
 const getForgotPassword = (req, res) => {
   console.log("\n\n*** getForgotPassword\n\n");
@@ -171,25 +171,22 @@ const postForgotPassword = async (req, res) => {
   try {
     // 1. GET USER BASED ON POSTED EMAIL
     const [existingUser] = await pool.query(fetchUserByField('email'), [email]);
-    console.log("\n\nuser fetcher from email", existingUser);
+    console.log("\n\nuser fetcher from email", existingUser[0]['id']);
 
     if (!existingUser || existingUser.length === 0) {
       return res.render("auth/forgot-password", { message: "Email not found" });
     }
 
     // 2. GENERATE RANDOM RESET TOKEN : crypto 
-
-    // Generate reset token and obtain it.
     const resetToken = await generateResetToken();
-    console.log("\n\n...resetToken() called");
 
     // 3. SEND TOKEN BACK TO THE USER EMAIL.
     const resetEmail = await sendResetEmail(email, resetToken); // Implement this function
 
-    res.render("auth/forgotPassword", { message: "Password reset email sent, verify your mailbox !" });
+    return res.render("auth/forgotPassword", { message: "Password reset email sent, verify your mailbox !" });
   } catch (error) {
     console.error("Error sending password reset email:", error);
-    res.render("auth/forgot-password", { message: "Error sending reset email" });
+    return res.render("auth/forgot-password", { message: "Error sending reset email" });
   }
 };
 
