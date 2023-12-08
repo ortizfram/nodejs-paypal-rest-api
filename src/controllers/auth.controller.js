@@ -149,11 +149,13 @@ const getForgotPassword = (req, res) => {
   const fields = ['email'];
   const titles = ['Forgot Password'];
   const submitBtn = ['Reset password'];
+  const formAction = ['/api/forgot-password'];
 
   const data = {
     fields,
     titles,
     submitBtn,
+    formAction,
     message,
     user
   }
@@ -184,7 +186,7 @@ const postForgotPassword = async (req, res) => {
     // 3. SEND TOKEN BACK TO THE USER EMAIL.
     const resetEmail = await sendResetEmail(email, resetToken); // Implement this function
 
-    res.render("auth/forgot-password", { message: "Password reset email sent, verify your mailbox !" });
+    res.render("auth/forgotPassword", { message: "Password reset email sent, verify your mailbox !" });
   } catch (error) {
     console.error("Error sending password reset email:", error);
     res.render("auth/forgot-password", { message: "Error sending reset email" });
@@ -200,11 +202,13 @@ const getResetPassword = (req, res) => {
   const fields = ['password', 'repeat password'];
   const titles = ['Reset Password'];
   const submitBtn = ['Change password'];
+  const formAction = ['/api/reset-password'];
 
   const data = {
     fields,
     titles,
     submitBtn,
+    formAction,
     message,
     user
   }

@@ -14,7 +14,7 @@ const generateResetToken = async (email) => {
 
     // store the token in DB.
     const [savedToken] = await pool.query(setResetToken, [resetToken, email]);
-    console.log(`\n\nToken stored in db ${savedToken[0]}`);
+    console.log(`\n\nToken stored in db`);
 
     return resetToken; // Return the plain token for use
   }; 
