@@ -167,6 +167,7 @@ const postForgotPassword = async (req, res) => {
   // ♦ send token to email for password changing
   console.log("\n\n*** postForgotPassword\n\n");
   const { email } = req.body;
+  const user = req.session.user;
 
   try {
     // 1. GET USER BASED ON POSTED EMAIL
@@ -183,10 +184,10 @@ const postForgotPassword = async (req, res) => {
     // 3. SEND TOKEN BACK TO THE USER EMAIL.
     const resetEmail = await sendResetEmail(email, resetToken); // Implement this function
 
-    return res.render("auth/forgotPassword", { message: "Password reset email sent, verify your mailbox !" });
+    return res.render("auth/emailSent", { user,message: "Password reset email sent, verify your mailbox !" });
   } catch (error) {
-    console.error("Error sending password reset email:", error);
-    return res.render("auth/forgot-password", { message: "Error sending reset email" });
+    console.error("Error sending Email for password reset:", error);
+    return res.render("auth/forgotPassword", { message: "Error sending reset email" });
   }
 };
 
