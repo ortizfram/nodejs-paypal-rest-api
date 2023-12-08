@@ -6,6 +6,8 @@ import createTableIfNotExists from "../public/js/createTable.js";
 import {config} from 'dotenv';
 import setUserRole from "../public/js/setUserRole.js";
 import crypto from "crypto";
+import generateResetToken from "../utils/generateToken.js";
+import sendResetEmail from "../utils/sendResetEmail.js";
 
 // load .ENV
 config();
@@ -167,27 +169,20 @@ const postForgotPassword = async (req, res) => {
   try {
     // 1. GET USER BASED ON POSTED EMAIL
     const [existingUser] = await pool.query(fetchUserByField('email'), [email]);
+    console.log("\n\nuser fetcher from email", existingUser);
 
     if (!existingUser || existingUser.length === 0) {
       return res.render("auth/forgot-password", { message: "Email not found" });
     }
 
     // 2. GENERATE RANDOM RESET TOKEN : crypto 
-    const generateResetToken = async () => {
 
-      // generate the token
-      const resetToken = crypto.randomBytes(20).toString('hex');
+    // Generate reset token and obtain it.
+    const resetToken = await generateResetToken();
+    console.log("\n\n...resetToken() called");
 
-      // encript the token
-      crypto.createHash('sha256').update(resetToken).digest('hex');
-
-      // store the token in DB
-      const [savedToken] = await pool.query(setResetToken, [resetToken, email]);
-      console.log(`\n\nToken stored in db ${savedToken}`);
-    }; 
-
-    // 3. SEND TOKEN BACK TO THE USER EMAIL
-    sendResetEmail(email, resetToken); // Implement this function
+    // 3. SEND TOKEN BACK TO THE USER EMAIL.
+    const resetEmail = await sendResetEmail(email, resetToken); // Implement this function
 
     res.render("auth/forgot-password", { message: "Password reset email sent, verify your mailbox !" });
   } catch (error) {
