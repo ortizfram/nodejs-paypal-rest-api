@@ -1,4 +1,8 @@
-const generateResetToken = async () => {
+import crypto from "crypto";
+import { pool } from "../db.js";
+import { setResetToken } from "../../db/queries/auth.queries.js";
+
+const generateResetToken = async (email) => {
 
     // generate the token.
     const resetToken = crypto.randomBytes(20).toString('hex');
@@ -10,7 +14,7 @@ const generateResetToken = async () => {
 
     // store the token in DB.
     const [savedToken] = await pool.query(setResetToken, [resetToken, email]);
-    console.log(`\n\nToken stored in db ${savedToken}`);
+    console.log(`\n\nToken stored in db ${savedToken[0]}`);
 
     return resetToken; // Return the plain token for use
   }; 
