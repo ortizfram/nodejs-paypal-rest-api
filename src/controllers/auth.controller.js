@@ -8,6 +8,8 @@ import setUserRole from "../public/js/setUserRole.js";
 import crypto from "crypto";
 import generateResetToken from "../utils/generateToken.js";
 import sendResetEmail from "../utils/sendResetEmail.js";
+import jwt from "jsonwebtoken";
+import { HOST } from "../config.js";
 
 // load .ENV
 config();
@@ -148,7 +150,7 @@ const getForgotPassword = (req, res) => {
 
   const fields = ['email'];
   const titles = ['Forgot Password'];
-  const submitBtn = ['Reset password'];
+  const submitBtn = ['Submit'];
   const formAction = ['/api/forgot-password'];
 
   const data = {
@@ -178,11 +180,23 @@ const postForgotPassword = async (req, res) => {
       return res.render("auth/forgot-password", { message: "Email not found" });
     }
 
-    // 2. GENERATE RANDOM RESET TOKEN : crypto 
-    const resetToken = await generateResetToken();
+    // ♦ Create a one time link valid for 15min
+
+    // 2. GENERATE RANDOM TOKEN : JWT secret 
+    const JWT_SECRET = process.env.JWT_SECRET;
+    const secret  = JWT_SECRET + existingUser[0]['password'];// unique each time
+    const userId = existingUser[0]['id'];
+    const payload = {
+      email: existingUser[0]['email'],
+      id: existingUser[0]['id'],
+    }
+    const token = jwt.sign(payload, secret, {expiresIn: '15m'})
+    const link = `${HOST}/api/reset-password/${userId}/${token}`
+    console.log("\n\n", link, "\n\n");
 
     // 3. SEND TOKEN BACK TO THE USER EMAIL.
-    const resetEmail = await sendResetEmail(email, resetToken); // Implement this function
+    // send email somehow (Gmail API)
+    const resetEmail = await sendResetEmail(email, token); 
 
     return res.render("auth/emailSent", { user,message: "Password reset email sent, verify your mailbox !" });
   } catch (error) {
@@ -190,6 +204,8 @@ const postForgotPassword = async (req, res) => {
     return res.render("auth/forgotPassword", { message: "Error sending reset email" });
   }
 };
+
+    
 
 const getResetPassword = (req, res) => {
   console.log("\n\n*** getResetPassword\n\n");

@@ -5,30 +5,45 @@ import { config } from "dotenv";
 config();
 
 const transporter = nodemailer.createTransport({
-  service: 'gmail',
+  service: "gmail",
+  host: "smtp.example.com",
+  port: 587,
+  secure: false, // use TLS: true for port 465, false for others
   auth: {
-    user: process.env.NODEMAILER_EMAIL, // Your email address
-    pass: process.env.NODEMAILER_PASS // Your email password
-  }
+    user: process.env.NODEMAILER_EMAIL, //sender email address
+    pass: process.env.NODEMAILER_PASS, //app password from Gmail account
+  },
 });
 
 const sendResetEmail = async (email, resetToken) => {
-    console.log("\n\n ...nodemailer sendResetEmail() called");
+  console.log("\n\n ...nodemailer sendResetEmail() called");
 
   const mailOptions = {
-    from: process.env.NODEMAILER_EMAIL,
-    to: email,
-    subject: 'Password Reset',
-    text: `Your password reset token is: ${resetToken}`
+    from: {
+      name: "nodejs",
+      addres: process.env.NODEMAILER_EMAIL,
+    }, // sender address
+    to: [email], //list of receivers
+    subject: "Password Reset", //subject line
+    text: `Your password reset token is:`, //plain text body
+    html: `<b>${resetToken}</b>`, //html body
+    attatchments: [
+      {
+        filename: "",
+        path: "",
+        contentType: "",
+      },
+    ],
   };
 
-  transporter.sendMail(mailOptions, (error, info) => {
-    if (error) {
-      console.error('\n\nError sending email:', error);
-    } else {
-      console.log('\n\nEmail sent: ' + info.response);
+  const sendMail = async (transporter, mailOptions) => {
+    try {
+      await transporter.sendMail(mailOptions);
+      console.log("\n\nEmail sent");
+    } catch (error) {
+      console.log(error);
     }
-  });
+  };
 };
 
 export default sendResetEmail;

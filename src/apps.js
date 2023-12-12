@@ -13,6 +13,7 @@ import indexRoutes from "./routes/index.routes.js";
 import morgan from "morgan";
 import methodOverride from "method-override";
 import fileUpload from "express-fileupload";
+import jwt from "jsonwebtoken";
 
 // load .ENV
 config();
@@ -41,8 +42,8 @@ app.set("view engine", "ejs");
 app.set("views", [path.join(__dirname, "views", "templates")]);
 
 // db use JSON
-app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // Use morgan to see requests in console
 app.use(morgan('dev'));
