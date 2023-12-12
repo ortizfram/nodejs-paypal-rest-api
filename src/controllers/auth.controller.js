@@ -278,7 +278,7 @@ const postResetPassword = async (req, res) => {
   console.log("\n\nuser fetcher from id", existingUser[0]["id"], "\n\n");
   id = existingUser[0]["id"];
   if (!existingUser || existingUser.length === 0) {
-    return res.render("auth/forgot-password", { message: "user id not found" });
+    return res.redirect("api/forgot-password?message=user id not found");
   }
 
   // We have valid id and valid user with this id
@@ -287,9 +287,7 @@ const postResetPassword = async (req, res) => {
     const payload = jwt.verify(token, secret);
     // password must match
     if (password !== repeat_password) {
-      return res.render("auth/forgot-password", {
-        message: "Passwords do not match",
-      });
+      return res.redirect("api/forgot-password?message=passwords do not match");
     }
 
     // update with new password hashed
@@ -297,7 +295,7 @@ const postResetPassword = async (req, res) => {
     await pool.query(updatePassword_q, [hashedPassword, id]);
 
     // render
-    res.render("auth/login", { message: "Password updated successfully. Please login with your new password." });
+    res.render("auth/login", { message: "Password updated successfully. Please login with your new password.", user });
 
   } catch (error) {
     console.log(error.message);
