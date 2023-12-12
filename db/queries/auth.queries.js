@@ -19,6 +19,10 @@ export const fetchUserByField = (fieldName) =>`
   SELECT * FROM users WHERE ${fieldName} = ?
 `;
 
+export const updatePassword_q = `
+  UPDATE users SET password = ? WHERE id = ?
+`;
+
 export const createTableUserCourses = `CREATE TABLE IF NOT EXISTS user_courses (
       user_id INT,
       course_id INT,
