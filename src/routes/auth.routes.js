@@ -17,7 +17,7 @@
     // ------------forgotPassword-------------------------
     router.get("/forgot-password", controller.getForgotPassword)
     router.post("/forgot-password", controller.postForgotPassword)
-    router.get("/reset-password", controller.getResetPassword)
-    router.post("/reset-password", controller.postResetPassword)
+    router.get("/reset-password/:id/:token", controller.getResetPassword)
+    router.post("/reset-password/:id/:token",  controller.postResetPassword)
 
     export default router;

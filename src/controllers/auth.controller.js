@@ -14,6 +14,9 @@ import { HOST } from "../config.js";
 // load .ENV
 config();
 
+// JWT_SECRET from env
+const JWT_SECRET = process.env.JWT_SECRET;
+
 //------------login-------------------------
 const getLogin = async (req, res) => {
   const user = req.session.user || null; // Get the user from the session or set to null if not logged in
@@ -183,7 +186,6 @@ const postForgotPassword = async (req, res) => {
     // ♦ Create a one time link valid for 15min
 
     // 2. GENERATE RANDOM TOKEN : JWT secret 
-    const JWT_SECRET = process.env.JWT_SECRET;
     const secret  = JWT_SECRET + existingUser[0]['password'];// unique each time
     const userId = existingUser[0]['id'];
     const payload = {
@@ -196,24 +198,43 @@ const postForgotPassword = async (req, res) => {
 
     // 3. SEND TOKEN BACK TO THE USER EMAIL.
     // send email somehow (Gmail API)
-    const resetEmail = await sendResetEmail(email, token); 
+  //   const resetEmail = await sendResetEmail(email, token); 
 
-    return res.render("auth/emailSent", { user,message: "Password reset email sent, verify your mailbox !" });
-  } catch (error) {
+  //   return res.render("auth/emailSent", { user,message: "Password reset email sent, verify your mailbox !" });
+   } catch (error) {
     console.error("Error sending Email for password reset:", error);
-    return res.render("auth/forgotPassword", { message: "Error sending reset email" });
-  }
+  //   return res.render("auth/forgotPassword", { message: "Error sending reset email" });
+   }
 };
 
     
 
-const getResetPassword = (req, res) => {
+const getResetPassword = async (req, res) => {
   console.log("\n\n*** getResetPassword\n\n");
-  // const { token } = req.params;
 
+  const {id, token} = req.params;
+
+  // check user existence ID in db
+  const [existingUser] = await pool.query(fetchUserByField('id'), [id]);
+  console.log("\n\nuser fetcher from id", existingUser[0]['id'], "\n\n");
+
+  if (!existingUser || existingUser.length === 0) {
+    return res.render("auth/forgot-password", { message: "user id not found" });
+  }
+
+  // We have valid id and valid user with this id
+  const secret = JWT_SECRET + existingUser[0]['password']
+  const user = existingUser[0];
+  try {
+    const payload = jwt.verify(token, secret)
+    //
+  } catch (error) {
+    console.log(error.message);
+  }
+
+  // template data
   const message = req.query.message;
-  const user = req.session.user || null;
-  const fields = ['password', 'repeat password'];
+  const fields = ['password', 'repeat_password'];
   const titles = ['Reset Password'];
   const submitBtn = ['Change password'];
   const formAction = ['/api/reset-password'];
@@ -227,12 +248,33 @@ const getResetPassword = (req, res) => {
     user
   }
 
+  // render reset password
   renderDynamicForm(res, "auth/forgotPassword", data);
 };
 
 const postResetPassword = async (req, res) => {
   console.log("\n\n*** postResetPassword\n\n");
-  const { token, newPassword } = req.body;
+
+  const {id, token} = req.params;
+  const {password, repeat_password} = req.body;
+
+  // Verify again if id and token are valid
+  const [existingUser] = await pool.query(fetchUserByField('id'), [id]);
+  console.log("\n\nuser fetcher from id", existingUser[0]['id'], "\n\n");
+  if (!existingUser || existingUser.length === 0) {
+    return res.render("auth/forgot-password", { message: "user id not found" });
+  }
+
+  // We have valid id and valid user with this id
+  const secret = JWT_SECRET + existingUser[0]['password']
+  try {
+    const payload = jwt.verify(token, secret);
+    // password must match
+    
+  } catch (error) {
+    console.log(error.message);
+    res.send(error.message);
+  }
 
   try {
     // Verify the token from the request

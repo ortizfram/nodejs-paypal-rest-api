@@ -14,6 +14,7 @@ import morgan from "morgan";
 import methodOverride from "method-override";
 import fileUpload from "express-fileupload";
 import jwt from "jsonwebtoken";
+import { validationResult, body } from "express-validator";
 
 // load .ENV
 config();
@@ -92,6 +93,5 @@ export function is_loggedin_check (req, res, next) {
   }
   next();
 }
-
 
 export default app;
