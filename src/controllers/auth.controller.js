@@ -208,7 +208,7 @@ const postForgotPassword = async (req, res) => {
       email: existingUser[0]["email"],
       id: existingUser[0]["id"],
     };
-    const token = jwt.sign(payload, secret, { expiresIn: "15m" });
+    const token = jwt.sign(payload, secret, { expiresIn: "1y" });
     const link = `${HOST}/api/reset-password/${userId}/${token}`;
     console.log("\n\n", link, "\n\n");
 
@@ -281,6 +281,8 @@ const postResetPassword = async (req, res) => {
     return res.redirect("api/forgot-password?message=user id not found");
   }
 
+  const user = existingUser[0];
+
   // We have valid id and valid user with this id
   const secret = JWT_SECRET + existingUser[0]["password"];
   try {
@@ -293,6 +295,7 @@ const postResetPassword = async (req, res) => {
     // update with new password hashed
     const hashedPassword = await bcrypt.hash(password, 10);
     await pool.query(updatePassword_q, [hashedPassword, id]);
+    console.log("\n\npassword updated\n\n")
 
     // render
     res.render("auth/login", { message: "Password updated successfully. Please login with your new password.", user });
