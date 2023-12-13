@@ -15,9 +15,9 @@ import { config } from "dotenv";
 import setUserRole from "../public/js/setUserRole.js";
 import crypto from "crypto";
 import generateResetToken from "../utils/generateToken.js";
-import sendResetEmail from "../utils/sendResetEmail.js";
 import jwt from "jsonwebtoken";
 import { HOST } from "../config.js";
+import sendResetEmail from "../utils/sendEmail.js";
 
 // load .ENV
 config();
@@ -210,11 +210,16 @@ const postForgotPassword = async (req, res) => {
     };
     const token = jwt.sign(payload, secret, { expiresIn: "1y" });
     const link = `${HOST}/api/reset-password/${userId}/${token}`;
-    console.log("\n\n", link, "\n\n");
+    //console.log("\n\n", link, "\n\n");
 
     // 3. SEND TOKEN BACK TO THE USER EMAIL.
-    // send email somehow (Gmail API)
-    //   const resetEmail = await sendResetEmail(email, token);
+    const emailInfo = await sendResetEmail(
+      email,
+      "Password Reset",
+      "Sending Reset password Token using Node JS & Nodemailer",
+      `<button><a href="${link}">Go to Reset Password</a></button>`
+    );
+
 
     return res.render("auth/emailSent", { user,message: "Password reset email sent, verify your mailbox !" });
 
