@@ -323,7 +323,7 @@ const getCourseDelete = async (req, res) => {
     console.log(`\n\ncourse: ${course.title}\n\n`);
 
     // render template
-    res.render("courseDelete/courseDeleteConfirmation", { user,messagge, course });
+    res.render("courseDelete/courseDeleteConfirmation", { user,message, course });
   } catch (error) {
     console.log("Error fetching course for deletion:", error);
     res.redirect(`/api/courses/`);
