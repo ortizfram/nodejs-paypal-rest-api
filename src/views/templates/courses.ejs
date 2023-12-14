@@ -4,32 +4,27 @@
   </div>
 
   <div class="courses-grid">
-    <% courses.forEach((course, index)=> { %><div class="course-item">
-      <a href="/api/course/<%= course.id %>/overview">
-        <img src="<%= course.thumbnail %>" alt="thumbnail-<%= course.slug %>" />
-        <p class="timestamp"><%= course.created_at %></p>
-        <h2><%= course.title %></h2>
-        <p>USD <%= course.usd_price %> | ARS <%= course.ars_price %></p>
-        <p><%= course.description %></p>
-      </a>
-      <div class="course-actions">
-        <p>
-          <a href="/api/course/<%= course.id %>/update">Edit</a>
-        </p>
-        <p>
-          <a href="/api/course/<%= course.id %>/delete?courseId=<%= course.id %>">Delete</a>
-        </p>
+    <% courses.reverse().forEach((course, index) => { %>
+      <div class="course-item">
+        <a href="/api/course/<%= course.id %>/overview">
+          <img src="<%= course.thumbnail %>" alt="thumbnail-<%= course.slug %>" />
+          <h2><%= course.title %></h2>
+          <p>USD <%= course.usd_price %> | ARS <%= course.ars_price %></p>
+          <p><%= course.description %></p>
+        </a>
+        <div class="course-actions">
+          <p>
+            <a href="/api/course/<%= course.id %>/update">Edit</a>
+          </p>
+          <p>
+            <a href="/api/course/<%= course.id %>/delete?courseId=<%= course.id %>">Delete</a>
+          </p>
+        </div>
       </div>
-    </div><% if ((index + 1) % 4===0 && index !==courses.length - 1) { %>
+      <% if ((index + 1) % 4 === 0 && index !== courses.length - 1) { %>
+        </div>
+        <div class="courses-grid">
+      <% } %>
+    <% }); %>
   </div>
-  
-  <div class="courses-grid"><% } %> <% }); %></div>
-</div>
-
-<!-- Add pagination controls -->
-<div class="pagination">
-  <!-- Math.ceil: rounds up and returns the smallest integer greater than or equal to a given number -->
-  <% for (let i=1; i <=Math.ceil(totalItems / pageSize); i++) { %>
-  <a href="/api/courses?page=<%= i %>" class="page-link"><%= i %></a>
-  <% } %>
 </div>

@@ -311,6 +311,8 @@ const postCourseUpdate = async (req, res) => {
 
 const getCourseDelete = async (req, res) => {
   console.log("\n\n*** getCourseDelete\n\n");
+  const user = req.session.user || null;
+  const message = req.query.message;
   try {
     // course from id
     const courseId = req.query.courseId;
@@ -321,7 +323,7 @@ const getCourseDelete = async (req, res) => {
     console.log(`\n\ncourse: ${course.title}\n\n`);
 
     // render template
-    res.render("courseDelete/courseDeleteConfirmation", { course });
+    res.render("courseDelete/courseDeleteConfirmation", { user,messagge, course });
   } catch (error) {
     console.log("Error fetching course for deletion:", error);
     res.redirect(`/api/courses/`);
@@ -367,22 +369,16 @@ const coursesList = async (req, res) => {
 
   try {
     const message = req.query.message;
-    const page = req.query.page || 1; // Get the requested page from query params, default to 1
-    const pageSize = 8; // Number of courses per page
-
-    // Calculate the offset based on the requested page
-    const offset = (page - 1) * pageSize;
-
-    let enrolledCourseIds = [];
     const user = req.session.user || null;
 
+    let enrolledCourseIds = [];
     if (user) {
       const [enrolledCoursesRows] = await pool.query(getUserEnrolledCoursesQuery, [user.id]);
       enrolledCourseIds = enrolledCoursesRows.map((enrolledCourse) => enrolledCourse.course_id.toString());
     }
 
-    // Fetch all courses from the database
-    const [coursesRows] = await pool.query(getCourseListQuery, [offset, pageSize]);
+    // Fetch all courses from the database without pagination
+    let [coursesRows] = await pool.query(getCourseListNoPagination_q);
 
     // If the user is logged in and has enrolled courses, filter them out
     let courses = coursesRows.map((course) => ({
@@ -405,14 +401,10 @@ const coursesList = async (req, res) => {
 
     const totalItems = courses.length;
 
-    // Paginate the courses based on the offset
-    const paginatedCourses = courses.slice(offset, offset + pageSize);
-
-    // Render paginated courses for the user
+    // Render all courses for the user
     res.render("courses", {
-      courses: paginatedCourses,
+      courses,
       totalItems,
-      pageSize,
       user,
       message: user ? "These courses are available for today, enjoy!" : "All courses",
     });
@@ -423,20 +415,16 @@ const coursesList = async (req, res) => {
 };
 
 
+
 const coursesListOwned = async (req, res) => {
   console.log("\n*** courseListOwned\n");
 
   try {
     const user = req.session.user || null;
     const message = req.query.message;
-    const page = req.query.page || 1; // Get the requested page from query params, default to 1
-    const pageSize = 8; // Number of courses per page
-
-    // Calculate the offset based on the requested page
-    const offset = (page - 1) * pageSize;
 
     let enrolledCourseIds = [];
-    
+
     // Fetch enrolled courses for the user if logged in
     if (user) {
       const [enrolledCoursesRows] = await pool.query(getUserEnrolledCoursesQuery, [user.id]);
@@ -447,39 +435,23 @@ const coursesListOwned = async (req, res) => {
     const [coursesRows] = await pool.query(getCourseListNoPagination_q);
 
     // Filter out courses that the user has not enrolled in
-    const enrolledCourses = coursesRows.filter((course) => enrolledCourseIds.includes(course.id.toString()));
+    let enrolledCourses = coursesRows.filter((course) => enrolledCourseIds.includes(course.id.toString()));
 
-    // Calculate totalItems from enrolled courses count
+    // Render enrolled courses for the user
     const totalItems = enrolledCourses.length;
 
-    // Paginate the enrolled courses based on the offset
-    const paginatedCourses = enrolledCourses.slice(offset, offset + pageSize);
-
-    // Render paginated enrolled courses for the user
-    if (paginatedCourses.length > 0) {
-      res.render("coursesOwned", {
-        courses: paginatedCourses,
-        totalItems,
-        pageSize,
-        user,
-        message: user ? "Your enrolled courses" : "You haven't enrolled in any courses yet.",
-      });
-    } else {
-      res.render("coursesOwned", {
-        user,
-        totalItems,
-        page,
-        pageSize,
-        offset,
-        courses: [],
-        message: "You haven't enrolled in any courses yet.",
-      });
-    }
+    res.render("coursesOwned", {
+      courses: enrolledCourses,
+      totalItems,
+      user,
+      message: user ? "Your enrolled courses" : "You haven't enrolled in any courses yet.",
+    });
   } catch (error) {
     console.log("Error fetching courses:", error);
     res.redirect("/api/courses-owned?message=Error fetching courses");
   }
 };
+
 
 
 const courseOverview = async (req, res) => {
