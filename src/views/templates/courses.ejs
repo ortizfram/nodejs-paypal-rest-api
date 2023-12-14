@@ -17,6 +17,7 @@
           <div class="course-actions">
             <p>
               <a href="/api/course/<%= course.id %>/update">Edit</a>
+              <input type="hidden" name="author" value="<%= course.author %>">
             </p>
             <p>
               <a href="/api/course/<%= course.id %>/delete?courseId=<%= course.id %>">Delete</a>

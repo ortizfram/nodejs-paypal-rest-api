@@ -240,6 +240,17 @@ const postCourseUpdate = async (req, res) => {
 
     // !if discount : null
     discountValue = discount !== "" ? discount : null;
+
+    // Get current timestamp like (DD-MM-YYY HH:MM:SS)
+    const currentDate = new Date();
+    const currentTimestamp =
+      currentDate.getDate().toString().padStart(2, '0') + '-' +
+      (currentDate.getMonth() + 1).toString().padStart(2, '0') + '-' +
+      currentDate.getFullYear().toString() + ' ' +
+      currentDate.getHours().toString().padStart(2, '0') + ':' +
+      currentDate.getMinutes().toString().padStart(2, '0') + ':' +
+      currentDate.getSeconds().toString().padStart(2, '0');
+
     // req thumbnail
     thumbnail = req.files.thumbnail;
 
@@ -254,6 +265,8 @@ const postCourseUpdate = async (req, res) => {
       await thumbnail.mv(path.join(__dirname, "uploads", uniqueFilename));
     }
 
+    let author = req.body.author
+
     const updateParams = [
       title,
       courseSlug,
@@ -267,6 +280,9 @@ const postCourseUpdate = async (req, res) => {
       thumbnailPath,
       length,
       courseId, // where course.id
+      currentTimestamp,
+      currentTimestamp,
+      author,
     ];
 
     // msg
@@ -445,6 +461,7 @@ const coursesListOwned = async (req, res) => {
 
     res.render("coursesOwned", {
       courses: enrolledCourses,
+      author: enrolledCourses.author,
       totalItems,
       user,
       message: user ? "Your enrolled courses" : "You haven't enrolled in any courses yet.",

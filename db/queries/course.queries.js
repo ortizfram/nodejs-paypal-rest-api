@@ -21,10 +21,11 @@ export const createCourseTableQuery = `CREATE TABLE IF NOT EXISTS courses (
     UNIQUE KEY(slug)
 );`;
 export const updateCourseQuery = `
-UPDATE courses
-SET title = ?, slug = ?, description = ?, text_content = ?, video_link = ?, ars_price = ?, usd_price = ?, discount = ?, active = ?, thumbnail = ?, length = ?, updated_at = CURRENT_TIMESTAMP, author = ?
-WHERE id = ?;
+  UPDATE courses
+  SET title = ?, slug = ?, description = ?, text_content = ?, video_link = ?, ars_price = ?, usd_price = ?, discount = ?, active = ?, thumbnail = ?, length = ?, updated_at = CURRENT_TIMESTAMP, author = ?
+  WHERE id = ?;
 `;
+
 export const createCourseQuery = `
 INSERT INTO courses (title, slug, description, text_content, video_link, ars_price, usd_price, discount, active, thumbnail, length, created_at, updated_at, author)
 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, ?);
