@@ -12,14 +12,19 @@
           <p>USD <%= course.usd_price %> | ARS <%= course.ars_price %></p>
           <p><%= course.description %></p>
         </a>
-        <div class="course-actions">
-          <p>
-            <a href="/api/course/<%= course.id %>/update">Edit</a>
-          </p>
-          <p>
-            <a href="/api/course/<%= course.id %>/delete?courseId=<%= course.id %>">Delete</a>
-          </p>
-        </div>
+
+        <% if (isAdmin) {%>
+          <div class="course-actions">
+            <p>
+              <a href="/api/course/<%= course.id %>/update">Edit</a>
+            </p>
+            <p>
+              <a href="/api/course/<%= course.id %>/delete?courseId=<%= course.id %>">Delete</a>
+            </p>
+          </div>
+        <% }%>
+        
+
       </div>
       <% if ((index + 1) % 4 === 0 && index !== courses.length - 1) { %>
         </div>

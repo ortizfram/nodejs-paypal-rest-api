@@ -370,6 +370,7 @@ const coursesList = async (req, res) => {
   try {
     const message = req.query.message;
     const user = req.session.user || null;
+    const isAdmin = user && user.role === 'admin';
 
     let enrolledCourseIds = [];
     if (user) {
@@ -407,6 +408,7 @@ const coursesList = async (req, res) => {
       totalItems,
       user,
       message: user ? "These courses are available for today, enjoy!" : "All courses",
+      isAdmin, // Sending isAdmin flag to the view
     });
   } catch (error) {
     console.log("Error fetching courses:", error);
@@ -421,6 +423,7 @@ const coursesListOwned = async (req, res) => {
 
   try {
     const user = req.session.user || null;
+    const isAdmin = user && user.role === 'admin';
     const message = req.query.message;
 
     let enrolledCourseIds = [];
@@ -445,6 +448,7 @@ const coursesListOwned = async (req, res) => {
       totalItems,
       user,
       message: user ? "Your enrolled courses" : "You haven't enrolled in any courses yet.",
+      isAdmin, // Sending isAdmin flag to the view
     });
   } catch (error) {
     console.log("Error fetching courses:", error);
