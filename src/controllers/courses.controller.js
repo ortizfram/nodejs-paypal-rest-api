@@ -108,6 +108,20 @@ const postCourseCreate = async (req, res) => {
         // !if discount: null
         const discountValue = discount !== "" ? discount : null;
 
+        // Get current timestamp like (DD-MM-YYY HH:MM:SS)
+        const currentDate = new Date();
+        const currentTimestamp =
+          currentDate.getDate().toString().padStart(2, '0') + '-' +
+          (currentDate.getMonth() + 1).toString().padStart(2, '0') + '-' +
+          currentDate.getFullYear().toString() + ' ' +
+          currentDate.getHours().toString().padStart(2, '0') + ':' +
+          currentDate.getMinutes().toString().padStart(2, '0') + ':' +
+          currentDate.getSeconds().toString().padStart(2, '0');
+
+
+        // Get author
+        let author = req.session.user || null;
+
         // Create an object with column names and values
         const courseData = [
           title,
@@ -121,6 +135,9 @@ const postCourseCreate = async (req, res) => {
           active === "true" ? true : false,
           relativePath, //this is thumbnail
           length,
+          currentTimestamp, // 'created_at'
+          currentTimestamp, // 'updated_at'
+          author,
         ];
 
         // Create the new course using the SQL query
@@ -377,6 +394,9 @@ const coursesList = async (req, res) => {
       thumbnail: course.thumbnail,
       id: course.id.toString(),
       thumbnailPath: `/uploads/${course.thumbnail}`,
+      created_at: new Date(course.created_at).toLocaleString(), // Format created_at
+      updated_at: new Date(course.updated_at).toLocaleString(), // Format updated_at
+      author: course.author,
     }));
 
     if (user && enrolledCourseIds.length > 0) {

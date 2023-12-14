@@ -21,6 +21,11 @@ hr {
     margin-bottom: 2px;
 }
 
+.timestamp {
+    color: #777;
+    text-decoration: none;
+}
+
 h1 {
     margin: 0;
     padding: 0;

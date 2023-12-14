@@ -7,6 +7,7 @@
     <% courses.forEach((course, index)=> { %><div class="course-item">
       <a href="/api/course/<%= course.id %>/overview">
         <img src="<%= course.thumbnail %>" alt="thumbnail-<%= course.slug %>" />
+        <p class="timestamp"><%= course.created_at %></p>
         <h2><%= course.title %></h2>
         <p>USD <%= course.usd_price %> | ARS <%= course.ars_price %></p>
         <p><%= course.description %></p>
