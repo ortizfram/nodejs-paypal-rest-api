@@ -8,6 +8,10 @@
       <a href="/api/course/<%= course.id %>/overview">
         <img src="<%= course.thumbnail %>" alt="thumbnail-<%= course.slug %>" />
         <p class="timestamp"><%= course.created_at %></p>
+        <!--<div>
+          <img src="#" alt="profile_img">
+          <p><%= course.author %><strong><%= course.author %></strong></p>
+        </div>-->
         <h2><%= course.title %></h2>
         <p>USD <%= course.usd_price %> | ARS <%= course.ars_price %></p>
         <p><%= course.description %></p>
