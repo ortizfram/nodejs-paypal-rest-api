@@ -16,6 +16,7 @@ import {
   updateCourseQuery,
 } from "../../db/queries/course.queries.js";
 import { __dirname } from "../apps.js";
+import { fetchUserByField } from "../../db/queries/auth.queries.js";
 
 //COURSE CREATE/UPDATE/DELETE
 // ===========================================================
@@ -83,7 +84,7 @@ const postCourseCreate = async (req, res) => {
           return Promise.resolve(); // Resolve promise to continue the chain
         }
       })
-      .then(() => {
+      .then(async () => {
         // req fields
         let {
           title,
@@ -121,6 +122,10 @@ const postCourseCreate = async (req, res) => {
 
         // Get author
         let author = req.session.user || null;
+        const authorUsername = author.username; 
+        const authorName = author.name;
+        const authorDetails =  JSON.stringify({authorUsername, authorName});
+        console.log("\n\nauthorDetails: ", authorDetails, "\n\n");
 
         // Create an object with column names and values
         const courseData = [
@@ -137,22 +142,21 @@ const postCourseCreate = async (req, res) => {
           length,
           currentTimestamp, // 'created_at'
           currentTimestamp, // 'updated_at'
-          author,
+          authorDetails,
         ];
 
         // Create the new course using the SQL query
-        return pool.query(createCourseQuery, courseData);
+        const [courseRow] = await pool.query(createCourseQuery, courseData);
+        
       })
-      .then(() => {
-        // get the course
-        return pool.query(getCourseFromSlugQuery, courseSlug);
-      })
-      .then(([courseRows]) => {
-        const course = courseRows[0];
+      .then(async () => {
+        // Fetch the created course
+        const [fetchedCourse] = await pool.query(getCourseFromSlugQuery, courseSlug);
+        const course = fetchedCourse[0];
         const courseId = course.id;
 
         console.log("\n\n◘ Creating course...");
-        console.log("\n\ncourse :", course.title);
+        console.log("\n\ncourse :", course);
 
         // Redirect after creating the course
         res.redirect(`/api/course/${courseId}`);
@@ -241,15 +245,8 @@ const postCourseUpdate = async (req, res) => {
     // !if discount : null
     discountValue = discount !== "" ? discount : null;
 
-    // Get current timestamp like (DD-MM-YYY HH:MM:SS)
+    // Get current timestamp 
     const currentDate = new Date();
-    const currentTimestamp =
-      currentDate.getDate().toString().padStart(2, '0') + '-' +
-      (currentDate.getMonth() + 1).toString().padStart(2, '0') + '-' +
-      currentDate.getFullYear().toString() + ' ' +
-      currentDate.getHours().toString().padStart(2, '0') + ':' +
-      currentDate.getMinutes().toString().padStart(2, '0') + ':' +
-      currentDate.getSeconds().toString().padStart(2, '0');
 
     // req thumbnail
     thumbnail = req.files.thumbnail;
@@ -279,10 +276,9 @@ const postCourseUpdate = async (req, res) => {
       active === "true" ? true : false,
       thumbnailPath,
       length,
-      courseId, // where course.id
-      currentTimestamp,
-      currentTimestamp,
+      currentDate, //updated_at
       author,
+      courseId, // where course.id
     ];
 
     // msg
