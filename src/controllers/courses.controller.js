@@ -26,7 +26,7 @@ const getCourseCreate = async (req, res) => {
   const message = req.query.message;
   const user = req.session.user || null;
   const userId = user.id || null;
-  res.render(`courseCreate/courseCreate?userId=${userId}`, {message, user});
+  res.render(`courseCreate/courseCreate`, {message, user});
 };
 
 const postCourseCreate = async (req, res) => {
@@ -122,27 +122,28 @@ const postCourseCreate = async (req, res) => {
 
 
          // Get author details from session
-         let authorId = req.query.userId || (req.session.user ? req.session.user.id : null);
+        //  let authorId = req.query.userId || (req.session.user ? req.session.user.id : null);
+         let authorId = null
         
          // Check if author ID exists
-        if (!authorId) {
-          return res.status(404).send('Author ID not provided');
-        }
-        try {
-        // Check if author exists and get their ID from the database
-        const [authorRow] =  await pool.query(fetchUserByField('id'), [authorId]);
+        // if (!authorId) {
+        //   return res.status(404).send('Author ID not provided');
+        // }
+      //   try {
+      //   // Check if author exists and get their ID from the database
+      //   const [authorRow] =  await pool.query(fetchUserByField('id'), [authorId]);
 
-        // validation error
-        if (!authorRow || authorRow.length === 0) {
-          return res.status(404).send('Author not found');
-        }
-        const author = authorRow[0];
-        authorId = author.id;
-        console.log("\n\nauthor: ", author);
-        console.log("\n\nauthorId: ", authorId);
-      } catch {
-        return res.status(500).send('Error fetching author details');
-      }
+      //   // validation error
+      //   if (!authorRow || authorRow.length === 0) {
+      //     return res.status(404).send('Author not found');
+      //   }
+      //   const author = authorRow[0];
+      //   authorId = author.id;
+      //   console.log("\n\nauthor: ", author);
+      //   console.log("\n\nauthorId: ", authorId);
+      // } catch {
+      //   return res.status(500).send('Error fetching author details');
+      // }
 
         // Create an object with column names and values
         const courseData = [
@@ -266,8 +267,8 @@ const postCourseUpdate = async (req, res) => {
     // !if discount : null
     discountValue = discount !== "" ? discount : null;
 
-    // Get current timestamp 
-    const currentDate = new Date();
+    // Get current timestamp in the format 'YYYY-MM-DD HH:MM:SS'
+    const currentTimestamp  = new Date().toISOString().slice(0, 19).replace('T', ' ');
 
     // req thumbnail
     thumbnail = req.files.thumbnail;
@@ -283,18 +284,6 @@ const postCourseUpdate = async (req, res) => {
       await thumbnail.mv(path.join(__dirname, "uploads", uniqueFilename));
     }
 
-    let authorUsername = req.session.user.username;
-    // If author not in request body, retrieve from session
-    if (!authorUsername && req.session.user) {
-      authorUsername = req.session.user.username; // Adjust this according to your session structure
-      console.log("\n\authorUsername: ", authorUsername);
-    }
-
-    // fetch id with username from DB 
-    const fetchUser_q = fetchUserByField("username");
-    const [existingUsername] = await pool.query(fetchUser_q, [authorUsername]); 
-    const authorId = existingUsername[0]['id'];
-    console.log("\n\nauthorId: ", authorId);
 
     const updateParams = [
       title,
@@ -308,8 +297,6 @@ const postCourseUpdate = async (req, res) => {
       active === "true" ? true : false,
       thumbnailPath,
       length,
-      currentDate, //updated_at
-      authorId,
       courseId, // where course.id
     ];
 
