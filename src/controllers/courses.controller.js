@@ -26,7 +26,7 @@ const getCourseCreate = async (req, res) => {
   const message = req.query.message;
   const user = req.session.user || null;
   const userId = user.id || null;
-  res.render(`courseCreate/courseCreate`, {message, user});
+  res.render(`courseCreate/courseCreate`, { message, user });
 };
 
 const postCourseCreate = async (req, res) => {
@@ -113,37 +113,41 @@ const postCourseCreate = async (req, res) => {
         // Get current timestamp like (DD-MM-YYY HH:MM:SS)
         const currentDate = new Date();
         const currentTimestamp =
-          currentDate.getDate().toString().padStart(2, '0') + '-' +
-          (currentDate.getMonth() + 1).toString().padStart(2, '0') + '-' +
-          currentDate.getFullYear().toString() + ' ' +
-          currentDate.getHours().toString().padStart(2, '0') + ':' +
-          currentDate.getMinutes().toString().padStart(2, '0') + ':' +
-          currentDate.getSeconds().toString().padStart(2, '0');
+          currentDate.getDate().toString().padStart(2, "0") +
+          "-" +
+          (currentDate.getMonth() + 1).toString().padStart(2, "0") +
+          "-" +
+          currentDate.getFullYear().toString() +
+          " " +
+          currentDate.getHours().toString().padStart(2, "0") +
+          ":" +
+          currentDate.getMinutes().toString().padStart(2, "0") +
+          ":" +
+          currentDate.getSeconds().toString().padStart(2, "0");
 
-
-         // Get author details from session
+        // Get author details from session
         //  let authorId = req.query.userId || (req.session.user ? req.session.user.id : null);
-         let authorId = null
-        
-         // Check if author ID exists
+        let authorId = null;
+
+        // Check if author ID exists
         // if (!authorId) {
         //   return res.status(404).send('Author ID not provided');
         // }
-      //   try {
-      //   // Check if author exists and get their ID from the database
-      //   const [authorRow] =  await pool.query(fetchUserByField('id'), [authorId]);
+        //   try {
+        //   // Check if author exists and get their ID from the database
+        //   const [authorRow] =  await pool.query(fetchUserByField('id'), [authorId]);
 
-      //   // validation error
-      //   if (!authorRow || authorRow.length === 0) {
-      //     return res.status(404).send('Author not found');
-      //   }
-      //   const author = authorRow[0];
-      //   authorId = author.id;
-      //   console.log("\n\nauthor: ", author);
-      //   console.log("\n\nauthorId: ", authorId);
-      // } catch {
-      //   return res.status(500).send('Error fetching author details');
-      // }
+        //   // validation error
+        //   if (!authorRow || authorRow.length === 0) {
+        //     return res.status(404).send('Author not found');
+        //   }
+        //   const author = authorRow[0];
+        //   authorId = author.id;
+        //   console.log("\n\nauthor: ", author);
+        //   console.log("\n\nauthorId: ", authorId);
+        // } catch {
+        //   return res.status(500).send('Error fetching author details');
+        // }
 
         // Create an object with column names and values
         const courseData = [
@@ -162,15 +166,17 @@ const postCourseCreate = async (req, res) => {
           currentTimestamp, // 'updated_at'
           authorId,
         ];
-        console.log("\n\ncourseData: ",courseData);
+        console.log("\n\ncourseData: ", courseData);
 
         // Create the new course using the SQL query
         const [courseRow] = await pool.query(createCourseQuery, courseData);
-        
       })
       .then(async () => {
         // Fetch the created course
-        const [fetchedCourse] = await pool.query(getCourseFromSlugQuery, courseSlug);
+        const [fetchedCourse] = await pool.query(
+          getCourseFromSlugQuery,
+          courseSlug
+        );
         const course = fetchedCourse[0];
         const courseId = course.id;
 
@@ -226,7 +232,7 @@ const postCourseUpdate = async (req, res) => {
 
   // get courseId
   let courseId = req.params.id; // Assuming the ID is coming from the request body
-  const [courseRows] = await pool.query(getCourseFromIdQuery, [courseId]) 
+  const [courseRows] = await pool.query(getCourseFromIdQuery, [courseId]);
   const course = courseRows[0];
   courseId = course.id;
   console.log(`\n--- courseId: ${courseId}\n`);
@@ -243,6 +249,23 @@ const postCourseUpdate = async (req, res) => {
     return res.redirect(
       `/api/course/${courseId}/update?courseId=${courseId}&message=${message}`
     );
+  }
+
+  // Check if thumbnail uploaded, encode, move
+  if (req.files && req.files.thumbnail) {
+    const timestamp = Date.now();
+    const filename = req.files.thumbnail.name;
+    const uniqueFilename = encodeURIComponent(`${timestamp}_${filename}`);
+    thumbnailPath = "/uploads/" + uniqueFilename;
+
+    // Assign the uploaded thumbnail file to the 'thumbnail' variable
+    thumbnail = req.files.thumbnail;
+
+    // Use mv() to place file on the server
+    await thumbnail.mv(path.join(__dirname, "uploads", uniqueFilename));
+  } else {
+    // If no new thumbnail uploaded, retain the existing thumbnail path
+    thumbnailPath = course.thumbnail; // Assuming course.thumbnail holds the existing thumbnail path
   }
 
   try {
@@ -268,22 +291,10 @@ const postCourseUpdate = async (req, res) => {
     discountValue = discount !== "" ? discount : null;
 
     // Get current timestamp in the format 'YYYY-MM-DD HH:MM:SS'
-    const currentTimestamp  = new Date().toISOString().slice(0, 19).replace('T', ' ');
-
-    // req thumbnail
-    thumbnail = req.files.thumbnail;
-
-    // Check if thumbnail uploaded, encode, move
-    if (req.files && req.files.thumbnail) {
-      const timestamp = Date.now();
-      const filename = req.files.thumbnail.name;
-      const uniqueFilename = encodeURIComponent(`${timestamp}_${filename}`);
-      thumbnailPath = "/uploads/" + uniqueFilename;
-
-      // Use mv() to place file on the server
-      await thumbnail.mv(path.join(__dirname, "uploads", uniqueFilename));
-    }
-
+    const currentTimestamp = new Date()
+      .toISOString()
+      .slice(0, 19)
+      .replace("T", " ");
 
     const updateParams = [
       title,
@@ -355,7 +366,11 @@ const getCourseDelete = async (req, res) => {
     console.log(`\n\ncourse: ${course.title}\n\n`);
 
     // render template
-    res.render("courseDelete/courseDeleteConfirmation", { user,message, course });
+    res.render("courseDelete/courseDeleteConfirmation", {
+      user,
+      message,
+      course,
+    });
   } catch (error) {
     console.log("Error fetching course for deletion:", error);
     res.redirect(`/api/courses/`);
@@ -402,12 +417,17 @@ const coursesList = async (req, res) => {
   try {
     const message = req.query.message;
     const user = req.session.user || null;
-    const isAdmin = user && user.role === 'admin';
+    const isAdmin = user && user.role === "admin";
 
     let enrolledCourseIds = [];
     if (user) {
-      const [enrolledCoursesRows] = await pool.query(getUserEnrolledCoursesQuery, [user.id]);
-      enrolledCourseIds = enrolledCoursesRows.map((enrolledCourse) => enrolledCourse.course_id.toString());
+      const [enrolledCoursesRows] = await pool.query(
+        getUserEnrolledCoursesQuery,
+        [user.id]
+      );
+      enrolledCourseIds = enrolledCoursesRows.map((enrolledCourse) =>
+        enrolledCourse.course_id.toString()
+      );
     }
 
     // Fetch all courses from the database without pagination
@@ -429,7 +449,9 @@ const coursesList = async (req, res) => {
     }));
 
     if (user && enrolledCourseIds.length > 0) {
-      courses = courses.filter((course) => !enrolledCourseIds.includes(course.id));
+      courses = courses.filter(
+        (course) => !enrolledCourseIds.includes(course.id)
+      );
     }
 
     const totalItems = courses.length;
@@ -439,7 +461,9 @@ const coursesList = async (req, res) => {
       courses,
       totalItems,
       user,
-      message: user ? "These courses are available for today, enjoy!" : "All courses",
+      message: user
+        ? "These courses are available for today, enjoy!"
+        : "All courses",
       isAdmin, // Sending isAdmin flag to the view
     });
   } catch (error) {
@@ -448,29 +472,34 @@ const coursesList = async (req, res) => {
   }
 };
 
-
-
 const coursesListOwned = async (req, res) => {
   console.log("\n*** courseListOwned\n");
 
   try {
     const user = req.session.user || null;
-    const isAdmin = user && user.role === 'admin';
+    const isAdmin = user && user.role === "admin";
     const message = req.query.message;
 
     let enrolledCourseIds = [];
 
     // Fetch enrolled courses for the user if logged in
     if (user) {
-      const [enrolledCoursesRows] = await pool.query(getUserEnrolledCoursesQuery, [user.id]);
-      enrolledCourseIds = enrolledCoursesRows.map((enrolledCourse) => enrolledCourse.course_id.toString());
+      const [enrolledCoursesRows] = await pool.query(
+        getUserEnrolledCoursesQuery,
+        [user.id]
+      );
+      enrolledCourseIds = enrolledCoursesRows.map((enrolledCourse) =>
+        enrolledCourse.course_id.toString()
+      );
     }
 
     // Fetch all courses from the database
     const [coursesRows] = await pool.query(getCourseListNoPagination_q);
 
     // Filter out courses that the user has not enrolled in
-    let enrolledCourses = coursesRows.filter((course) => enrolledCourseIds.includes(course.id.toString()));
+    let enrolledCourses = coursesRows.filter((course) =>
+      enrolledCourseIds.includes(course.id.toString())
+    );
 
     // Render enrolled courses for the user
     const totalItems = enrolledCourses.length;
@@ -480,7 +509,9 @@ const coursesListOwned = async (req, res) => {
       author: enrolledCourses.author,
       totalItems,
       user,
-      message: user ? "Your enrolled courses" : "You haven't enrolled in any courses yet.",
+      message: user
+        ? "Your enrolled courses"
+        : "You haven't enrolled in any courses yet.",
       isAdmin, // Sending isAdmin flag to the view
     });
   } catch (error) {
@@ -488,8 +519,6 @@ const coursesListOwned = async (req, res) => {
     res.redirect("/api/courses-owned?message=Error fetching courses");
   }
 };
-
-
 
 const courseOverview = async (req, res) => {
   console.log("\n*** courseOverview\n");
@@ -544,7 +573,7 @@ const courseEnroll = async (req, res) => {
   console.log("\n***courseEnroll\n");
 
   const user = req.session.user; // Retrieve the user from the session
-    const message = req.query.message; // Retrieve success message from query params authcontroller
+  const message = req.query.message; // Retrieve success message from query params authcontroller
   // Fetch the course slug from the request
   const courseId = req.params.id;
 

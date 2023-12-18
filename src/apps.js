@@ -25,6 +25,9 @@ const app = express();
 // configure methodOverride
 app.use(methodOverride('_method'));
 
+// Set default time zone
+Intl.DateTimeFormat = Intl.DateTimeFormat(undefined, { timeZone: 'America/Argentina/Buenos_Aires' });
+
 // shortcuts for files/dirs
 export const __filename = fileURLToPath(import.meta.url);
 export const __dirname = path.dirname(__filename);
