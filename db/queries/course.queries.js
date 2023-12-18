@@ -19,15 +19,18 @@ export const createCourseTableQuery = `CREATE TABLE IF NOT EXISTS courses (
     PRIMARY KEY(id),
     UNIQUE KEY(slug),
 );`;
+
+const argentinaTimeZone = "CONVERT_TZ(NOW(), 'UTC', 'America/Argentina/Buenos_Aires')";
+
 export const updateCourseQuery = `
   UPDATE courses
-  SET title = ?, slug = ?, description = ?, text_content = ?, video_link = ?, ars_price = ?, usd_price = ?, discount = ?, active = ?, thumbnail = ?, length = ?, updated_at = CURRENT_TIMESTAMP
+  SET title = ?, slug = ?, description = ?, text_content = ?, video_link = ?, ars_price = ?, usd_price = ?, discount = ?, active = ?, thumbnail = ?, length = ?, updated_at = ${argentinaTimeZone}
   WHERE id = ?;
 `;
 
 export const createCourseQuery = `
 INSERT INTO courses (title, slug, description, text_content, video_link, ars_price, usd_price, discount, active, thumbnail, length, created_at, updated_at)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ${argentinaTimeZone}, ${argentinaTimeZone});
 `;
 export const deleteCourseQuery = `DELETE FROM courses WHERE id = ?;`;
 export const deleteUserCourseQuery = `DELETE FROM user_courses WHERE course_id = ?;`;
