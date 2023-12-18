@@ -38,6 +38,11 @@
             <% } %>
               <!-- sign out -->
               <% if (user) { %>
+                <a class="nav-link" href="/api/user-update/<%= user.id %>">
+                  <!-- Add a placeholder image for the avatar -->
+                  <img src="images/user.png" alt="Placeholder Avatar" class="avatar">
+                  Update Profile
+                </a>
                 <!-- If user is signed in, display the circular avatar -->
                 <a class="nav-link" href="/api/logout">
                   <!-- Add a placeholder image for the avatar -->

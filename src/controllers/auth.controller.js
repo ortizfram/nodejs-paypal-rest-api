@@ -311,6 +311,11 @@ const postResetPassword = async (req, res) => {
     res.send(error.message);
   }
 };
+// -----------userUpdate-----------------------
+const getUserUpdate = async (req, res) => {
+ res.send("\n\n*** getUserUpdate\n\n");
+ console.log("\n\n*** getUserUpdate\n\n");
+}
 
 export default {
   getLogin,
@@ -322,4 +327,5 @@ export default {
   postForgotPassword,
   getResetPassword,
   postResetPassword,
+  getUserUpdate,
 };
