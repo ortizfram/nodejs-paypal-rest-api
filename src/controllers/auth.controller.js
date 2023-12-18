@@ -313,8 +313,33 @@ const postResetPassword = async (req, res) => {
 };
 // -----------userUpdate-----------------------
 const getUserUpdate = async (req, res) => {
- res.send("\n\n*** getUserUpdate\n\n");
  console.log("\n\n*** getUserUpdate\n\n");
+
+   // template data
+   const message = req.query.message;
+   const user = req.session.user
+   const userId = req.session.user.id
+   const fields = ["username", "name", "email"]; //avatar, password
+   const titles = ["Update User info"];
+   const submitBtn = ["Update"];
+   const formAction = [`/api/user-update/${userId}`];
+ 
+   const data = {
+     fields,
+     titles,
+     submitBtn,
+     formAction,
+     message,
+     user,
+   };
+ 
+   // render reset password
+   renderDynamicForm(res, "auth/forgotPassword", data);
+}
+
+const postUserUpdate = async (req, res) => {
+  console.log("\n\n*** postUserUpdate\n\n");
+  res.send("\n\n*** postUserUpdate\n\n");
 }
 
 export default {
