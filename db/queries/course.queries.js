@@ -16,18 +16,19 @@ export const createCourseTableQuery = `CREATE TABLE IF NOT EXISTS courses (
     length INT DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    author VARCHAR(255),
+    author_id INT, -- Reference to the users table
     PRIMARY KEY(id),
-    UNIQUE KEY(slug)
+    UNIQUE KEY(slug),
+    FOREIGN KEY(author_id) REFERENCES users(id)
 );`;
 export const updateCourseQuery = `
   UPDATE courses
-  SET title = ?, slug = ?, description = ?, text_content = ?, video_link = ?, ars_price = ?, usd_price = ?, discount = ?, active = ?, thumbnail = ?, length = ?, updated_at = CURRENT_TIMESTAMP, author = ?
+  SET title = ?, slug = ?, description = ?, text_content = ?, video_link = ?, ars_price = ?, usd_price = ?, discount = ?, active = ?, thumbnail = ?, length = ?, updated_at = CURRENT_TIMESTAMP, author_id = ?
   WHERE id = ?;
 `;
 
 export const createCourseQuery = `
-INSERT INTO courses (title, slug, description, text_content, video_link, ars_price, usd_price, discount, active, thumbnail, length, created_at, updated_at, author)
+INSERT INTO courses (title, slug, description, text_content, video_link, ars_price, usd_price, discount, active, thumbnail, length, created_at, updated_at, author_id)
 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, ?);
 `;
 export const deleteCourseQuery = `DELETE FROM courses WHERE id = ?;`;

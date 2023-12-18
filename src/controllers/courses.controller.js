@@ -25,7 +25,8 @@ const getCourseCreate = async (req, res) => {
 
   const message = req.query.message;
   const user = req.session.user || null;
-  res.render("courseCreate/courseCreate", {message, user});
+  const userId = user.id || null;
+  res.render(`courseCreate/courseCreate?userId=${userId}`, {message, user});
 };
 
 const postCourseCreate = async (req, res) => {
@@ -120,12 +121,28 @@ const postCourseCreate = async (req, res) => {
           currentDate.getSeconds().toString().padStart(2, '0');
 
 
-        // Get author
-        let author = req.session.user || null;
-        const authorUsername = author.username; 
-        const authorName = author.name;
-        const authorDetails =  JSON.stringify({authorUsername, authorName});
-        console.log("\n\nauthorDetails: ", authorDetails, "\n\n");
+         // Get author details from session
+         let authorId = req.query.userId || (req.session.user ? req.session.user.id : null);
+        
+         // Check if author ID exists
+        if (!authorId) {
+          return res.status(404).send('Author ID not provided');
+        }
+        try {
+        // Check if author exists and get their ID from the database
+        const [authorRow] =  await pool.query(fetchUserByField('id'), [authorId]);
+
+        // validation error
+        if (!authorRow || authorRow.length === 0) {
+          return res.status(404).send('Author not found');
+        }
+        const author = authorRow[0];
+        authorId = author.id;
+        console.log("\n\nauthor: ", author);
+        console.log("\n\nauthorId: ", authorId);
+      } catch {
+        return res.status(500).send('Error fetching author details');
+      }
 
         // Create an object with column names and values
         const courseData = [
@@ -142,8 +159,9 @@ const postCourseCreate = async (req, res) => {
           length,
           currentTimestamp, // 'created_at'
           currentTimestamp, // 'updated_at'
-          authorDetails,
+          authorId,
         ];
+        console.log("\n\ncourseData: ",courseData);
 
         // Create the new course using the SQL query
         const [courseRow] = await pool.query(createCourseQuery, courseData);
@@ -206,7 +224,10 @@ const postCourseUpdate = async (req, res) => {
   console.log("\n\n*** PostCourseUpdate\n\n");
 
   // get courseId
-  const courseId = req.params.id; // Assuming the ID is coming from the request body
+  let courseId = req.params.id; // Assuming the ID is coming from the request body
+  const [courseRows] = await pool.query(getCourseFromIdQuery, [courseId]) 
+  const course = courseRows[0];
+  courseId = course.id;
   console.log(`\n--- courseId: ${courseId}\n`);
 
   // Declare
@@ -262,7 +283,18 @@ const postCourseUpdate = async (req, res) => {
       await thumbnail.mv(path.join(__dirname, "uploads", uniqueFilename));
     }
 
-    let author = req.body.author
+    let authorUsername = req.session.user.username;
+    // If author not in request body, retrieve from session
+    if (!authorUsername && req.session.user) {
+      authorUsername = req.session.user.username; // Adjust this according to your session structure
+      console.log("\n\authorUsername: ", authorUsername);
+    }
+
+    // fetch id with username from DB 
+    const fetchUser_q = fetchUserByField("username");
+    const [existingUsername] = await pool.query(fetchUser_q, [authorUsername]); 
+    const authorId = existingUsername[0]['id'];
+    console.log("\n\nauthorId: ", authorId);
 
     const updateParams = [
       title,
@@ -277,7 +309,7 @@ const postCourseUpdate = async (req, res) => {
       thumbnailPath,
       length,
       currentDate, //updated_at
-      author,
+      authorId,
       courseId, // where course.id
     ];
 
@@ -317,6 +349,7 @@ const postCourseUpdate = async (req, res) => {
     }
   } catch (error) {
     console.error("Error updating course:", error);
+    console.error("Database Error:", error.sqlMessage); // Log the database error message
     res.status(500).json({ message: "Error updating the course" });
   }
 };
@@ -577,9 +610,13 @@ const courseDetail = async (req, res) => {
   try {
     console.log("\nCourseId:", courseId);
     const [courseRows] = await pool.query(getCourseFromIdQuery, courseId);
+    if (!courseRows || courseRows.length === 0) {
+      return res.status(404).send("Course not found");
+    }
     const course = courseRows[0];
+    console.log("courseId : ", course.id);
+    console.log(`\n\ncourse: ${course}\n\n`);
     courseId = course.id;
-    console.log("\nFetched course:", course.title);
 
     if (!course) {
       return res.status(404).send("Course not found");

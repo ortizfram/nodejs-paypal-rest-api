@@ -48,7 +48,8 @@ const postLogin = async (req, res, next) => {
     if (user && (await bcrypt.compare(password, user.password))) {
       req.session.user = user; // Store the user in the session
       const userId = user.id;
-      res.redirect(`/?message=Login successful, user.id:${userId}`);
+      console.log("\n\nuser: ", user);
+      res.redirect(`/?message=Login successful, user:${userId}`);
       console.log("\n*** Logged in\n");
       next();
     } else {
