@@ -629,10 +629,19 @@ const courseDetail = async (req, res) => {
     if (!courseRows || courseRows.length === 0) {
       return res.status(404).send("Course not found");
     }
+
     const course = courseRows[0];
     console.log("courseId : ", course.id);
     console.log(`\n\ncourse: ${course}\n\n`);
     courseId = course.id;
+
+    // Format the date strings for created_at and updated_at fields
+    const formattedCourse = {
+      ...course,
+      created_at: new Date(course.created_at).toLocaleString(),
+      updated_at: new Date(course.updated_at).toLocaleString(),
+    };
+    
 
     if (!course) {
       return res.status(404).send("Course not found");
@@ -648,7 +657,7 @@ const courseDetail = async (req, res) => {
     }
 
     res.render("courseDetail", {
-      course,
+      course: formattedCourse,
       message,
       user,
       enrolledCourses,
