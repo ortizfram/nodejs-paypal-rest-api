@@ -16,6 +16,8 @@ export const createCourseTableQuery = `CREATE TABLE IF NOT EXISTS courses (
     length INT DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    author_id INT NOT NULL,
+    
     PRIMARY KEY(id),
     UNIQUE KEY(slug),
 );`;
@@ -24,7 +26,7 @@ const argentinaTimeZone = "CONVERT_TZ(NOW(), 'UTC', 'America/Argentina/Buenos_Ai
 
 export const updateCourseQuery = `
   UPDATE courses
-  SET title = ?, slug = ?, description = ?, text_content = ?, video_link = ?, ars_price = ?, usd_price = ?, discount = ?, active = ?, thumbnail = ?, length = ?, updated_at = ${argentinaTimeZone}
+  SET title = ?, slug = ?, description = ?, text_content = ?, video_link = ?, ars_price = ?, usd_price = ?, discount = ?, active = ?, thumbnail = ?, length = ?, updated_at = ${argentinaTimeZone}, author_id = ?
   WHERE id = ?;
 `;
 

@@ -41,6 +41,7 @@ const postCourseCreate = async (req, res) => {
     let uniqueFilename;
     let timestamp;
     let slug;
+    let authorId = req.session.user.id;
 
     // file upload check
     if (!req.files || Object.keys(req.files).length === 0) {
@@ -125,29 +126,10 @@ const postCourseCreate = async (req, res) => {
           ":" +
           currentDate.getSeconds().toString().padStart(2, "0");
 
-        // Get author details from session
-        //  let authorId = req.query.userId || (req.session.user ? req.session.user.id : null);
-        let authorId = null;
 
-        // Check if author ID exists
-        // if (!authorId) {
-        //   return res.status(404).send('Author ID not provided');
-        // }
-        //   try {
-        //   // Check if author exists and get their ID from the database
-        //   const [authorRow] =  await pool.query(fetchUserByField('id'), [authorId]);
-
-        //   // validation error
-        //   if (!authorRow || authorRow.length === 0) {
-        //     return res.status(404).send('Author not found');
-        //   }
-        //   const author = authorRow[0];
-        //   authorId = author.id;
-        //   console.log("\n\nauthor: ", author);
-        //   console.log("\n\nauthorId: ", authorId);
-        // } catch {
-        //   return res.status(500).send('Error fetching author details');
-        // }
+        // make authorId the fetched userId from DB
+        const [authorRow] = await pool.query(fetchUserByField("id"), authorId);//comes from session.user.id
+        const existingUserId = authorRow[0]["id"];
 
         // Create an object with column names and values
         const courseData = [
@@ -164,7 +146,7 @@ const postCourseCreate = async (req, res) => {
           length,
           currentTimestamp, // 'created_at'
           currentTimestamp, // 'updated_at'
-          authorId,
+          existingUserId, // 'author_id'
         ];
         console.log("\n\ncourseData: ", courseData);
 
@@ -433,21 +415,34 @@ const coursesList = async (req, res) => {
     // Fetch all courses from the database without pagination
     let [coursesRows] = await pool.query(getCourseListNoPagination_q);
 
-    // If the user is logged in and has enrolled courses, filter them out
-    let courses = coursesRows.map((course) => ({
-      title: course.title,
-      slug: course.slug,
-      description: course.description,
-      ars_price: course.ars_price,
-      usd_price: course.usd_price,
-      thumbnail: course.thumbnail,
-      id: course.id.toString(),
-      thumbnailPath: `/uploads/${course.thumbnail}`,
-      created_at: new Date(course.created_at).toLocaleString(), // Format created_at
-      updated_at: new Date(course.updated_at).toLocaleString(), // Format updated_at
-      author: course.author,
-    }));
+    // Fetch author details, and other fields for each course
+    const coursePromises = coursesRows.map(async (course) => {
+      const [authorRow] = await pool.query(fetchUserByField('id'), course.author_id);
+      const author = authorRow[0]; // Assuming the author details are returned in the first row
+      
+      return {
+        title: course.title,
+        slug: course.slug,
+        description: course.description,
+        ars_price: course.ars_price,
+        usd_price: course.usd_price,
+        thumbnail: course.thumbnail,
+        id: course.id.toString(),
+        thumbnailPath: `/uploads/${course.thumbnail}`,
+        created_at: new Date(course.created_at).toLocaleString(),
+        updated_at: new Date(course.updated_at).toLocaleString(),
+        author: {
+          name: author.name,
+          username: author.username,
+          avatar: author.avatar,
+        },
+      };
+    });
 
+    // Resolve all promises to get the complete course details
+    let courses = await Promise.all(coursePromises);
+
+    // If the user is logged in and has enrolled courses, filter them out
     if (user && enrolledCourseIds.length > 0) {
       courses = courses.filter(
         (course) => !enrolledCourseIds.includes(course.id)
