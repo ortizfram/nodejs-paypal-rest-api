@@ -19,6 +19,8 @@ import generateResetToken from "../utils/generateToken.js";
 import jwt from "jsonwebtoken";
 import { HOST } from "../config.js";
 import sendResetEmail from "../utils/sendEmail.js";
+import path from "path";
+import { __dirname } from "../apps.js";
 
 // load .ENV
 config();
@@ -344,12 +346,38 @@ const getUserUpdate = async (req, res) => {
   renderDynamicForm(res, "auth/forgotPassword", data);
 }
 
+postsendEmailToken = async(req,res) => {
+  console.log("\n\n*** postSendEmailToken\n\n");
+
+  // 1. GET USER BASED ON ID
+  let userId = req.params.id || null;
+  const [existingUser] = await pool.query(fetchUserByField("id"), [userId])
+  console.log("\n\nuser fetcher from id", existingUser[0]["id"]);
+  if (!existingUser || existingUser.length === 0) { //validation
+    return res.render("api/login", { message: "userId not found not found" });
+  }
+
+  // ♦ Create a one time link valid for min/year/sec/months
+
+  // 2. GENERATE RANDOM TOKEN : JWT secret
+  const secret = JWT_SECRET + existingUser[0]["password"]; // unique each time
+  userId = existingUser[0]["id"];
+  const payload = {
+    email: existingUser[0]["email"],
+    id: userId,
+  };
+  const token = jwt.sign(payload, secret, { expiresIn: "1y" });
+  const link = `${HOST}/api/reset-password/${userId}/${token}`;
+  //console.log("\n\n", link, "\n\n");
+
+}
+
 const postUserUpdate = async (req, res) => {
   console.log("\n\n*** postUserUpdate\n\n");
 
   //Declare
   let avatarPath;
-  let userId = req.session.user.id || null;
+  let userId = req.params.id || null;
 
   let { username, name, email, avatar, password } = req.body;
 
@@ -410,6 +438,7 @@ const postUserUpdate = async (req, res) => {
     console.log("\n\n---Affected Rows:", affectedRows);
 
     if (affectedRows > 0) {
+      console.log(affectedRows)
       const message = "User data updated correctly, we've sent you and email too";
 
       // Include updated column names in the email message
