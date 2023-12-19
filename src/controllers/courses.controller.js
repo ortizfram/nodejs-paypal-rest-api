@@ -151,7 +151,13 @@ const postCourseCreate = async (req, res) => {
         console.log("\n\ncourseData: ", courseData);
 
         // Create the new course using the SQL query
-        const [courseRow] = await pool.query(createCourseQuery, courseData);
+        const [courseRow] = await pool.query(createCourseQuery, courseData)
+        .catch((sqlError) => {
+          // Log SQL errors
+          console.error('SQL Error:', sqlError);
+          throw sqlError; // Re-throw the error to be caught by the subsequent catch block
+        });
+        
       })
       .then(async () => {
         // Fetch the created course
