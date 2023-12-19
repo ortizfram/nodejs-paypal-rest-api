@@ -90,21 +90,17 @@ const postSignup = async (req, res) => {
 
     // If the email already exists, handle the duplicate case
     if (existingEmail.length > 0) {
-      return res
-        .status(400)
-        .render("auth/signup", {
-          user,
-          message: "This email is already registered.",
-        });
+      return res.status(400).render("auth/signup", {
+        user,
+        message: "This email is already registered.",
+      });
     }
     // If the username already exists, handle the duplicate case
     if (existingUsername.length > 0) {
-      return res
-        .status(400)
-        .render("auth/signup", {
-          user,
-          message: "This username is already registered.",
-        });
+      return res.status(400).render("auth/signup", {
+        user,
+        message: "This username is already registered.",
+      });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -175,10 +171,14 @@ const getForgotPassword = (req, res) => {
   const titles = ["Forgot Password"];
   const submitBtn = ["Submit"];
   const formAction = ["/api/forgot-password"];
+  const subtitle = ['Inset your current Email to receive reset instructions']
+  const labels = ['']
 
   const data = {
     fields,
     titles,
+    subtitle,
+    labels,
     submitBtn,
     formAction,
     message,
@@ -224,9 +224,11 @@ const postForgotPassword = async (req, res) => {
       `<button><a href="${link}">Go to Reset Password</a></button>`
     );
 
-
-    return res.render("auth/emailSent", { user,message: "Password reset email sent, verify your mailbox !" });
-
+    return res.render("auth/emailSent", {
+      user,
+      message: "Password reset email sent, verify your mailbox !",
+      
+    });
   } catch (error) {
     console.error("Error sending Email for password reset:", error);
     //   return res.render("auth/forgotPassword", { message: "Error sending reset email" });
@@ -262,6 +264,8 @@ const getResetPassword = async (req, res) => {
   const titles = ["Reset Password"];
   const submitBtn = ["Change password"];
   const formAction = [`/api/reset-password/${id}/${token}`];
+  const labels = [''];
+  const subtitle = [''];
 
   const data = {
     fields,
@@ -270,6 +274,8 @@ const getResetPassword = async (req, res) => {
     formAction,
     message,
     user,
+    labels,
+    subtitle,
   };
 
   // render reset password
@@ -304,32 +310,113 @@ const postResetPassword = async (req, res) => {
     // update with new password hashed
     const hashedPassword = await bcrypt.hash(password, 10);
     await pool.query(updatePassword_q, [hashedPassword, id]);
-    console.log("\n\npassword updated\n\n")
+    console.log("\n\npassword updated\n\n");
 
     // render
-    res.render("auth/login", { message: "Password updated successfully. Please login with your new password.", user });
-
+    res.render("auth/login", {
+      message:
+        "Password updated successfully. Please login with your new password.",
+      user,
+    });
   } catch (error) {
     console.log(error.message);
     res.send(error.message);
   }
 };
+
 // -----------userUpdate-----------------------
+const getsendEmailToken = async (req, res) => { 
+  console.log("\n\n*** getsendEmailToken\n\n");
+  const message = req.query.message;
+  const user = req.session.user || null;
+  const userId = req.session.user.id || null;
+
+  const fields = ["email"];
+  const titles = ["Account update"];
+  const submitBtn = ["Submit"];
+  const formAction = [`/api/user-update/${userId}`];
+  const subtitle = ['Inset your current Email to receive Token for updating account']
+  const labels = ['']
+
+  const data = {
+    fields,
+    titles,
+    subtitle,
+    labels,
+    submitBtn,
+    formAction,
+    message,
+    user,
+  };
+
+  renderDynamicForm(res, "auth/forgotPassword", data);
+}
+
+const postsendEmailToken = async (req, res) => {
+  console.log("\n\n*** postSendEmailToken\n\n");
+  const user = req.session.user;
+
+  try {
+    // 1. GET USER BASED ON ID
+    let userId = req.params.id || null;
+    const [existingUser] = await pool.query(fetchUserByField("id"), [userId]);
+    console.log("\n\nuser fetcher from id", existingUser[0]["id"]);
+    if (!existingUser || existingUser.length === 0) {
+      //validation
+      return res.render("api/login", { message: "userId not found not found" });
+    }
+
+    // ♦ Create a one time link valid for min/year/sec/months
+
+    // 2. GENERATE RANDOM TOKEN : JWT secret
+    const secret = JWT_SECRET + existingUser[0]["password"]; // unique each time
+    userId = existingUser[0]["id"];
+    const userEmail = existingUser[0]["email"];
+    const payload = {
+      email: userEmail,
+      id: userId,
+    };
+    const token = jwt.sign(payload, secret, { expiresIn: "1y" });
+    const link = `${HOST}/api/user-update/${userId}?token=${token}`;
+
+    // 3. SEND TOKEN BACK TO THE USER EMAIL.
+    const emailInfo = await sendResetEmail(
+      userEmail,
+      "🔑TOKEN: Update User account",
+      "We're Sending you the updating Token to change your account information",
+      `<button><a href="${link}">UPDATE ACCOUNT</a></button>`
+    );
+
+    return res.render("auth/emailSent", {
+      user,
+      message: "Update TOKEN email sent, check your mailbox !",
+    });
+  } catch (error) {
+    console.error("Error sending Email Token to update Account:", error);
+  }
+};
+
 const getUserUpdate = async (req, res) => {
   console.log("\n\n*** getUserUpdate\n\n");
 
   // template data
   const message = req.query.message;
   const user = req.session.user;
-  const userId = req.session.user.id;
-  const labels = ["New username", "Change First Name", "New Email", "New Password"]
+  const userId = req.params.id;
+  const token = req.query.token;
+  const labels = [
+    "New username",
+    "Change First Name",
+    "New Email",
+    "New Password",
+  ];
   const fields = ["username", "name", "email", "password", "avatar"];
 
-
   const titles = ["Update User info"];
-  const subtitle = ["Insert all your new data / change actual"]
+  const subtitle = ["Insert all your new data / change actual"];
   const submitBtn = ["Update"];
-  const formAction = [`/api/user-update/${userId}`];
+  // send action: post to change data
+  const formAction = [`/api/user-update/${userId}/${token}`];
 
   const data = {
     subtitle,
@@ -344,33 +431,7 @@ const getUserUpdate = async (req, res) => {
 
   // render reset password
   renderDynamicForm(res, "auth/forgotPassword", data);
-}
-
-postsendEmailToken = async(req,res) => {
-  console.log("\n\n*** postSendEmailToken\n\n");
-
-  // 1. GET USER BASED ON ID
-  let userId = req.params.id || null;
-  const [existingUser] = await pool.query(fetchUserByField("id"), [userId])
-  console.log("\n\nuser fetcher from id", existingUser[0]["id"]);
-  if (!existingUser || existingUser.length === 0) { //validation
-    return res.render("api/login", { message: "userId not found not found" });
-  }
-
-  // ♦ Create a one time link valid for min/year/sec/months
-
-  // 2. GENERATE RANDOM TOKEN : JWT secret
-  const secret = JWT_SECRET + existingUser[0]["password"]; // unique each time
-  userId = existingUser[0]["id"];
-  const payload = {
-    email: existingUser[0]["email"],
-    id: userId,
-  };
-  const token = jwt.sign(payload, secret, { expiresIn: "1y" });
-  const link = `${HOST}/api/reset-password/${userId}/${token}`;
-  //console.log("\n\n", link, "\n\n");
-
-}
+};
 
 const postUserUpdate = async (req, res) => {
   console.log("\n\n*** postUserUpdate\n\n");
@@ -384,9 +445,7 @@ const postUserUpdate = async (req, res) => {
   // file upload check
   if (!req.files || Object.keys(req.files).length === 0) {
     const message = `(ERROR): no Thumbnail was uploaded, try again uploading a file.`;
-    return res.redirect(
-      `/api/user-update/${userId}`
-    );
+    return res.redirect(`/api/user-update/${userId}`);
   }
 
   // Check if thumbnail uploaded, encode, move
@@ -409,7 +468,7 @@ const postUserUpdate = async (req, res) => {
   // hash password to save in DB
   const hashedPassword = await bcrypt.hash(password, 10);
 
-  //username = ?, name = ?, email = ?, avatar = ?, password = ? 
+  //username = ?, name = ?, email = ?, avatar = ?, password = ?
   //WHERE id = ?
   const updateParams = [
     username,
@@ -434,39 +493,39 @@ const postUserUpdate = async (req, res) => {
   if (result && result[0].affectedRows !== undefined) {
     //show if affected rows
     const affectedRows = parseInt(result[0].affectedRows);
-    const updatedColumns = []; 
+    const updatedColumns = [];
     console.log("\n\n---Affected Rows:", affectedRows);
 
     if (affectedRows > 0) {
-      console.log(affectedRows)
-      const message = "User data updated correctly, we've sent you and email too";
+      console.log(affectedRows);
+      const message =
+        "User data updated correctly, we've sent you and email too";
 
       // Include updated column names in the email message
-      const updatedColumnsMessage = updatedColumns.length > 0 ? `You've updated your: ${updatedColumns.join(', ')}` : '';
+      const updatedColumnsMessage =
+        updatedColumns.length > 0
+          ? `You've updated your: ${updatedColumns.join(", ")}`
+          : "";
 
-      //send email 
+      //send email
       // 3. SEND TOKEN BACK TO THE USER EMAIL.
       const emailInfo = await sendResetEmail(
         email,
         "User Info Updated 👍🏽",
-        `Hello 🤗, we are communicating that ${updatedColumnsMessage}`
+        `Hello 🤗, we are communicating that your personal information has been changed`,
+        `<button><a href="${HOST}">Check it Out</a></button>`
       );
       console.log("\n\nemail sent\n\n");
-      
-      console.log(`\n\n\→ Go to home: ${message}`);
-      res.redirect(
-        `/`
-      );
+
+      console.log(`\n\n\→ Go to home`);
+      res.redirect(`/?message=${message}`, );
     } else {
       const message = "no changes made to user";
       console.log(`\n\n\→ Go to user: ${message}`);
-      res.status(304).redirect(
-        `/api/user-update/${userId}`
-      );
+      res.status(304).redirect(`/api/user-update/${userId}`);
     }
   }
-
-}
+};
 
 export default {
   getLogin,
@@ -480,4 +539,6 @@ export default {
   postResetPassword,
   getUserUpdate,
   postUserUpdate,
+  getsendEmailToken,
+  postsendEmailToken,
 };
