@@ -18,6 +18,12 @@ hr {
     margin-bottom: 20px;
 }
 
+.subtitle {
+    font-size: 16px;
+    color: #777;
+    margin-bottom: 15px;
+}
+
 h1 {
     margin: 0;
     padding: 0;
@@ -34,9 +40,14 @@ h1 {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-label {
-    margin-bottom: 8px;
+
+.label,
+.label-avatar {
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 6px; /* Adjust spacing between labels */
 }
+
 
 input[type="text"],
 input[type="password"] {

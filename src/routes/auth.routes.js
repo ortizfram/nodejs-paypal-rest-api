@@ -20,4 +20,5 @@
     router.get("/reset-password/:id/:token", controller.getResetPassword)
     router.post("/reset-password/:id/:token",  controller.postResetPassword)
     router.get("/user-update/:id", controller.getUserUpdate)
+    router.post("/user-update/:id", controller.postUserUpdate)
     export default router;

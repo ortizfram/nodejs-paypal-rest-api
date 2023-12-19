@@ -8,6 +8,7 @@ export const createUserTableQuery = `
       password VARCHAR(255) NOT NULL,
       role ENUM('user', 'admin', 'staff') NOT NULL,
       resetToken VARCHAR(255) DEFAULT NULL,
+      avatar VARCHAR(255) DEFAULT NULL,
   );
     `;
 
@@ -22,6 +23,12 @@ export const fetchUserByField = (fieldName) =>`
 export const updatePassword_q = `
   UPDATE users SET password = ? WHERE id = ?
 `;
+
+export const updateUserQuery = `
+    UPDATE users 
+    SET username = ?, name = ?, email = ?, avatar = ?, password = ? 
+    WHERE id = ?
+  `;
 
 export const createTableUserCourses = `CREATE TABLE IF NOT EXISTS user_courses (
       user_id INT,
