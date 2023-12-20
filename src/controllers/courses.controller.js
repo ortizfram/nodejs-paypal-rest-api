@@ -42,29 +42,36 @@ const postCourseCreate = async (req, res) => {
     let uniqueFilename;
     let timestamp;
     let slug;
-    let authorId ;
+    let authorId;
     let existingUserId;
 
     // Ensure user ID exists in the session
     if (!req.session || !req.session.user || !req.session.user.id) {
-      return res.status(401).json({ message: 'User ID not found in the session' });
+      return res
+        .status(401)
+        .json({ message: "User ID not found in the session" });
     }
 
-    const userId = req.session.user.id;
+    // Fetch user details from the database based on the session's user ID
+    let userId = req.session.user.id;
+    const [userRow] = await pool.query(fetchUserByField("id"), [userId]);
+    existingUserId = userRow[0].id;
+    authorId = existingUserId;
 
-    try {
-      // Fetch user details from the database based on the session's user ID
-      const [userRow] = await pool.query(fetchUserByField("id"), [userId]);
-      let existingUserId = userRow[0] && userRow[0].id;
-      existingUserId = parseInt(existingUserId);
 
-      // Ensure that the existingUserId is a valid user ID fetched from the database.
-      // check id and type
-      if (existingUserId) {
-        console.log("\n\n◘ existingUserId:", existingUserId, "type:", typeof existingUserId);
-      } 
-    } catch (error) {
-      return res.status(404).json({ message: 'User not found', error: error.message });
+    // Ensure that the existingUserId is a valid user ID fetched from the database.
+    // check id and type
+    if (authorId) {
+      console.log(
+        "\n\n◘ authorId:",
+        authorId,
+        "type:",
+        typeof authorId
+      );
+    } else {
+      return res
+        .status(404)
+        .json({ message: "UserId not found", error: error.message });
     }
 
     // file upload check
@@ -150,7 +157,6 @@ const postCourseCreate = async (req, res) => {
           ":" +
           currentDate.getSeconds().toString().padStart(2, "0");
 
-        
         // Create an object with column names and values
         const courseData = [
           title,
@@ -166,13 +172,12 @@ const postCourseCreate = async (req, res) => {
           length,
           currentTimestamp, // 'created_at'
           currentTimestamp, // 'updated_at'
-          existingUserId, // 'author_id'
+          authorId, // 'author_id'
         ];
         console.log("\n\ncourseData: ", courseData);
 
         // Create the new course using the SQL query
         const [courseRow] = await pool.query(createCourseQuery, courseData);
-        
       })
       .then(async () => {
         // Fetch the created course
@@ -636,7 +641,6 @@ const courseDetail = async (req, res) => {
       created_at: new Date(course.created_at).toLocaleString(),
       updated_at: new Date(course.updated_at).toLocaleString(),
     };
-    
 
     if (!course) {
       return res.status(404).send("Course not found");
