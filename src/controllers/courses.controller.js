@@ -3,6 +3,7 @@ import slugify from "slugify";
 import { pool } from "../db.js";
 import path from "path";
 import {
+  courseFieldsPlusAuthor_q,
   createCourseQuery,
   createCourseTableQuery,
   deleteCourseQuery,
@@ -416,25 +417,11 @@ const coursesList = async (req, res) => {
     const user = req.session.user || null;
     const isAdmin = user && user.role === "admin";
 
-    let enrolledCourseIds = [];
-    if (user) {
-      const [enrolledCoursesRows] = await pool.query(
-        getUserEnrolledCoursesQuery,
-        [user.id]
-      );
-      enrolledCourseIds = enrolledCoursesRows.map((enrolledCourse) =>
-        enrolledCourse.course_id.toString()
-      );
-    }
+    // Fetch all courses from the database using the new query
+    const [coursesRows] = await pool.query(courseFieldsPlusAuthor_q);
 
-    // Fetch all courses from the database without pagination
-    let [coursesRows] = await pool.query(getCourseListNoPagination_q);
-
-    // Fetch author details, and other fields for each course
-    const coursePromises = coursesRows.map(async (course) => {
-      const [authorRow] = await pool.query(fetchUserByField('id'), course.author_id);
-      const author = authorRow[0]; // Assuming the author details are returned in the first row
-      
+    // Process fetched courses and map necessary details
+    let courses = coursesRows.map((course) => {
       return {
         title: course.title,
         slug: course.slug,
@@ -447,24 +434,17 @@ const coursesList = async (req, res) => {
         created_at: new Date(course.created_at).toLocaleString(),
         updated_at: new Date(course.updated_at).toLocaleString(),
         author: {
-          name: author.name,
-          username: author.username,
-          avatar: author.avatar,
+          name: course.author_name,
+          username: course.author_username,
+          avatar: course.author_avatar,
         },
       };
     });
 
-    // Resolve all promises to get the complete course details
-    let courses = await Promise.all(coursePromises);
-
-    // If the user is logged in and has enrolled courses, filter them out
-    if (user && enrolledCourseIds.length > 0) {
-      courses = courses.filter(
-        (course) => !enrolledCourseIds.includes(course.id)
-      );
-    }
-
     const totalItems = courses.length;
+
+    // Log fetched courses for debugging
+    console.log("Fetched Courses:", courses);
 
     // Render all courses for the user
     res.render("courses", {
@@ -474,7 +454,7 @@ const coursesList = async (req, res) => {
       message: user
         ? "These courses are available for today, enjoy!"
         : "All courses",
-      isAdmin, // Sending isAdmin flag to the view
+      isAdmin,
     });
   } catch (error) {
     console.log("Error fetching courses:", error);

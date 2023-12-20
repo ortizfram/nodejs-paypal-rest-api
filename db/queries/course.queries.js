@@ -23,7 +23,8 @@ export const createCourseTableQuery = `CREATE TABLE IF NOT EXISTS courses (
     FOREIGN KEY (author_id) REFERENCES users(id)
 );`;
 
-const argentinaTimeZone = "CONVERT_TZ(NOW(), 'UTC', 'America/Argentina/Buenos_Aires')";
+const argentinaTimeZone =
+  "CONVERT_TZ(NOW(), 'UTC', 'America/Argentina/Buenos_Aires')";
 
 export const updateCourseQuery = `
   UPDATE courses
@@ -36,14 +37,16 @@ INSERT INTO courses (title, slug, description, text_content, video_link, ars_pri
 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ${argentinaTimeZone}, ${argentinaTimeZone}, ?);
 `;
 
-export const courseWithAuthor_q = `SELECT 
-users.name AS author_name,
-users.username AS author_username,
-users.avatar AS author_avatar
+export const courseFieldsPlusAuthor_q = `
+SELECT 
+  courses.*,
+  users.name AS author_name,
+  users.username AS author_username,
+  users.avatar AS author_avatar
 FROM 
-courses
-JOIN 
-users ON users.id = courses.author_id;
+  courses
+LEFT JOIN 
+  users ON users.id = courses.author_id;
 `;
 
 export const deleteCourseQuery = `DELETE FROM courses WHERE id = ?;`;
@@ -56,10 +59,26 @@ export const getCourseFromIdQuery = `SELECT * FROM courses WHERE id = ?`;
 export const getCourseListQuery = `SELECT * FROM courses LIMIT ?, ?`;
 export const getCourseListNoPagination_q = `SELECT * FROM courses`;
 
+// export const getUserEnrolledCoursesQuery = `
+//   SELECT course_id
+//   FROM user_courses
+//   WHERE user_id = ?
+// `;
+
 export const getUserEnrolledCoursesQuery = `
-  SELECT course_id 
-  FROM user_courses 
-  WHERE user_id = ?
+SELECT 
+  courses.*,
+  users.name AS author_name,
+  users.username AS author_username,
+  users.avatar AS author_avatar
+FROM 
+  user_courses 
+JOIN 
+  courses ON user_courses.course_id = courses.id
+JOIN 
+  users ON courses.author_id = users.id
+WHERE 
+  user_courses.user_id = ?
 `;
 
 // -----Enroll course queries-----------------
