@@ -207,7 +207,18 @@ const postCourseCreate = async (req, res) => {
           .json({ message: "Error creating the course", error: error.message });
       });
   } catch (error) {
-    return res.status(500).send(error);
+    //sql error msgs
+    if (error.code === "ER_DATA_TOO_LONG") {
+      console.log("Data too long for a column:", error);
+      // Handle the error or send a specific response for this case
+    } else if (error.code === "ER_TRUNCATED_WRONG_VALUE") {
+      console.log("Truncated wrong value for a column:", error);
+      // Handle the error or send a specific response for this case
+    } else {
+      console.log("SQL Error:", error);
+      // Handle other SQL errors or send a generic error response
+    }
+    res.status(500).json({ message: "Error creating the course", error: error.message });
   }
 };
 

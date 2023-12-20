@@ -11,14 +11,14 @@ export const createUserTableQuery = `
       avatar VARCHAR(255) DEFAULT NULL,
   );
     `;
+export const fetchUserByField = (fieldName) =>`
+  SELECT * FROM users WHERE ${fieldName} = ?
+`;
 
 export const setResetToken = `
   UPDATE users SET resetToken = ? WHERE email = ?
 `;
 
-export const fetchUserByField = (fieldName) =>`
-  SELECT * FROM users WHERE ${fieldName} = ?
-`;
 
 export const updatePassword_q = `
   UPDATE users SET password = ? WHERE id = ?
