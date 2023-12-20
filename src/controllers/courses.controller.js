@@ -43,6 +43,7 @@ const postCourseCreate = async (req, res) => {
     let timestamp;
     let slug;
     let authorId ;
+    let existingUserId;
 
     // Ensure user ID exists in the session
     if (!req.session || !req.session.user || !req.session.user.id) {
@@ -51,15 +52,19 @@ const postCourseCreate = async (req, res) => {
 
     const userId = req.session.user.id;
 
-    // Fetch user details from the database based on the session's user ID
-    const [userRow] = await pool.query(fetchUserByField("id"), [userId]);
-    const existingUserId = userRow[0] && userRow[0].id;
+    try {
+      // Fetch user details from the database based on the session's user ID
+      const [userRow] = await pool.query(fetchUserByField("id"), [userId]);
+      let existingUserId = userRow[0] && userRow[0].id;
+      existingUserId = parseInt(existingUserId);
 
-    console.log("\n\n◘ existingUserId:", existingUserId);
-    
-
-    if (!existingUserId) {
-      return res.status(404).json({ message: 'User not found' });
+      // Ensure that the existingUserId is a valid user ID fetched from the database.
+      // check id and type
+      if (existingUserId) {
+        console.log("\n\n◘ existingUserId:", existingUserId, "type:", typeof existingUserId);
+      } 
+    } catch (error) {
+      return res.status(404).json({ message: 'User not found', error: error.message });
     }
 
     // file upload check
