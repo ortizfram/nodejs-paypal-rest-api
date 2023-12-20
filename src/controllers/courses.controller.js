@@ -34,17 +34,6 @@ const postCourseCreate = async (req, res) => {
   console.log("\n\n*** PostCourseCreate\n\n");
 
   try {
-    // Declare
-    let thumbnail;
-    let relativePath;
-    let courseSlug;
-    let filename;
-    let uniqueFilename;
-    let timestamp;
-    let slug;
-    let authorId;
-    let existingUserId;
-
     // Ensure user ID exists in the session
     if (!req.session || !req.session.user || !req.session.user.id) {
       return res
@@ -52,112 +41,64 @@ const postCourseCreate = async (req, res) => {
         .json({ message: "User ID not found in the session" });
     }
 
-    // Fetch user details from the database based on the session's user ID
-    let userId = req.session.user.id;
-    const [userRow] = await pool.query(fetchUserByField("id"), [userId]);
-    existingUserId = userRow[0].id;
-    authorId = existingUserId;
+    const authorId = req.session.user.id.toString();
 
-
-    // Ensure that the existingUserId is a valid user ID fetched from the database.
-    // check id and type
-    if (authorId) {
-      console.log(
-        "\n\n◘ authorId:",
-        authorId,
-        "type:",
-        typeof authorId
-      );
-    } else {
-      return res
-        .status(404)
-        .json({ message: "UserId not found", error: error.message });
+    // File upload check
+    if (!req.files || !req.files.thumbnail) {
+      return res.status(400).send("No thumbnail file uploaded");
     }
 
-    // file upload check
-    if (!req.files || Object.keys(req.files).length === 0) {
-      return res.status(400).send("No files were uploaded");
+    // Extract necessary data from request body
+    let {
+      title,
+      description,
+      text_content,
+      video_link,
+      ars_price,
+      usd_price,
+      discount,
+      active,
+      length,
+    } = req.body;
+
+    // Ensure title is a string
+    if (typeof title !== "string") {
+      title = String(title);
     }
 
-    // req thumbnail
-    thumbnail = req.files ? req.files.thumbnail : "";
-    timestamp = Date.now();
-    filename = thumbnail.name;
-    uniqueFilename = encodeURIComponent(`${timestamp}_${filename}`);
-    relativePath = "/uploads/" + uniqueFilename;
+    // Generate course slug
+    const courseSlug = slugify(title, { lower: true, strict: true });
 
-    // msgs
-    console.log(" ");
-    console.log("thumbnail :", thumbnail);
-    console.log(" ");
-    console.log("relativePath :", relativePath);
+    // Manage discount value
+    const discountValue = discount !== "" ? discount : null;
 
-    // Use mv() to place file on the server
-    thumbnail
-      .mv(path.join(__dirname, "uploads", uniqueFilename))
-      .then(() => {
-        console.log(" ");
-        console.log(" ");
-        console.log("File uploaded!");
+    // Generate unique filename for the thumbnail
+    const timestamp = Date.now();
+    const filename = req.files.thumbnail.name;
+    const uniqueFilename = encodeURIComponent(`${timestamp}_${filename}`);
+    const relativePath = "/uploads/" + uniqueFilename;
 
-        // table check
-        return pool.query(tableCheckQuery, "courses");
-      })
-      .then(([tableCheck]) => {
-        if (tableCheck.length === 0) {
-          // Table doesn't exist, create it
-          console.log(" ");
-          console.log(" ");
-          console.log("course table created");
-          return pool.query(createCourseTableQuery);
-        } else {
-          console.log(" ");
-          console.log(" ");
-          console.log("Course table already exists.");
-          return Promise.resolve(); // Resolve promise to continue the chain
-        }
-      })
-      .then(async () => {
-        // req fields
-        let {
-          title,
-          description,
-          text_content,
-          video_link,
-          ars_price,
-          usd_price,
-          discount,
-          active,
-          length,
-        } = req.body;
+    // Move uploaded thumbnail to the server
+    req.files.thumbnail.mv(path.join(__dirname, "uploads", uniqueFilename), async (err) => {
+      if (err) {
+        console.error(err);
+        return res.status(500).send("Error uploading the file");
+      }
 
-        // Parse String 'title'
-        if (typeof title !== "string") {
-          title = String(title);
-        }
-
-        // assign
-        courseSlug = slugify(title, { lower: true, strict: true });
-
-        // !if discount: null
-        const discountValue = discount !== "" ? discount : null;
-
-        // Get current timestamp like (DD-MM-YYY HH:MM:SS)
+      try {
+        // Get current timestamp
         const currentDate = new Date();
-        const currentTimestamp =
-          currentDate.getDate().toString().padStart(2, "0") +
-          "-" +
-          (currentDate.getMonth() + 1).toString().padStart(2, "0") +
-          "-" +
-          currentDate.getFullYear().toString() +
-          " " +
-          currentDate.getHours().toString().padStart(2, "0") +
-          ":" +
-          currentDate.getMinutes().toString().padStart(2, "0") +
-          ":" +
-          currentDate.getSeconds().toString().padStart(2, "0");
+        const currentTimestamp = `${currentDate.getDate().toString().padStart(2, "0")}-${
+          (currentDate.getMonth() + 1).toString().padStart(2, "0")
+        }-${currentDate.getFullYear().toString()} ${currentDate
+          .getHours()
+          .toString()
+          .padStart(2, "0")}:${currentDate.getMinutes().toString().padStart(2, "0")}:${currentDate
+          .getSeconds()
+          .toString()
+          .padStart(2, "0")}`;
 
-        // Create an object with column names and values
+        // Prepare course data
         const courseData = [
           title,
           courseSlug,
@@ -168,23 +109,20 @@ const postCourseCreate = async (req, res) => {
           usd_price,
           discountValue,
           active === "true" ? true : false,
-          relativePath, //this is thumbnail
+          relativePath,
           length,
-          currentTimestamp, // 'created_at'
-          currentTimestamp, // 'updated_at'
-          authorId, // 'author_id'
+          currentTimestamp,
+          currentTimestamp,
+          authorId,
         ];
+
         console.log("\n\ncourseData: ", courseData);
 
         // Create the new course using the SQL query
         const [courseRow] = await pool.query(createCourseQuery, courseData);
-      })
-      .then(async () => {
+
         // Fetch the created course
-        const [fetchedCourse] = await pool.query(
-          getCourseFromSlugQuery,
-          courseSlug
-        );
+        const [fetchedCourse] = await pool.query(getCourseFromSlugQuery, courseSlug);
         const course = fetchedCourse[0];
         const courseId = course.id;
 
@@ -193,34 +131,17 @@ const postCourseCreate = async (req, res) => {
 
         // Redirect after creating the course
         res.redirect(`/api/course/${courseId}`);
-      })
-      .catch((error) => {
-        if (error.code === 11000 && error.keyPattern && error.keyPattern.slug) {
-          // If the error is due to the unique constraint on the slug field
-          const errorMessage = "Slug must be unique";
-          return res.render("courseCreate/courseCreate", { errorMessage });
-        }
-
-        // If the error is due to other reasons
-        return res
-          .status(500)
-          .json({ message: "Error creating the course", error: error.message });
-      });
+      } catch (error) {
+        console.error("Error creating the course:", error);
+        return res.status(500).json({ message: "Error creating the course", error: error.message });
+      }
+    });
   } catch (error) {
-    //sql error msgs
-    if (error.code === "ER_DATA_TOO_LONG") {
-      console.log("Data too long for a column:", error);
-      // Handle the error or send a specific response for this case
-    } else if (error.code === "ER_TRUNCATED_WRONG_VALUE") {
-      console.log("Truncated wrong value for a column:", error);
-      // Handle the error or send a specific response for this case
-    } else {
-      console.log("SQL Error:", error);
-      // Handle other SQL errors or send a generic error response
-    }
+    console.error("General error:", error);
     res.status(500).json({ message: "Error creating the course", error: error.message });
   }
 };
+
 
 const getCourseUpdate = async (req, res) => {
   console.log(`\n\n*** getCourseUpdate\n\n`);
