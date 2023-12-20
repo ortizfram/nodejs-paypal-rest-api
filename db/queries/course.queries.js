@@ -20,6 +20,7 @@ export const createCourseTableQuery = `CREATE TABLE IF NOT EXISTS courses (
 
     PRIMARY KEY(id),
     UNIQUE KEY(slug),
+    FOREIGN KEY (author_id) REFERENCES users(id)
 );`;
 
 const argentinaTimeZone = "CONVERT_TZ(NOW(), 'UTC', 'America/Argentina/Buenos_Aires')";
@@ -34,6 +35,17 @@ export const createCourseQuery = `
 INSERT INTO courses (title, slug, description, text_content, video_link, ars_price, usd_price, discount, active, thumbnail, length, created_at, updated_at, author_id)
 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ${argentinaTimeZone}, ${argentinaTimeZone}, ?);
 `;
+
+export const courseWithAuthor_q = `SELECT 
+users.name AS author_name,
+users.username AS author_username,
+users.avatar AS author_avatar
+FROM 
+courses
+JOIN 
+users ON users.id = courses.author_id;
+`;
+
 export const deleteCourseQuery = `DELETE FROM courses WHERE id = ?;`;
 export const deleteUserCourseQuery = `DELETE FROM user_courses WHERE course_id = ?;`;
 

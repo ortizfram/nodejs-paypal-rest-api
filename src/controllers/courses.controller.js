@@ -41,7 +41,25 @@ const postCourseCreate = async (req, res) => {
     let uniqueFilename;
     let timestamp;
     let slug;
-    let authorId = req.session.user.id;
+    let authorId ;
+
+    // Ensure user ID exists in the session
+    if (!req.session || !req.session.user || !req.session.user.id) {
+      return res.status(401).json({ message: 'User ID not found in the session' });
+    }
+
+    const userId = req.session.user.id;
+
+    // Fetch user details from the database based on the session's user ID
+    const [userRow] = await pool.query(fetchUserByField("id"), [userId]);
+    const existingUserId = userRow[0] && userRow[0].id;
+
+    console.log("\n\n◘ existingUserId:", existingUserId);
+    
+
+    if (!existingUserId) {
+      return res.status(404).json({ message: 'User not found' });
+    }
 
     // file upload check
     if (!req.files || Object.keys(req.files).length === 0) {
@@ -126,11 +144,7 @@ const postCourseCreate = async (req, res) => {
           ":" +
           currentDate.getSeconds().toString().padStart(2, "0");
 
-
-        // make authorId the fetched userId from DB
-        const [authorRow] = await pool.query(fetchUserByField("id"), authorId);//comes from session.user.id
-        const existingUserId = authorRow[0]["id"];
-
+        
         // Create an object with column names and values
         const courseData = [
           title,
@@ -151,12 +165,7 @@ const postCourseCreate = async (req, res) => {
         console.log("\n\ncourseData: ", courseData);
 
         // Create the new course using the SQL query
-        const [courseRow] = await pool.query(createCourseQuery, courseData)
-        .catch((sqlError) => {
-          // Log SQL errors
-          console.error('SQL Error:', sqlError);
-          throw sqlError; // Re-throw the error to be caught by the subsequent catch block
-        });
+        const [courseRow] = await pool.query(createCourseQuery, courseData);
         
       })
       .then(async () => {
