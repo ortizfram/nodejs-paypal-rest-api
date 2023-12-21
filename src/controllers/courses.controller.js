@@ -381,12 +381,28 @@ const coursesList = async (req, res) => {
       };
     });
 
+    let enrolledCourseIds = [];
+
+    // Fetch enrolled courses for the user if logged in
+    if (user) {
+      const [enrolledCoursesRows] = await pool.query(
+        getUserEnrolledCoursesQuery,
+        [user.id]
+      );
+      enrolledCourseIds = enrolledCoursesRows.map(
+        (enrolledCourse) => enrolledCourse.id.toString()
+      );
+    }
+
+    // Filter out enrolled courses from the complete course list
+    courses = courses.filter((course) => !enrolledCourseIds.includes(course.id));
+
     const totalItems = courses.length;
 
     // Log fetched courses for debugging
     console.log("Fetched Courses:", courses);
 
-    // Render all courses for the user
+    // Render filtered courses for the user
     res.render("courses", {
       title: "All Courses",
       courses,
@@ -402,6 +418,7 @@ const coursesList = async (req, res) => {
     res.redirect("/api/courses?message=Error fetching courses");
   }
 };
+
 
 const coursesListOwned = async (req, res) => {
   console.log("\n*** courseListOwned\n");
@@ -450,6 +467,9 @@ const coursesListOwned = async (req, res) => {
           next: `/api/course/${course.id}`, // Dynamic course link
         };
       });
+
+    
+    console.log("enrolled courses: ", enrolledCourses);
 
     // Render enrolled courses for the user
     const totalItems = enrolledCourses.length;

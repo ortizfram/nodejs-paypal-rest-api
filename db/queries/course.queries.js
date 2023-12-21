@@ -91,6 +91,8 @@ WHERE
   user_courses.user_id = ?
 `;
 
+
+
 // -----Enroll course queries-----------------
 // stored as a comma-separated string
 export const insertUserCourseQuery = `INSERT INTO user_courses (user_id, course_id) VALUES (?, ?)`;
