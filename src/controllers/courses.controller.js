@@ -377,6 +377,7 @@ const coursesList = async (req, res) => {
           username: course.author_username,
           avatar: course.author_avatar,
         },
+        next: `/api/course/${course.id}/overview`, // Dynamic course link
       };
     });
 
@@ -387,6 +388,7 @@ const coursesList = async (req, res) => {
 
     // Render all courses for the user
     res.render("courses", {
+      title: "All Courses",
       courses,
       totalItems,
       user,
@@ -433,8 +435,8 @@ const coursesListOwned = async (req, res) => {
           title: course.title,
           slug: course.slug,
           description: course.description,
-          ars_price: course.ars_price,
-          usd_price: course.usd_price,
+          //ars_price: course.ars_price,
+          //usd_price: course.usd_price,
           thumbnail: course.thumbnail,
           id: course.id.toString(),
           thumbnailPath: `/uploads/${course.thumbnail}`,
@@ -445,19 +447,21 @@ const coursesListOwned = async (req, res) => {
             username: course.author_username,
             avatar: course.author_avatar,
           },
+          next: `/api/course/${course.id}`, // Dynamic course link
         };
       });
 
     // Render enrolled courses for the user
     const totalItems = enrolledCourses.length;
 
-    res.render("coursesOwned", {
+    res.render("courses", {
+      title: "My courses Library",
       courses: enrolledCourses,
       totalItems,
       user,
       message: user
-        ? "Your enrolled courses"
-        : "You haven't enrolled in any courses yet.",
+        ? "These are your joined courses"
+        : "Not courses joined yet",
       isAdmin,
     });
   } catch (error) {
