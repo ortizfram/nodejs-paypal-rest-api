@@ -1,6 +1,6 @@
 <nav class="navbar navbar-expand-lg bg-body-dark">
   <div class="container-fluid">
-    <a class="navbar-brand" href="#">Navbar</a>
+    <!-- <a class="navbar-brand" href="#">Navbar</a> -->
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"
       aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
@@ -21,55 +21,58 @@
             <a class="nav-link" href="/api/courses-owned"><i class="fas fa-graduation-cap"></i> My courses</a>
           </li>
 
+          <!-- MAIN DROPDOWN -->
           <!-- admin links -->
-          <% if (user.role==="admin" ) { %>
+          <% if (user && user.role==="admin" ) { %>
             <li class="nav-item dropdown">
               <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
-                aria-expanded="false"><i class="fa-solid fa-users-gear"></i>
-                Admin Settings
+                aria-expanded="false">
+                <i class="fas fa-ellipsis-v"></i> <!-- Three dots icon -->
               </a>
               <ul class="dropdown-menu">
                 <li><a class="dropdown-item" href="/api/course/create"><i class="fas fa-plus-circle"></i> Create
                     course</a></li>
                 <li><a class="dropdown-item" href="/api/admin/users"><i class="fas fa-users-cog"></i> Users panel</a>
                 </li>
+                <% if (user && user.avatar) { %>
+                  <!-- Update Profile with user's avatar -->
+                  <li><a class="dropdown-item" href="/api/user-update/<%= user.id %>/confirm">
+                      <img src="<%= user.avatar %>" alt="User Avatar" class="avatar">
+                      Update Profile
+                    </a></li>
+                  <% } else { %>
+                    <!-- If no avatar, use a placeholder -->
+                    <li><a class="dropdown-item" href="/api/user-update/<%= user.id %>/confirm">
+                        <img src="images/user.png" alt="Placeholder Avatar" class="avatar">
+                        Update Profile
+                      </a></li>
+                    <% } %>
+                      <!-- sign out -->
+                      <% if (user) { %>
+                        <li><a class="dropdown-item" href="/api/logout">
+                          <i class="fas fa-sign-out-alt"></i>
+                          Signout
+                        </a></li>
+                        <% } %>
               </ul>
             </li>
             <% } %>
-              <!-- sign out a-->
-              <% if (user) { %>
-                <% if (user.avatar) { %>
-                  <!-- Update Profile with user's avatar -->
-                  <a class="nav-link" href="/api/user-update/<%= user.id %>/confirm">
-                    <img src="<%= user.avatar %>" alt="User Avatar" class="avatar">
-                    Update Profile
-                  </a>
-                <% } else { %>
-                  <!-- If no avatar, use a placeholder -->
-                  <a class="nav-link" href="/api/user-update/<%= user.id %>/confirm">
-                    <img src="images/user.png" alt="Placeholder Avatar" class="avatar">
-                    Update Profile
-                  </a>
+
+              <!-- END MAIN DROPDOWN -->
+
+              <!-- ----------------------------------------------------------------------- -->
+              <% } else { %>
+                <!-- sign in -->
+                <li class="nav-item">
+                  <a class="nav-link" href="/api/login"><i class="fas fa-graduation-cap"></i><i
+                      class="fas fa-sign-in-alt"></i> Signin</a>
+                </li>
+                <!-- sign up -->
+                <li class="nav-item">
+                  <a class="nav-link" href="/api/signup"><i class="fas fa-graduation-cap"></i><i
+                      class="fas fa-user-plus"></i> Signup</a>
+                </li>
                 <% } %>
-                <!-- If user is signed in, display the circular avatar -->
-                <a class="nav-link" href="/api/logout">
-                  <!-- Add a placeholder image for the avatar -->
-                  <img src="images/user.png" alt="Placeholder Avatar" class="avatar">
-                  Signout
-                </a>
-                  <% } %>
-                    <% } else { %>
-                      <!-- sign in -->
-                      <li class="nav-item">
-                        <a class="nav-link" href="/api/login"><i class="fas fa-graduation-cap"></i><i
-                            class="fas fa-sign-in-alt"></i> Signin</a>
-                      </li>
-                      <!-- sign up -->
-                      <li class="nav-item">
-                        <a class="nav-link" href="/api/signup"><i class="fas fa-graduation-cap"></i><i
-                            class="fas fa-user-plus"></i> Signup</a>
-                      </li>
-                      <% } %>
 
 
 
