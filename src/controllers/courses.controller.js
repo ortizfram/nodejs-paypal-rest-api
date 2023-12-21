@@ -417,8 +417,8 @@ const coursesListOwned = async (req, res) => {
         getUserEnrolledCoursesQuery,
         [user.id]
       );
-      enrolledCourseIds = enrolledCoursesRows.map((enrolledCourse) =>
-        enrolledCourse.course_id.toString()
+      enrolledCourseIds = enrolledCoursesRows.map(
+        (enrolledCourse) => enrolledCourse.id.toString()
       );
     }
 
@@ -426,22 +426,39 @@ const coursesListOwned = async (req, res) => {
     const [coursesRows] = await pool.query(getCourseListNoPagination_q);
 
     // Filter out courses that the user has not enrolled in
-    let enrolledCourses = coursesRows.filter((course) =>
-      enrolledCourseIds.includes(course.id.toString())
-    );
+    let enrolledCourses = coursesRows
+      .filter((course) => enrolledCourseIds.includes(course.id.toString()))
+      .map((course) => {
+        return {
+          title: course.title,
+          slug: course.slug,
+          description: course.description,
+          ars_price: course.ars_price,
+          usd_price: course.usd_price,
+          thumbnail: course.thumbnail,
+          id: course.id.toString(),
+          thumbnailPath: `/uploads/${course.thumbnail}`,
+          created_at: new Date(course.created_at).toLocaleString(),
+          updated_at: new Date(course.updated_at).toLocaleString(),
+          author: {
+            name: course.author_name,
+            username: course.author_username,
+            avatar: course.author_avatar,
+          },
+        };
+      });
 
     // Render enrolled courses for the user
     const totalItems = enrolledCourses.length;
 
     res.render("coursesOwned", {
       courses: enrolledCourses,
-      author: enrolledCourses.author,
       totalItems,
       user,
       message: user
         ? "Your enrolled courses"
         : "You haven't enrolled in any courses yet.",
-      isAdmin, // Sending isAdmin flag to the view
+      isAdmin,
     });
   } catch (error) {
     console.log("Error fetching courses:", error);
