@@ -168,6 +168,7 @@ const getForgotPassword = (req, res) => {
   const user = req.session.user || null;
 
   const fields = ["email"];
+  const values = [];
   const titles = ["Forgot Password"];
   const submitBtn = ["Submit"];
   const formAction = ["/api/forgot-password"];
@@ -176,6 +177,7 @@ const getForgotPassword = (req, res) => {
 
   const data = {
     fields,
+    values,
     titles,
     subtitle,
     labels,
@@ -269,6 +271,7 @@ const getResetPassword = async (req, res) => {
 
   const data = {
     fields,
+    values,
     titles,
     submitBtn,
     formAction,
@@ -332,6 +335,7 @@ const getsendEmailToken = async (req, res) => {
   const userId = req.session.user.id || null;
 
   const fields = ["email"];
+  const values = [];
   const titles = ["Account update"];
   const submitBtn = ["Submit"];
   const formAction = [`/api/user-update/${userId}`];
@@ -340,6 +344,7 @@ const getsendEmailToken = async (req, res) => {
 
   const data = {
     fields,
+    values,
     titles,
     subtitle,
     labels,
@@ -411,6 +416,7 @@ const getUserUpdate = async (req, res) => {
     "New Password",
   ];
   const fields = ["username", "name", "email", "password", "avatar"];
+  const values = [user.username, user.name, user.email];
 
   const titles = ["Update User info"];
   const subtitle = ["Insert all your new data / change actual"];
@@ -421,6 +427,7 @@ const getUserUpdate = async (req, res) => {
   const data = {
     subtitle,
     fields,
+    values,
     labels,
     titles,
     submitBtn,

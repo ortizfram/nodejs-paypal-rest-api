@@ -6,6 +6,21 @@ body {
     justify-content: center;
 }
 
+.avatar-profile {
+    width: 80px; /* Adjust the width as needed */
+    height: 80px; /* Adjust the height as needed */
+    border-radius: 100%; /* Circular shape */
+    margin-right: 10px; /* Add space between image and text */
+    color: #777;
+    object-fit: cover;
+}
+
+.avatar-uploader {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
 hr {
     width: 100%;
     margin: 20px 0;
