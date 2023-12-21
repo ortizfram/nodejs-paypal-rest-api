@@ -1,7 +1,8 @@
 // db/queries/course.queries.js
 
 // ----- Create, Update course Queries-----------------
-export const createCourseTableQuery = `CREATE TABLE IF NOT EXISTS courses (
+export const createCourseTableQuery = `
+CREATE TABLE IF NOT EXISTS courses (
     id INT NOT NULL AUTO_INCREMENT,
     title VARCHAR(255) NOT NULL,
     slug VARCHAR(255) NOT NULL,
@@ -21,16 +22,16 @@ export const createCourseTableQuery = `CREATE TABLE IF NOT EXISTS courses (
     PRIMARY KEY(id),
     UNIQUE KEY(slug),
     FOREIGN KEY (author_id) REFERENCES users(id)
-);`;
+);
+
+ALTER TABLE courses
+ADD CONSTRAINT fk_author
+FOREIGN KEY (author_id) REFERENCES users(id);
+`;
+
 
 const argentinaTimeZone =
   "CONVERT_TZ(NOW(), 'UTC', 'America/Argentina/Buenos_Aires')";
-
-export const updateCourseQuery = `
-  UPDATE courses
-  SET title = ?, slug = ?, description = ?, text_content = ?, video_link = ?, ars_price = ?, usd_price = ?, discount = ?, active = ?, thumbnail = ?, length = ?, updated_at = ${argentinaTimeZone}
-  WHERE id = ?;
-`;
 
 export const createCourseQuery = `
 INSERT INTO courses (title, slug, description, text_content, video_link, ars_price, usd_price, discount, active, thumbnail, length, created_at, updated_at, author_id)
@@ -40,6 +41,7 @@ VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ${argentinaTimeZone}, ${argentinaTimeZo
 export const courseFieldsPlusAuthor_q = `
 SELECT 
   courses.*,
+  users.id AS author_id,
   users.name AS author_name,
   users.username AS author_username,
   users.avatar AS author_avatar
@@ -47,6 +49,14 @@ FROM
   courses
 LEFT JOIN 
   users ON users.id = courses.author_id;
+`;
+
+
+
+export const updateCourseQuery = `
+  UPDATE courses
+  SET title = ?, slug = ?, description = ?, text_content = ?, video_link = ?, ars_price = ?, usd_price = ?, discount = ?, active = ?, thumbnail = ?, length = ?, updated_at = ${argentinaTimeZone}
+  WHERE id = ?;
 `;
 
 export const deleteCourseQuery = `DELETE FROM courses WHERE id = ?;`;

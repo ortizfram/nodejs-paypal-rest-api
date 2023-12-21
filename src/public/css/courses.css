@@ -79,6 +79,31 @@ h1 {
     color: #333;
 }
 
+/* Adjust the author section */
+.course-item .author {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px; /* Add spacing between author and course details */
+}
+
+/* Style for the author's avatar */
+.course-item .author img.avatar {
+    width: 30px; /* Adjust the width as needed */
+    height: 30px; /* Adjust the height as needed */
+    border-radius: 50%; /* Circular shape */
+    margin-right: 10px; /* Add space between image and text */
+    color: #777;
+}
+.course-item .timestamp {
+    color: #777;
+    margin: 0;
+}
+/* Style for the author's information */
+.course-item .author p.author-info {
+    margin: 0; /* Remove default margins */
+    color: #777;
+}
+
 /* Style for the course title */
 .course-item .course-details h2 {
     margin-top: 0;

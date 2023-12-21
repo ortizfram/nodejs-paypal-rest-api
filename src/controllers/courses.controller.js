@@ -41,7 +41,7 @@ const postCourseCreate = async (req, res) => {
         .json({ message: "User ID not found in the session" });
     }
 
-    const authorId = req.session.user.id.toString();
+    const authorId = req.session.user.id;
 
     // File upload check
     if (!req.files || !req.files.thumbnail) {
@@ -111,8 +111,6 @@ const postCourseCreate = async (req, res) => {
           active === "true" ? true : false,
           relativePath,
           length,
-          currentTimestamp,
-          currentTimestamp,
           authorId,
         ];
 
@@ -121,7 +119,7 @@ const postCourseCreate = async (req, res) => {
         // Create the new course using the SQL query
         const [courseRow] = await pool.query(createCourseQuery, courseData);
 
-        // Fetch the created course
+        // Fetch the created course & JOIN with user as author
         const [fetchedCourse] = await pool.query(getCourseFromSlugQuery, courseSlug);
         const course = fetchedCourse[0];
         const courseId = course.id;
@@ -141,7 +139,6 @@ const postCourseCreate = async (req, res) => {
     res.status(500).json({ message: "Error creating the course", error: error.message });
   }
 };
-
 
 const getCourseUpdate = async (req, res) => {
   console.log(`\n\n*** getCourseUpdate\n\n`);

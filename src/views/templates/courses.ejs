@@ -7,9 +7,12 @@
     <% courses.reverse().forEach((course, index) => { %>
       <div class="course-item">
         <a href="/api/course/<%= course.id %>/overview">
-          <p><%= course.updated_at %></p>
           <img src="<%= course.thumbnail %>" alt="thumbnail-<%= course.slug %>" />
-          <p class="author"><%= course.author %></p>
+          <p class="timestamp"><%= course.updated_at %></p>
+          <div class="author">
+            <img src="<%= course.author.avatar %>" alt="User Avatar" class="avatar">
+            <p class="author-info"><strong><%= course.author.username %></strong> • <%=course.author.name%></p>
+          </div>
           <h2><%= course.title %></h2>
           <p>USD <%= course.usd_price %> | ARS <%= course.ars_price %></p>
           <p><%= course.description %></p>
