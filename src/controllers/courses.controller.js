@@ -442,7 +442,7 @@ const coursesListOwned = async (req, res) => {
     }
 
     // Fetch all courses from the database
-    const [coursesRows] = await pool.query(getCourseListNoPagination_q);
+    const [coursesRows] = await pool.query(courseFieldsPlusAuthor_q);
 
     // Filter out courses that the user has not enrolled in
     let enrolledCourses = coursesRows
