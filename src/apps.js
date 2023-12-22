@@ -15,6 +15,8 @@ import methodOverride from "method-override";
 import fileUpload from "express-fileupload";
 import jwt from "jsonwebtoken";
 import { validationResult, body } from "express-validator";
+import { pool } from "./db.js";
+import { getUserEnrolledCoursesQuery } from "../db/queries/course.queries.js";
 
 // load .ENV
 config();
@@ -96,5 +98,34 @@ export function is_loggedin_check (req, res, next) {
   }
   next();
 }
+
+// Middleware for checking course enrollment
+export async function checkCourseEnrollment(req, res, next) {
+  console.log("\n\n*** middleware: checkCourseEnrollment\n\n");
+  const courseId = req.params.id;
+  console.log("\n\ncourseId: ",courseId);
+  const user = req.session.user || null;
+
+  try {
+    if (!user) {
+      return res.status(403).redirect('/api/login');
+    }
+
+    const [enrolledRows] = await pool.query(getUserEnrolledCoursesQuery, [user.id]);
+    console.log("\n\nenrolledRows: ", enrolledRows);
+    const enrolledCourses = parseInt(enrolledRows.map(row => row.id));
+
+    if (enrolledCourses.includes(parseInt(courseId))) {
+      // User is enrolled in the course, proceed to render the courseDetail
+      return next();
+    } else {
+      return res.status(403).send("You are not enrolled in this course");
+    }
+  } catch (error) {
+    console.error("Error checking user enrollment:", error);
+    return res.status(500).send("Error checking user enrollment");
+  }
+}
+
 
 export default app;

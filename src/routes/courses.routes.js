@@ -1,6 +1,6 @@
 import { Router } from "express";
 import controllers from "../controllers/courses.controller.js";
-import { admin_staff_check, is_loggedin_check } from "../apps.js";
+import { admin_staff_check, checkCourseEnrollment, is_loggedin_check } from "../apps.js";
 
 const router = Router();
 
@@ -16,7 +16,7 @@ router.post('/course/:id/delete',  admin_staff_check, controllers.postCourseDele
 //------------courseDetail  -------------------------
 router.get("/course/:id/overview", is_loggedin_check, controllers.courseOverview);
 router.get("/course/:id/enroll", is_loggedin_check, controllers.courseEnroll);
-router.get("/course/:id/", is_loggedin_check, controllers.courseDetail); // This route should fetch course detail
+router.get("/course/:id/", is_loggedin_check, checkCourseEnrollment, controllers.courseDetail); // This route should fetch course detail
 //------------coursesList-------------------------
 router.get("/courses", controllers.coursesList);
 router.get("/courses-owned", is_loggedin_check, controllers.coursesListOwned);
