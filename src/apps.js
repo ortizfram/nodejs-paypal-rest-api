@@ -110,7 +110,7 @@ export async function checkCourseEnrollment(req, res, next) {
     if (!user) {
       return res.status(403).redirect('/api/login');
     }
-
+//
     const [enrolledRows] = await pool.query(getUserEnrolledCoursesQuery, [user.id]);
     console.log("\n\nenrolledRows: ", enrolledRows);
     const enrolledCourses = parseInt(enrolledRows.map(row => row.id));
