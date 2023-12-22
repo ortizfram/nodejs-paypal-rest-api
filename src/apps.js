@@ -113,7 +113,9 @@ export async function checkCourseEnrollment(req, res, next) {
 //
     const [enrolledRows] = await pool.query(getUserEnrolledCoursesQuery, [user.id]);
     console.log("\n\nenrolledRows: ", enrolledRows);
-    const enrolledCourses = parseInt(enrolledRows.map(row => row.id));
+
+    // Extracting course IDs from the fetched data (assuming the ID field is 'course_id')
+    const enrolledCourses = enrolledRows.map(row => row.id);
 
     if (enrolledCourses.includes(parseInt(courseId))) {
       // User is enrolled in the course, proceed to render the courseDetail
