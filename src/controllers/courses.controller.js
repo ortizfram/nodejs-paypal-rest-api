@@ -356,8 +356,18 @@ const coursesList = async (req, res) => {
     const user = req.session.user || null;
     const isAdmin = user && user.role === "admin";
 
+    // Get pagination parameters from query or set default values
+    const page = parseInt(req.query.page) || 1;
+    const perPage = parseInt(req.query.perPage) || 1;
+    // Calculate the offset based on the current page and number of items per page
+    const offset = (page - 1) * perPage; // where to start the fetch depending on the page
+
+    // Fetch all courses count (including enrolled)
+    const [totalCourses] = await pool.query("SELECT COUNT(*) AS count FROM courses");
+    const totalItems = totalCourses[0].count;
+
     // Fetch all courses from the database using the new query
-    const [coursesRows] = await pool.query(courseFieldsPlusAuthor_q);
+    const [coursesRows] = await pool.query(courseFieldsPlusAuthor_q, [offset, perPage]);
 
     // Process fetched courses and map necessary details
     let courses = coursesRows.map((course) => {
@@ -397,7 +407,9 @@ const coursesList = async (req, res) => {
     // Filter out enrolled courses from the complete course list
     courses = courses.filter((course) => !enrolledCourseIds.includes(course.id));
 
-    const totalItems = courses.length;
+    // Calculate total items after filtering enrolled courses
+    const totalFilteredItems = courses.length;
+    const totalPages = Math.ceil(totalItems / perPage);
 
     // Log fetched courses for debugging
     console.log("Fetched Courses:", courses);
@@ -406,18 +418,24 @@ const coursesList = async (req, res) => {
     res.render("courses", {
       title: "All Courses",
       courses,
-      totalItems,
+      totalItems: totalFilteredItems,
       user,
       message: user
         ? "These courses are available for today, enjoy!"
         : "All courses",
       isAdmin,
+      perPage,
+      page,
+      offset,
+      currentPage: page,
+      totalPages,
     });
   } catch (error) {
     console.log("Error fetching courses:", error);
     res.redirect("/api/courses?message=Error fetching courses");
   }
 };
+
 
 
 const coursesListOwned = async (req, res) => {

@@ -48,7 +48,8 @@ SELECT
 FROM 
   courses
 LEFT JOIN 
-  users ON users.id = courses.author_id;
+  users ON users.id = courses.author_id
+LIMIT ?,?
 `;
 
 
