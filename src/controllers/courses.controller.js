@@ -351,6 +351,9 @@ const postCourseDelete = async (req, res) => {
 const coursesList = async (req, res) => {
   console.log("\n*** coursesList\n");
 
+  const route  = "courses";
+
+
   try {
     const message = req.query.message;
     const user = req.session.user || null;
@@ -416,6 +419,7 @@ const coursesList = async (req, res) => {
 
     // Render filtered courses for the user
     res.render("courses", {
+      route,
       title: "All Courses",
       courses,
       totalItems: totalFilteredItems,
@@ -440,6 +444,7 @@ const coursesList = async (req, res) => {
 
 const coursesListOwned = async (req, res) => {
   console.log("\n*** courseListOwned\n");
+  const route  = "courses-owned";
 
   try {
     const user = req.session.user || null;
@@ -459,8 +464,18 @@ const coursesListOwned = async (req, res) => {
       );
     }
 
+    // Get pagination parameters from query or set default values
+    const page = parseInt(req.query.page) || 1;
+    const perPage = parseInt(req.query.perPage) || 1;
+    // Calculate the offset based on the current page and number of items per page
+    const offset = (page - 1) * perPage; // where to start the fetch depending on the page
+
+    // Fetch all courses count (including enrolled)
+    const [totalCourses] = await pool.query("SELECT COUNT(*) AS count FROM courses");
+    const totalItems = totalCourses[0].count;
+
     // Fetch all courses from the database
-    const [coursesRows] = await pool.query(courseFieldsPlusAuthor_q);
+    const [coursesRows] = await pool.query(courseFieldsPlusAuthor_q, [offset, perPage]);
 
     // Filter out courses that the user has not enrolled in
     let enrolledCourses = coursesRows
@@ -486,13 +501,13 @@ const coursesListOwned = async (req, res) => {
         };
       });
 
-    
+    const totalPages = Math.ceil(totalItems / perPage);
+
     console.log("enrolled courses: ", enrolledCourses);
 
     // Render enrolled courses for the user
-    const totalItems = enrolledCourses.length;
-
     res.render("courses", {
+      route,
       title: "My courses Library",
       courses: enrolledCourses,
       totalItems,
@@ -501,6 +516,11 @@ const coursesListOwned = async (req, res) => {
         ? "These are your joined courses"
         : "Not courses joined yet",
       isAdmin,
+      perPage,
+      page,
+      offset,
+      currentPage: page,
+      totalPages,
     });
   } catch (error) {
     console.log("Error fetching courses:", error);
