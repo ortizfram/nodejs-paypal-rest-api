@@ -9,11 +9,14 @@
       <a href="/api/<%= route %>?page=<%= page - 1 %>&perPage=<%= perPage %>">Previous</a>
     <% } %>
     <% for (let i = 1; i <= totalPages; i++) { %>
-      <a href="/api/<%= route %>?page=<%= i %>&perPage=<%= perPage %>"
-         class="<%= currentPage === i ? 'active' : '' %>">
-        <%= i %>
-      </a>
+      <% if (!(i === totalPages && courses.length === 0)) { %>
+        <a href="/api/<%= route %>?page=<%= i %>&perPage=<%= perPage %>"
+           class="<%= currentPage === i ? 'active' : '' %>">
+          <%= i %>
+        </a>
+      <% } %>
     <% } %>
+    
     <% if (page && page < totalPages) { %>
       <a href="/api/<%= route %>?page=<%= page + 1 %>&perPage=<%= perPage %>">Next</a>
     <% } %>

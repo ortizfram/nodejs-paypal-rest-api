@@ -397,7 +397,7 @@ const coursesList = async (req, res) => {
 
     const totalFilteredItems = courses.length;
 
-    const totalPages = Math.ceil(totalItems / perPage);
+    const totalPages = Math.ceil(totalFilteredItems / perPage) || 1;
 
     // Adjust perPage if there are fewer items than perPage value
     if (totalFilteredItems < perPage) {
@@ -408,7 +408,7 @@ const coursesList = async (req, res) => {
 
     const coursesForPage = courses.slice(offset, offset + perPage);
 
-    // Remove the last page if it's empty
+    // redirect to the previous page if last it's empty
     if (page === totalPages && coursesForPage.length === 0) {
       res.redirect(`/api/${route}?page=${page - 1}&perPage=${perPage}`);
       return;
