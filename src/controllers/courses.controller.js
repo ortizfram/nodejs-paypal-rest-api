@@ -466,12 +466,18 @@ const coursesListOwned = async (req, res) => {
     // Calculate the offset based on the current page and number of items per page
     const offset = (page - 1) * perPage; // where to start the fetch depending on the page
 
-    // Fetch all courses count (including enrolled)
-    const [totalCourses] = await pool.query("SELECT COUNT(*) AS count FROM courses");
-    const totalItems = totalCourses[0].count;
+    // Fetch total enrolled courses count for the user
+    const [totalEnrolledCourses] = await pool.query(
+      "SELECT COUNT(*) AS count FROM courses WHERE id IN (?)",
+      [enrolledCourseIds]
+    );
+    const totalItems = totalEnrolledCourses[0].count;
 
-    // Fetch all courses from the database
-    const [coursesRows] = await pool.query(courseFieldsPlusAuthor_q, [offset, perPage]);
+    // Fetch enrolled courses for the user with pagination
+    const [coursesRows] = await pool.query(
+      "SELECT * FROM courses WHERE id IN (?) LIMIT ? OFFSET ?",
+      [enrolledCourseIds, perPage, offset]
+    );
 
     // Filter out courses that the user has not enrolled in
     let enrolledCourses = coursesRows
@@ -497,9 +503,22 @@ const coursesListOwned = async (req, res) => {
         };
       });
 
-    const totalPages = Math.ceil(totalItems / perPage);
+      let totalPages = Math.ceil(totalItems / perPage) || 1;
+
+    // Ensure that the currentPage doesn't exceed the total pages calculated
+    if (page > totalPages) {
+      page = totalPages;
+      offset = (page - 1) * perPage;
+    }
+
+    // Handle redirect to the previous page if the last page is empty
+    if (page > 1 && enrolledCourses.length === 0) {
+      res.redirect(`/api/${route}?page=${page - 1}&perPage=${perPage}`);
+      return;
+    }
 
     console.log("enrolled courses: ", enrolledCourses);
+
 
     // Render enrolled courses for the user
     res.render("courses", {
@@ -516,7 +535,7 @@ const coursesListOwned = async (req, res) => {
       page,
       offset,
       currentPage: page,
-      totalPages,
+      totalPages ,
     });
   } catch (error) {
     console.log("Error fetching courses:", error);
