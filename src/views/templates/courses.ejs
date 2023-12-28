@@ -22,7 +22,7 @@
 
 <!-- courses -->
   <div class="courses-grid">
-    <% courses.reverse().forEach((course, index) => { %>
+    <% courses.forEach((course, index) => { %>
       <div class="course-item">
         <a href="<%= course.next %>">
           <img src="<%= course.thumbnail %>" alt="thumbnail-<%= course.slug %>" />

@@ -350,29 +350,21 @@ const postCourseDelete = async (req, res) => {
 
 const coursesList = async (req, res) => {
   console.log("\n*** coursesList\n");
-
-  const route  = "courses";
-
+  const route = "courses";
 
   try {
     const message = req.query.message;
     const user = req.session.user || null;
     const isAdmin = user && user.role === "admin";
 
-    // Get pagination parameters from query or set default values
     const page = parseInt(req.query.page) || 1;
-    const perPage = parseInt(req.query.perPage) || 1;
-    // Calculate the offset based on the current page and number of items per page
-    const offset = (page - 1) * perPage; // where to start the fetch depending on the page
+    let perPage = parseInt(req.query.perPage) || 1;
 
-    // Fetch all courses count (including enrolled)
     const [totalCourses] = await pool.query("SELECT COUNT(*) AS count FROM courses");
     const totalItems = totalCourses[0].count;
 
-    // Fetch all courses from the database using the new query
-    const [coursesRows] = await pool.query(courseFieldsPlusAuthor_q, [offset, perPage]);
+    const [coursesRows] = await pool.query(courseFieldsPlusAuthor_q, [0, totalItems]);
 
-    // Process fetched courses and map necessary details
     let courses = coursesRows.map((course) => {
       return {
         title: course.title,
@@ -396,37 +388,39 @@ const coursesList = async (req, res) => {
 
     let enrolledCourseIds = [];
 
-    // Fetch enrolled courses for the user if logged in
     if (user) {
-      const [enrolledCoursesRows] = await pool.query(
-        getUserEnrolledCoursesQuery,
-        [user.id]
-      );
-      enrolledCourseIds = enrolledCoursesRows.map(
-        (enrolledCourse) => enrolledCourse.id.toString()
-      );
+      const [enrolledCoursesRows] = await pool.query(getUserEnrolledCoursesQuery, [user.id]);
+      enrolledCourseIds = enrolledCoursesRows.map((enrolledCourse) => enrolledCourse.id.toString());
     }
 
-    // Filter out enrolled courses from the complete course list
     courses = courses.filter((course) => !enrolledCourseIds.includes(course.id));
 
-    // Calculate total items after filtering enrolled courses
     const totalFilteredItems = courses.length;
+
     const totalPages = Math.ceil(totalItems / perPage);
 
-    // Log fetched courses for debugging
-    console.log("Fetched Courses:", courses);
+    // Adjust perPage if there are fewer items than perPage value
+    if (totalFilteredItems < perPage) {
+      perPage = totalFilteredItems;
+    }
 
-    // Render filtered courses for the user
+    const offset = (page - 1) * perPage;
+
+    const coursesForPage = courses.slice(offset, offset + perPage);
+
+    // Remove the last page if it's empty
+    if (page === totalPages && coursesForPage.length === 0) {
+      res.redirect(`/api/${route}?page=${page - 1}&perPage=${perPage}`);
+      return;
+    }
+
     res.render("courses", {
       route,
       title: "All Courses",
-      courses,
+      courses: coursesForPage,
       totalItems: totalFilteredItems,
       user,
-      message: user
-        ? "These courses are available for today, enjoy!"
-        : "All courses",
+      message: user ? "These courses are available for today, enjoy!" : "All courses",
       isAdmin,
       perPage,
       page,
@@ -439,6 +433,8 @@ const coursesList = async (req, res) => {
     res.redirect("/api/courses?message=Error fetching courses");
   }
 };
+
+
 
 
 
