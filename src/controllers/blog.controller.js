@@ -1,4 +1,4 @@
-import { createBlogQuery, getCourseFromSlugQuery } from "../../db/queries/blog.queries";
+import { createBlogQuery, getCourseFromSlugQuery } from "../../db/queries/blog.queries.js";
 
 const getblogCreate = async (req, res, next) => {
   console.log("\n\n*** getblogCreate\n\n");
@@ -99,7 +99,7 @@ const postblogCreate = async (req, res, next) => {
           } catch (error) {
             console.error("Error creating the blog:", error);
             return res.status(500).json({ message: "Error creating the blog", error: error.message });
-          }
+          };
         }
       );
     } catch (error) {
