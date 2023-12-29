@@ -64,6 +64,7 @@ LEFT JOIN
 users ON users.id = courses.author_id
 WHERE
 blogs.id = ?`;
+export const getCourseFromSlugQuery = `SELECT * FROM blogs WHERE slug = ?`;
 
 export const getCourseListQuery = `SELECT * FROM blogs LIMIT ?, ?`;
 export const getCourseListNoPagination_q = `SELECT * FROM blogs`;
