@@ -1,26 +1,24 @@
 
 
-    <% if (user.role === "admin") { %>
+<% if (user.role === "admin") { %>
     <div class="course-admin-options">
+      <div>
         <div>
-            <div>
-                <button>
-                    <p><a href="/api/course/<%= course.id %>/update?courseId=<%= course.id %>">Edit course</a>
-                    </p>
-                </button>
-                <button>
-                    <p><a href="/api/course/<%= course.id %>/delete?courseId=<%= course.id %>">Delete course</a>
-                    </p>
-                </button>
-            </div>
+          <button class="btn">
+            <p><a class="text-muted" href="/api/course/<%= course.id %>/update?courseId=<%= course.id %>"><i class="fas fa-edit me-2"></i>Edit course</a></p>
+          </button>
+          <button  class="btn">
+            <p><a class="text-muted" href="/api/course/<%= course.id %>/delete?courseId=<%= course.id %>"><i class="fas fa-trash-alt me-2"></i>Delete course</a></p>
+          </button>
         </div>
+      </div>
     </div>
-    <% } %>
+  <% } %>
 
     <!-- PLAYER -->
     <!-- ========================================================= -->
     <div>
-            <div class="container">
+            <div class="container mb-4">
                 <div class="row">
                     <div class="col-lg-12">
                         <iframe  src="<%= course.video_link %>" width="560" height="315" frameborder="0" autoplay allowfullscreen></iframe>
