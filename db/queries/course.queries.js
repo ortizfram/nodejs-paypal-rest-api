@@ -29,7 +29,6 @@ ADD CONSTRAINT fk_author
 FOREIGN KEY (author_id) REFERENCES users(id);
 `;
 
-
 const argentinaTimeZone =
   "CONVERT_TZ(NOW(), 'UTC', 'America/Argentina/Buenos_Aires')";
 
@@ -52,8 +51,6 @@ LEFT JOIN
 LIMIT ?,?
 `;
 
-
-
 export const updateCourseQuery = `
   UPDATE courses
   SET title = ?, slug = ?, description = ?, text_content = ?, video_link = ?, ars_price = ?, usd_price = ?, discount = ?, active = ?, thumbnail = ?, length = ?, updated_at = ${argentinaTimeZone}
@@ -65,7 +62,17 @@ export const deleteUserCourseQuery = `DELETE FROM user_courses WHERE course_id =
 
 // -----Get course queries-----------------
 export const getCourseFromSlugQuery = `SELECT * FROM courses WHERE slug = ?`;
-export const getCourseFromIdQuery = `SELECT * FROM courses WHERE id = ?`;
+export const getCourseFromIdQuery = `SELECT 
+courses.*,
+users.name AS author_name,
+users.username AS author_username,
+users.avatar AS author_avatar
+FROM 
+courses
+LEFT JOIN 
+users ON users.id = courses.author_id
+WHERE
+courses.id = ?`;
 
 export const getCourseListQuery = `SELECT * FROM courses LIMIT ?, ?`;
 export const getCourseListNoPagination_q = `SELECT * FROM courses`;
@@ -75,6 +82,18 @@ export const getCourseListNoPagination_q = `SELECT * FROM courses`;
 //   FROM user_courses
 //   WHERE user_id = ?
 // `;
+
+export const getCourseAuthorQuery = `
+  SELECT 
+    id AS author_id,
+    name AS author_name,
+    username AS author_username,
+    avatar AS author_avatar
+  FROM 
+    users 
+  WHERE 
+    id = ?;
+`;
 
 export const getUserEnrolledCoursesQuery = `
 SELECT 
@@ -91,8 +110,6 @@ JOIN
 WHERE 
   user_courses.user_id = ?
 `;
-
-
 
 // -----Enroll course queries-----------------
 // stored as a comma-separated string

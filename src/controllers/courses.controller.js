@@ -8,6 +8,7 @@ import {
   createCourseTableQuery,
   deleteCourseQuery,
   deleteUserCourseQuery,
+  getCourseAuthorQuery,
   getCourseFromIdQuery,
   getCourseFromSlugQuery,
   getCourseListNoPagination_q,
@@ -638,27 +639,23 @@ const courseEnroll = async (req, res) => {
 
 const courseDetail = async (req, res) => {
   console.log("\n*** courseDetail\n");
-  // ♦ View that renders x bought course ,
-  // ♦ it has course modules, videos and content
 
-  // Fetch the course slug from the request
   let courseId = req.params.id;
-  const user = req.session.user || null; // Get the user from the session or set to null if not logged in
-  const message = req.query.message; // Retrieve success message from query params authcontroller
+  const user = req.session.user || null;
+  const message = req.query.message;
 
   try {
     console.log("\nCourseId:", courseId);
     const [courseRows] = await pool.query(getCourseFromIdQuery, courseId);
+
     if (!courseRows || courseRows.length === 0) {
       return res.status(404).send("Course not found");
     }
 
     const course = courseRows[0];
-    console.log("courseId : ", course.id);
-    console.log(`\n\ncourse: ${course}\n\n`);
     courseId = course.id;
 
-    // Format the date strings for created_at and updated_at fields
+    // Format course timestamps and video_link
     const formattedCourse = {
       ...course,
       created_at: new Date(course.created_at).toLocaleString(),
@@ -670,15 +667,32 @@ const courseDetail = async (req, res) => {
       return res.status(404).send("Course not found");
     }
 
-    // Fetch the enrolled courses for the current user
+    // Fetching author details
+    const [authorRows] = await pool.query(getCourseAuthorQuery, [course.author_id]);
+    const author = authorRows[0];
+    console.log(author);
+
+    if (!author) {
+      return res.status(404).send("Author details not found");
+    }
+
+    // Extend formattedCourse with author details
+    formattedCourse.author = {
+      name: author.author_name,
+      username: author.author_username,
+      avatar: author.author_avatar,
+    };
+    console.log(formattedCourse.author);
+
+
+    // Fill array with query result
     let enrolledCourses = [];
     if (user) {
-      const [enrolledRows] = await pool.query(getUserEnrolledCoursesQuery, [
-        user.id,
-      ]);
+      const [enrolledRows] = await pool.query(getUserEnrolledCoursesQuery, [user.id]);
       enrolledCourses = enrolledRows[0]?.enrolled_courses || [];
     }
 
+    // Render the courseDetail view with the fetched data
     res.render("courseDetail", {
       course: formattedCourse,
       message,
@@ -690,6 +704,9 @@ const courseDetail = async (req, res) => {
     res.status(500).send("Error fetching the course");
   }
 };
+
+
+
 
 export default {
   coursesList,

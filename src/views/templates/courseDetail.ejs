@@ -35,7 +35,7 @@
     <!-- COURSE DETAIL -->
     <!-- ========================================================= -->
     <div>
-        <p class="text-muted"><%= course.updated_at %></p>
+        <p class="text-muted"><%= course.updated_at %> <span><img class="avatar ms-4 me-2" src="<%= course.author.avatar %>" alt="author_avatar"></span><span class="fw-bold"><%= course.author.username %></span> • <span><%= course.author.name %></span></p>
         <div>
             <h1>
                 <%= course.title %>
