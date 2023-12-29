@@ -43,11 +43,11 @@
         <% if (isAdmin) {%>
           <div class="course-actions">
             <p>
-              <a href="/api/course/<%= course.id %>/update">Edit</a>
+              <a class='text-muted' href="/api/course/<%= course.id %>/update"><i class="fas fa-edit me-2"></i>Edit</a>
               <input type="hidden" name="author" value="<%= course.author %>">
             </p>
             <p>
-              <a href="/api/course/<%= course.id %>/delete?courseId=<%= course.id %>">Delete</a>
+              <a class='text-muted' href="/api/course/<%= course.id %>/delete?courseId=<%= course.id %>"><i class="fas fa-trash-alt me-2"></i>Delete</a>
             </p>
           </div>
         <% }%>

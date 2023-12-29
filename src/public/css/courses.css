@@ -156,11 +156,34 @@ h1 {
 }
 
 /* Pagination bar */
-.pagination a {
-    margin-right: 10px;
-    background-color: #333;
-    color: #ccc;
+/* Pagination styles */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
 }
+
+.pagination a {
+    padding: 8px 12px;
+    margin-right: 5px;
+    color: #333;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    text-decoration: none;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.pagination a.active {
+    background-color: #333;
+    color: #fff;
+}
+
+.pagination a:hover {
+    background-color: #eee;
+    color: #333;
+}
+
 /* ========================================================= */
 /* Media query for responsive layout */
 @media screen and (max-width: 960px) {
