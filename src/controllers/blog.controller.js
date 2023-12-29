@@ -5,8 +5,17 @@ const getblogCreate = async (req, res, next) => {
   //   const userId = user.id || null;
     const userId =  null;
   
-    res.send(`getBlogCreate`);
-  };
+    res.render(`blog/blogCreate`, {user,userId,message});
+};
+const postblogCreate = async (req, res, next) => {
+    console.log("\n\n*** postblogCreate\n\n");
+    const message = req.query.message;
+    const user = req.session.user || null;
+  //   const userId = user.id || null;
+    const userId =  null;
+  
+    res.send(`postblogCreate`);
+};
 
 const getblogList = async (req, res, next) => {
   console.log("\n\n*** getblogList\n\n");
@@ -22,4 +31,5 @@ const getblogList = async (req, res, next) => {
 export default {
     getblogList,
     getblogCreate,
+    postblogCreate,
 };
