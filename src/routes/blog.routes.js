@@ -5,5 +5,6 @@ const router = Router();
 
 //------------login-------------------------
 router.get("/blog", controller.getblogList);
+router.get("/blog/create", controller.getblogCreate);
 
 export default router;

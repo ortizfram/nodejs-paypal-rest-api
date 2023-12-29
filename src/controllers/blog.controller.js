@@ -1,5 +1,15 @@
+const getblogCreate = async (req, res, next) => {
+    console.log("\n\n*** getblogCreate\n\n");
+    const message = req.query.message;
+    const user = req.session.user || null;
+  //   const userId = user.id || null;
+    const userId =  null;
+  
+    res.send(`getBlogCreate`);
+  };
+
 const getblogList = async (req, res, next) => {
-  console.log("\n\n*** getCourseCreate\n\n");
+  console.log("\n\n*** getblogList\n\n");
   const message = req.query.message;
   const user = req.session.user || null;
 //   const userId = user.id || null;
@@ -11,4 +21,5 @@ const getblogList = async (req, res, next) => {
 
 export default {
     getblogList,
+    getblogCreate,
 };
