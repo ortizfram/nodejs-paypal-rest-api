@@ -663,6 +663,7 @@ const courseDetail = async (req, res) => {
       ...course,
       created_at: new Date(course.created_at).toLocaleString(),
       updated_at: new Date(course.updated_at).toLocaleString(),
+      video_link: course.video_link.replace("watch?v=", "embed/"),
     };
 
     if (!course) {

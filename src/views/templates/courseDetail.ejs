@@ -20,18 +20,14 @@
     <!-- PLAYER -->
     <!-- ========================================================= -->
     <div>
-            <div class="first-module">
-                <div>
-                    <div class="plyr__video-embed" id="player<%= course.id %>">
-                        <!-- Embedded video link -->
-                        <iframe src="<%= course.video_link %>" allowfullscreen allowtransparency
-                            allow="autoplay"></iframe>
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <iframe  src="<%= course.video_link %>" width="560" height="315" frameborder="0" autoplay allowfullscreen></iframe>
                     </div>
                 </div>
             </div>
-                <!-- ========================================================= -->
-                <!-- Include Plyr.js CSS -->
-                <link rel="stylesheet" href="https://cdn.plyr.io/3.6.4/plyr.css" />
+              
 
               
     </div>
@@ -39,7 +35,7 @@
     <!-- COURSE DETAIL -->
     <!-- ========================================================= -->
     <div>
-        <p><%= course.updated_at %></p>
+        <p class="text-muted"><%= course.updated_at %></p>
         <div>
             <h1>
                 <%= course.title %>
@@ -52,13 +48,4 @@
     </div>
 
     <!--SCRIPTS-------------------------------------------------------------------------------------------------------------------->
-    <!-- Include Plyr.js library -->
-    <script src="https://cdn.plyr.io/3.6.4/plyr.js"></script>
-
-    <!-- Initialize Plyr.js -->
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // Select all video players with class 'plyr__video-embed' and initialize Plyr
-            const players = Array.from(document.querySelectorAll('.plyr__video-embed')).map(p => new Plyr(p));
-        });
-    </script>
+   
