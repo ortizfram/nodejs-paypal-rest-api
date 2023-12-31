@@ -361,11 +361,14 @@ const coursesList = async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     let perPage = parseInt(req.query.perPage) || 1;
 
+    // count courses
     const [totalCourses] = await pool.query("SELECT COUNT(*) AS count FROM courses");
     const totalItems = totalCourses[0].count;
 
+    // fetch all courses
     const [coursesRows] = await pool.query(courseFieldsPlusAuthor_q, [0, totalItems]);
 
+    // map courses
     let courses = coursesRows.map((course) => {
       return {
         title: course.title,
@@ -397,7 +400,6 @@ const coursesList = async (req, res) => {
     courses = courses.filter((course) => !enrolledCourseIds.includes(course.id));
 
     const totalFilteredItems = courses.length;
-
     const totalPages = Math.ceil(totalFilteredItems / perPage) || 1;
 
     // Adjust perPage if there are fewer items than perPage value
@@ -406,7 +408,6 @@ const coursesList = async (req, res) => {
     }
 
     const offset = (page - 1) * perPage;
-
     const coursesForPage = courses.slice(offset, offset + perPage);
 
     // redirect to the previous page if last it's empty

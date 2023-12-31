@@ -191,76 +191,84 @@ const getBlogDetail = async (req, res, next) => {
 
 const getblogList = async (req, res, next) => {
   console.log("\n\n*** getblogList\n\n");
-  const message = req.query.message;
-  const user = req.session.user || null;
-  //   const userId = user.id || null;
-  const userId = null;
+  try {
+    const route = "blog";
 
-  const isAdmin = user && user.role === "admin";
-  const route = "blog";
+    const message = req.query.message;
+    const user = req.session.user || null;
+    const isAdmin = user && user.role === "admin";
 
-  const page = parseInt(req.query.page) || 1;
-  let perPage = parseInt(req.query.perPage) || 1;
+    const page = parseInt(req.query.page) || 1;
+    let perPage = parseInt(req.query.perPage) || 1;
 
-  // count blogs
-  const [totalBlogs] = await pool.query("SELECT COUNT(*) AS count FROM blogs");
-  const totalItems = totalBlogs[0].count;
+    // count blogs
+    const [totalBlogs] = await pool.query(
+      "SELECT COUNT(*) AS count FROM blogs"
+    );
+    const totalItems = totalBlogs[0].count;
 
-  // fetch all blogs
-  const [blogRows] = await pool.query(blogFieldsPlusAuthor_q, [0, totalItems]);
+    // fetch all blogs
+    const [blogRows] = await pool.query(blogFieldsPlusAuthor_q, [
+      0,
+      totalItems,
+    ]);
 
-  // map blogs
-  let blogs = blogRows.map((blog) => {
-    return {
-      title: blog.title,
-      slug: blog.slug,
-      description: blog.description,
-      thumbnail: blog.thumbnail,
-      id: blog.id.toString(),
-      thumbnailPath: `/uploads/${blog.thumbnail}`,
-      created_at: new Date(blog.created_at).toLocaleString(),
-      updated_at: new Date(blog.updated_at).toLocaleString(),
-      author: {
-        name: blog.author_name,
-        username: blog.author_username,
-        avatar: blog.author_avatar,
-      },
-      next: `/api/blog/${blog.id}`, // Dynamic blog link
-    };
-  });
+    // map blogs
+    let blogs = blogRows.map((blog) => {
+      return {
+        title: blog.title,
+        slug: blog.slug,
+        description: blog.description,
+        thumbnail: blog.thumbnail,
+        id: blog.id.toString(),
+        thumbnailPath: `/uploads/${blog.thumbnail}`,
+        created_at: new Date(blog.created_at).toLocaleString(),
+        updated_at: new Date(blog.updated_at).toLocaleString(),
+        author: {
+          name: blog.author_name,
+          username: blog.author_username,
+          avatar: blog.author_avatar,
+        },
+        next: `/api/blog/${blog.id}`, // Dynamic blog link
+      };
+    });
 
-  // calculate totalItems for pagination
-  const totalFilteredItems = blogs.length;
-  const totalPages = Math.ceil(totalFilteredItems / perPage) || 1;
+    // calculate totalItems for pagination
+    const totalFilteredItems = blogs.length;
+    const totalPages = Math.ceil(totalFilteredItems / perPage) || 1;
 
-  // Adjust perPage if there are fewer items than perPage value
-  if (totalFilteredItems < perPage) {
-    perPage = totalFilteredItems;
+    // Adjust perPage if there are fewer items than perPage value
+    if (totalFilteredItems < perPage) {
+      perPage = totalFilteredItems;
+    }
+
+    const offset = (page - 1) * perPage;
+    const blogsForPage = blogs.slice(offset, offset + perPage);
+
+    // redirect to the previous page if last it's empty
+    if (page === totalPages && blogsForPage.length === 0) {
+      res.redirect(`/api/blog?page=${page - 1}&perPage=${perPage}`);
+      return;
+    }
+
+    res.render(`blog/blogList`, {
+      route,
+      title: "Blogs and Latest News",
+      blogs: blogsForPage,
+      totalItems: totalFilteredItems,
+      user,
+      message: "All readings free",
+      isAdmin,
+      perPage,
+      page,
+      offset,
+      currentPage: page,
+      totalPages,
+    });
+  } catch (error) {
+    console.log("Error fetching blogs:", error);
+    res.redirect("/api/blog?message=Error fetching blogs");
   }
-
-  const offset = (page - 1) * perPage;
-  const blogsForPage = blogs.slice(offset, offset + perPage);
-
-  // redirect to the previous page if last it's empty
-  if (page === totalPages && blogsForPage.length === 0) {
-    res.redirect(`/api/blog?page=${page - 1}&perPage=${perPage}`);
-    return;
-  }
-
-  res.render(`blog/blogList`, {
-    isAdmin,
-    message,
-    user,
-    userId,
-    blogs,
-    totalItems,
-    perPage,
-    page,
-    offset,
-    currentPage: page,
-    totalPages,
-    route,
-  });
 };
 
 export default {
