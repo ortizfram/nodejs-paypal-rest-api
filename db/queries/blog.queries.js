@@ -16,16 +16,16 @@ CREATE TABLE IF NOT EXISTS blogs (
     FOREIGN KEY (author_id) REFERENCES users(id)
 );
 
-ALTER TABLE courses
-ADD CONSTRAINT fk_author
-FOREIGN KEY (author_id) REFERENCES users(id)
 `;
+// ALTER TABLE courses
+// ADD CONSTRAINT fk_author
+// FOREIGN KEY (author_id) REFERENCES users(id)
 
 const argentinaTimeZone =
   "CONVERT_TZ(NOW(), 'UTC', 'America/Argentina/Buenos_Aires')";
 
 export const createBlogQuery = `
-INSERT INTO courses (title, slug, description, text_content, thumbnail, created_at, updated_at, author_id)
+INSERT INTO blogs (title, slug, description, text_content, thumbnail, created_at, updated_at, author_id)
 VALUES (?, ?, ?, ?, ?, ${argentinaTimeZone}, ${argentinaTimeZone}, ?);
 `;
 
@@ -64,7 +64,8 @@ LEFT JOIN
 users ON users.id = courses.author_id
 WHERE
 blogs.id = ?`;
-export const getCourseFromSlugQuery = `SELECT * FROM blogs WHERE slug = ?`;
+export const getBlogFromSlugQuery = `SELECT * FROM blogs WHERE slug = ?`;
+export const getBlogFromIdQuery = `SELECT * FROM blogs WHERE id = ?`;
 
 export const getCourseListQuery = `SELECT * FROM blogs LIMIT ?, ?`;
 export const getCourseListNoPagination_q = `SELECT * FROM blogs`;

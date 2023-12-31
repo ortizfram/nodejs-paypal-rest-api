@@ -2,7 +2,6 @@
 <div>
     <form id="courseForm" action="/api/blog/create" method="POST" enctype="multipart/form-data">
         <!-- Form action should match the route for creating a course -->
-        <h3>Course description</h3>
         <label for="title">title:</label><br>
         <input type="text" id="title" name="title"><br><br>
 
@@ -19,8 +18,8 @@
         <button type="submit">Create Blog</button>
 
         <!-- Display error message -->
-        <% if (typeof errorMessage !=='undefined' ) { %>
-            <p style="color: red;">
+        <% if (errorMessage) { %>
+            <p class="bg-red">
                 <%= errorMessage %>
             </p>
             <% } %>
