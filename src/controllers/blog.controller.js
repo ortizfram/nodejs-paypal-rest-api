@@ -199,7 +199,7 @@ const getblogList = async (req, res, next) => {
   const userId = null;
 
   const [blogRows] = await pool.query(fetchAllBlogs);
-  const blogs = blogRows[0];
+  const blogs = blogRows;
 
   // res.render(`blog/blogList`, { message, user, userId, blogs });
   res.json(blogs);
