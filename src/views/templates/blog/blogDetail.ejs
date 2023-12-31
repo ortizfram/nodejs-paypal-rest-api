@@ -1,1 +1,38 @@
-<h1>Blog title</h1>
+
+
+<% if (user.role === "admin") { %>
+    <div class="course-admin-options opacity-50">
+      <div>
+        <div>
+          <button class="btn">
+            <p><a class="text-muted" href="/api/blog/<%= blog.id %>/update?blogId=<%= blog.id %>"><i class="fas fa-edit me-2"></i>Edit blog</a></p>
+          </button>
+          <button  class="btn">
+            <p><a class="text-muted" href="/api/blog/<%= blog.id %>/delete?blogId=<%= blog.id %>"><i class="fas fa-trash-alt me-2"></i>Delete blog</a></p>
+          </button>
+        </div>
+      </div>
+    </div>
+  <% } else { %>
+    
+  <% } %>
+
+    
+
+    <!-- Blog DETAIL -->
+    <!-- ========================================================= -->
+    <div class="thumbnail mb-4">
+        <img src="<%= blog.thumbnail %>" alt="blog thumbnail">
+    </div>
+    <div>
+        <p class="text-muted"><%= blog.updated_at %> <span><img class="avatar ms-4 me-2" src="<%= blog.author.avatar %>" alt="author_avatar"></span><span class="fw-bold"><%= blog.author.username %></span> • <span><%= blog.author.name %></span></p>
+        <div>
+            <h1>
+                <%= blog.title %>
+            </h1>
+        </div>
+        <h3>
+            <%= blog.description %>
+        </h3>
+        <p><%= blog.text_content %></p>
+    </div>

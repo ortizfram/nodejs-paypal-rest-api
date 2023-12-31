@@ -2,6 +2,7 @@ import {
   blogFieldsPlusAuthor_q,
   createBlogQuery,
   createBlogTable,
+  getBlogAuthorQuery,
   getBlogFromIdQuery,
   getBlogFromSlugQuery,
 } from "../../db/queries/blog.queries.js";
@@ -166,21 +167,44 @@ const postblogCreate = async (req, res, next) => {
 const getBlogDetail = async (req, res, next) => {
   console.log("\n\n*** getBlogDetail\n\n");
   try {
+    const blogId = req.params.id;
     const message = req.query.message;
     const user = req.session.user || null;
-    // const userId = user.id || null;
-    const userId = null;
-    const blogId = req.params.id;
 
     const [blogRows] = await pool.query(getBlogFromIdQuery, blogId);
     const blog = blogRows[0];
+
+    // Format course timestamps and video_link
+    const formattedBlog = {
+      ...blog,
+      created_at: new Date(blog.created_at).toLocaleString(),
+      updated_at: new Date(blog.updated_at).toLocaleString(),
+    };
 
     if (!blog) {
       return res.status(404).json({ message: "Blog not found" });
     }
 
+    // Fetching author details
+    const [authorRows] = await pool.query(getBlogAuthorQuery, [blog.author_id]);
+    const author = authorRows[0];
+    console.log(author);
+
+    if (!author) {
+      return res.status(404).send("Author details not found");
+    }
+
+    // Extend formattedBlog with author details
+    formattedBlog.author = {
+      name: author.author_name,
+      username: author.author_username,
+      avatar: author.author_avatar,
+    };
+    console.log(formattedBlog.author);
+
     // Render the blog details as JSON
-    res.json(blog);
+    // res.json(blog);
+    res.render("blog/blogDetail", { message, user, blogId, blog: formattedBlog });
   } catch (error) {
     console.error("Error fetching blog details:", error);
     res
