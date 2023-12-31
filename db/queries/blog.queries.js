@@ -48,7 +48,7 @@ SELECT
 FROM 
   blogs
 LEFT JOIN 
-  users ON users.id = courses.author_id
+  users ON users.id = blogs.author_id
 LIMIT ?,?
 `;
 
