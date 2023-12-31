@@ -81,3 +81,5 @@ export const getBlogAuthorQuery = `
   WHERE 
     id = ?;
 `;
+
+export const fetchAllBlogs = `SELECT * FROM blogs`;

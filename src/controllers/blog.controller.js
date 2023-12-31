@@ -1,6 +1,7 @@
 import {
   createBlogQuery,
   createBlogTable,
+  fetchAllBlogs,
   getBlogFromIdQuery,
   getBlogFromSlugQuery,
 } from "../../db/queries/blog.queries.js";
@@ -197,7 +198,11 @@ const getblogList = async (req, res, next) => {
   //   const userId = user.id || null;
   const userId = null;
 
-  res.render(`blog/blogList`, { message, user, userId });
+  const [blogRows] = await pool.query(fetchAllBlogs);
+  const blogs = blogRows[0];
+
+  // res.render(`blog/blogList`, { message, user, userId, blogs });
+  res.json(blogs);
 };
 
 export default {
