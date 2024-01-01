@@ -35,7 +35,7 @@ SET title=?, slug=?, description=?, text_content=?, thumbnail=?, updated_at=${ar
 WHERE id = ?;
 `;
 
-export const deletBlogQuery = `DELETE FROM blogs WHERE id = ?;`;
+export const deleteBlogQuery = `DELETE FROM blogs WHERE id = ?;`;
 
 // limited
 export const blogFieldsPlusAuthor_q = ` 

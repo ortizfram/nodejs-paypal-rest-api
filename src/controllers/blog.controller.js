@@ -2,6 +2,7 @@ import {
   blogFieldsPlusAuthor_q,
   createBlogQuery,
   createBlogTable,
+  deleteBlogQuery,
   getBlogAuthorQuery,
   getBlogFromIdQuery,
   getBlogFromSlugQuery,
@@ -285,7 +286,7 @@ const getblogList = async (req, res, next) => {
       blogs: blogsForPage,
       totalItems: totalFilteredItems,
       user,
-      message: "All readings free",
+      message,
       isAdmin,
       perPage,
       page,
@@ -421,59 +422,59 @@ const postBlogUpdate = async (req, res) => {
   }
 };
 
-const getCourseDelete = async (req, res) => {
-  console.log("\n\n*** getCourseDelete\n\n");
+const getBlogDelete = async (req, res) => {
+  console.log("\n\n*** getBlogDelete\n\n");
   const user = req.session.user || null;
   const message = req.query.message;
   try {
     // course from id
-    const courseId = req.query.courseId;
-    const [courseRows] = await pool.query(getCourseFromIdQuery, [courseId]);
-    const course = courseRows[0];
+    const blogId = req.params.id;
+    const [blogRows] = await pool.query(getBlogFromIdQuery, [blogId]);
+    const blog = blogRows[0];
+    const action = `/api/blog/${blogId}/delete`;
 
     //msg
-    console.log(`\n\ncourse: ${course.title}\n\n`);
+    console.log(`\n\nblog: ${blog.title}\n\n`);
 
     // render template
-    res.render("courseDelete/courseDeleteConfirmation", {
+    res.render("blog/blogDeleteConfirmation", {
       user,
       message,
-      course,
+      blog,
+      action,
     });
   } catch (error) {
-    console.log("Error fetching course for deletion:", error);
-    res.redirect(`/api/courses/`);
+    console.log("Error fetching blog for deletion:", error);
+    res.redirect(`/api/blog?page=1&perPage=6`);
   }
 };
 
-const postCourseDelete = async (req, res) => {
-  // Deletes course from Id of tables: courses user_courses
-  console.log("\n\n*** postCourseDelete\n\n");
+const postBlogDelete = async (req, res) => {
+  console.log("\n\n*** postBlogDelete\n\n");
 
   try {
-    // get course
-    let courseId = req.body.courseId;
-    const [courseRows] = await pool.query(getCourseFromIdQuery, [courseId]);
-    const course = courseRows[0];
-    courseId = course.id;
+    // get blog
+    let blogId = req.params.id;
+    const [blogRows] = await pool.query(getBlogFromIdQuery, [blogId]);
+    const blog = blogRows[0];
+    blogId = blog.id;
 
     //msg
-    console.log(`\n\n${course.title}\n\n`);
+    console.log(`\n\n${blog.title}\n\n`);
 
     // Perform deletion query
-    await pool.query(deleteUserCourseQuery, [courseId]);
-    await pool.query(deleteCourseQuery, [courseId]);
+    await pool.query(deleteBlogQuery, [blogId]);
 
     //msgs
-    const message = `course deleted successfully`;
+    const message = `blog deleted successfully`;
     console.log(`\n\n${message}`);
 
     // Redirect after successful deletion
-    res.redirect(`/api/courses?message=${message}`);
+    res.redirect(`/api/blog?page=1&perPage=6&message=${message}`);
   } catch (error) {
-    const message = `Error deleting course: ${error}`;
+    const message = `Error deleting blog: ${error}`;
     console.log(`\n\n${message}`);
-    res.redirect(`/api/courses?message=${message}`);
+    res.redirect(`/api/blog?page=1&perPage=6&message=${message}`);
   }
 };
 
@@ -484,4 +485,6 @@ export default {
   getBlogDetail,
   getBlogUpdate,
   postBlogUpdate,
+  getBlogDelete,
+  postBlogDelete,
 };

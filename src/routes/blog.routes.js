@@ -15,6 +15,9 @@ router.get("/blog/:id", controller.getBlogDetail);
 //------------update-------------------------
 router.get("/blog/:id/update", admin_staff_check, controller.getBlogUpdate);
 router.post("/blog/:id/update", admin_staff_check, controller.postBlogUpdate);
+//------------delete-------------------------
+router.get("/blog/:id/delete", admin_staff_check, controller.getBlogDelete);
+router.post("/blog/:id/delete", admin_staff_check, controller.postBlogDelete);
 
 
 export default router;
