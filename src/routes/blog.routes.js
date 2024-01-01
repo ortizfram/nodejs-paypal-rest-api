@@ -10,5 +10,9 @@ router.get("/blog/create", controller.getblogCreate);
 router.post("/blog/create", controller.postblogCreate);
 //------------detail-------------------------
 router.get("/blog/:id", controller.getBlogDetail);
+//------------update-------------------------
+router.get("/blog/:id/update", controller.getBlogUpdate);
+router.post("/blog/:id/update", controller.postBlogUpdate);
+
 
 export default router;

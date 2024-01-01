@@ -5,6 +5,7 @@ import {
   getBlogAuthorQuery,
   getBlogFromIdQuery,
   getBlogFromSlugQuery,
+  updateBlogQuery,
 } from "../../db/queries/blog.queries.js";
 import slugify from "slugify";
 import { pool } from "../db.js";
@@ -20,8 +21,11 @@ const getblogCreate = async (req, res, next) => {
   //   const userId = user.id || null;
   const userId = null;
   const errorMessage = "";
+  const title = 'Blog Create';
+  const submit = 'Create';
+  const action = `/api/blog/create`;
 
-  res.render(`blog/blogCreate`, { user, userId, message, errorMessage });
+  res.render(`blog/blogCreate`, { user, userId, message, errorMessage,title,submit, action });
 };
 const postblogCreate = async (req, res, next) => {
   console.log("\n\n*** postblogCreate\n\n");
@@ -294,10 +298,190 @@ const getblogList = async (req, res, next) => {
     res.redirect("/api/blog?message=Error fetching blogs");
   }
 };
+// --------------------
+
+const getBlogUpdate = async (req, res) => {
+  console.log(`\n\n*** getBlogUpdate\n\n`);
+
+  const message = req.query.message;
+  const user = req.session.user || null;
+  const blogId = req.params.id;
+  const userId = null;
+  const errorMessage = "";
+  const title = 'Blog Update';
+  const submit = 'Update';
+  const action = `/api/blog/${blogId}/update`;
+
+  res.render(`blog/blogCreate`, { user, userId, message, errorMessage, title,submit,action });
+};
+
+const postBlogUpdate = async (req, res) => {
+  console.log("\n\n*** postBlogUpdate\n\n");
+
+  // get blogId
+  let blogId = req.params.id; // Assuming the ID is coming from the request body
+  const [blogRows] = await pool.query(getBlogFromIdQuery, [blogId]);
+  const blog = blogRows[0];
+  blogId = blog.id;
+  let thumbnailPath ='';
+  let thumbnail ='';
+  let blogSlug='';
+  console.log(`\n--- blogId: ${blogId}\n`);
+
+
+  // file upload check
+  if (!req.files || Object.keys(req.files).length === 0) {
+    const message = `(ERROR): no Thumbnail was uploaded, try again uploading a file.`;
+    return res.redirect(
+      `/api/blog/${blogId}/update?blogId=${blogId}&message=${message}`
+    );
+  }
+
+
+  // Check if thumbnail uploaded, encode, move
+  if (req.files && req.files.thumbnail) {
+    const timestamp = Date.now();
+    const filename = req.files.thumbnail.name;
+    const uniqueFilename = encodeURIComponent(`${timestamp}_${filename}`);
+    thumbnailPath = "/uploads/" + uniqueFilename;
+
+    // Assign the uploaded thumbnail file to the 'thumbnail' variable
+    thumbnail = req.files.thumbnail;
+
+    // Use mv() to place file on the server
+    await thumbnail.mv(path.join(__dirname, "uploads", uniqueFilename));
+  } else {
+    // If no new thumbnail uploaded, retain the existing thumbnail path
+    thumbnailPath = course.thumbnail; // Assuming course.thumbnail holds the existing thumbnail path
+  }
+
+  try {
+    // req fields
+    const {
+      title,
+      description,
+      text_content,
+    } = req.body;
+
+    // Autogenerate slug from title
+    if (typeof title === "string" && title.trim() !== "") {
+      blogSlug = slugify(title, { lower: true, strict: true });
+    }
+
+
+    // Get current timestamp in the format 'YYYY-MM-DD HH:MM:SS'
+    const currentTimestamp = new Date()
+      .toISOString()
+      .slice(0, 19)
+      .replace("T", " ");
+
+    const updateParams = [
+      title,
+      blogSlug,
+      description,
+      text_content,
+      thumbnailPath,
+      blogId, // where 
+    ];
+
+    // msg
+    console.log("\n\n---Update Parameters:", updateParams); // Log the update parameters
+
+    // query
+    const result = await pool.query(updateBlogQuery, updateParams);
+
+    //msg of query & result of query
+    console.log("\n\n---Update Query:", updateBlogQuery);
+    console.log("\n\n---Query Result:", result); // Log the result of the query execution
+
+    // update check msg
+    if (result && result[0].affectedRows !== undefined) {
+      //show if affected rows
+      const affectedRows = parseInt(result[0].affectedRows);
+      console.log("\n\n---Affected Rows:", affectedRows);
+
+      const user = req.session.user || null;
+
+      if (affectedRows > 0) {
+        const message = "blog updated correctly";
+        res.redirect(
+          `/api/blog/${blogId}`
+        );
+      } else {
+        const message = "no changes made to blog";
+        res.status(201).redirect(
+          `/api/blog/${blogId}`
+        );
+      }
+    }
+  } catch (error) {
+    console.error("Error updating blog:", error);
+    console.error("Database Error:", error.sqlMessage); // Log the database error message
+    res.status(500).json({ message: "Error updating the blog" });
+  }
+};
+
+const getCourseDelete = async (req, res) => {
+  console.log("\n\n*** getCourseDelete\n\n");
+  const user = req.session.user || null;
+  const message = req.query.message;
+  try {
+    // course from id
+    const courseId = req.query.courseId;
+    const [courseRows] = await pool.query(getCourseFromIdQuery, [courseId]);
+    const course = courseRows[0];
+
+    //msg
+    console.log(`\n\ncourse: ${course.title}\n\n`);
+
+    // render template
+    res.render("courseDelete/courseDeleteConfirmation", {
+      user,
+      message,
+      course,
+    });
+  } catch (error) {
+    console.log("Error fetching course for deletion:", error);
+    res.redirect(`/api/courses/`);
+  }
+};
+
+const postCourseDelete = async (req, res) => {
+  // Deletes course from Id of tables: courses user_courses
+  console.log("\n\n*** postCourseDelete\n\n");
+
+  try {
+    // get course
+    let courseId = req.body.courseId;
+    const [courseRows] = await pool.query(getCourseFromIdQuery, [courseId]);
+    const course = courseRows[0];
+    courseId = course.id;
+
+    //msg
+    console.log(`\n\n${course.title}\n\n`);
+
+    // Perform deletion query
+    await pool.query(deleteUserCourseQuery, [courseId]);
+    await pool.query(deleteCourseQuery, [courseId]);
+
+    //msgs
+    const message = `course deleted successfully`;
+    console.log(`\n\n${message}`);
+
+    // Redirect after successful deletion
+    res.redirect(`/api/courses?message=${message}`);
+  } catch (error) {
+    const message = `Error deleting course: ${error}`;
+    console.log(`\n\n${message}`);
+    res.redirect(`/api/courses?message=${message}`);
+  }
+};
 
 export default {
   getblogList,
   getblogCreate,
   postblogCreate,
   getBlogDetail,
+  getBlogUpdate,
+  postBlogUpdate,
 };

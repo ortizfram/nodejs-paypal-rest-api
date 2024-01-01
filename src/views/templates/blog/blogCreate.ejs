@@ -1,6 +1,6 @@
-<h1 class="section-title">Blog Create</h1>
+<h1 class="section-title"><%= title %></h1>
 <div>
-    <form id="courseForm" action="/api/blog/create" method="POST" enctype="multipart/form-data">
+    <form id="courseForm" action="<%= action %>" method="POST" enctype="multipart/form-data">
         <!-- Form action should match the route for creating a course -->
         <label for="title">title:</label><br>
         <input type="text" id="title" name="title"><br><br>
@@ -15,7 +15,7 @@
         <input type="file" name="thumbnail" accept="image/*"><br><br>
 
         <input type="hidden" name="author" value="<%= user %>">  
-        <button type="submit">Create Blog</button>
+        <button type="submit"><%= submit %></button>
 
         <!-- Display error message -->
         <% if (errorMessage) { %>

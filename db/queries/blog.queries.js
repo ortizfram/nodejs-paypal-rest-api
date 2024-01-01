@@ -31,7 +31,7 @@ VALUES (?, ?, ?, ?, ?, ${argentinaTimeZone}, ${argentinaTimeZone}, ?);
 
 export const updateBlogQuery = `
 UPDATE blogs
-SET title=?, slug=?, description=?, text_content=?, thumbnail=?, updated_at=${argentinaTimeZone})
+SET title=?, slug=?, description=?, text_content=?, thumbnail=?, updated_at=${argentinaTimeZone}
 WHERE id = ?;
 `;
 
