@@ -15,20 +15,21 @@ const getHome = async (req, res) => {
 };
 
 const sendEmail = async (req, res) => {
-  const { name, email, message } = req.body;
+  const { name, email, msg } = req.body;
 
   //send email
   // 3. SEND TOKEN BACK TO THE USER EMAIL.
   const emailInfo = await sendEmailContactForm(
     email,
     "BuonaVibra 📫 Formulario de Contacto",
-    `[${name} | ${email}] te ha escrito : ${message}`,
+    `[${name} | ${email}] te ha escrito : ${msg}`,
     ``
   );
   console.log("\n\nemail sent\n\n");
+  let message = "Email sent successfully!";
 
   // Respond to the client
-  res.status(200).json({ message: "Email sent successfully!" });
+  res.redirect(`/?message=${message}`);
 };
 
 export default {
