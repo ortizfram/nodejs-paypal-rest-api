@@ -1,5 +1,11 @@
 /* courses.css */
-
+.courses-page-container {
+    background-image: url("../../images/blog-image.jpg");
+  background-size: cover;
+  background-position: center; /* Centers the background image */
+  height: 100%;
+  width: 100vw;
+}
 /* Reset styles */
 body {
     display: flex;
