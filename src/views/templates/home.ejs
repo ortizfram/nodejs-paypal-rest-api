@@ -9,7 +9,8 @@
 
   <div class="row">
     <div class="col-md-6 text-center">
-      <img src="images/me-about.jpg" style="max-width: 300px; height: auto;" class="shadow-2xl rounded-circle w-100" alt="Marcela Marzetti Gimenez">
+      <img src="images/me-about.jpg" style="max-width: 300px; height: auto;" class="shadow-2xl rounded-circle w-100"
+        alt="Marcela Marzetti Gimenez">
       <h3 class="mt-3 font-weight-bold highlight-txt">Marcela Marzetti</h3>
     </div>
     <div class="col-md-6 text-center">
@@ -39,24 +40,44 @@
 
 <!-- contact -->
 <div id="contact" class="bg-cover bg-center bg-brightness-50 py-6 h-50vh mt-310px md:m-auto md:mt-50px">
-  <!-- Section title -->
-  <h1 class="p-4 text-2xl italic font-bold text-center text-white">Contacto.</h1>
+ <div class="">
+   
+  <div class="">
+    <h1 class="section-title italic font-bold text-white">Contacto.</h1>
 
-  <!-- Container for icons -->
-  <div class="container-lg d-flex justify-content-center align-items-center flex-wrap shadow-xl rounded-2xl bg-black-20 backdrop-blur-lg p-4 mt-4 mx-4">
-    <a href="http://www.youtube.com" class="text-decoration-none text-white mx-5 fs-3">
-      <i class="bi bi-youtube"></i>
-    </a>
-    <a href="https://wa.me/2615996913" class="text-decoration-none text-white mx-5 fs-3">
-      <i class="bi bi-whatsapp"></i>
-    </a>
-    <a href="https://www.instagram.com/marcelamarzetti/" class="text-decoration-none text-white mx-5 fs-3">
-      <i class="bi bi-instagram"></i>
-    </a>
-    <a href="https://mail.google.com/mail/?view=cm&fs=1&tf=1&to=marzettimarcela@gmail.com&subject=Summer%20Party&body=Afiliado%20de%20Buona%20Vibra!"
-      class="text-decoration-none text-white mx-5 fs-3">
-      <i class="bi bi-envelope"></i>
-    </a>
+    <!-- Row for contact icons -->
+    <div class="row mt-4 container">
+      <div class="col backdrop-filter p-4 rounded col-md-6 mx-auto d-flex justify-content-between">
+        <div class="list-unstyled d-flex justify-content-between">
+          <a href="https://wa.me/2615996913" target="_blank"><img class="icon" src="images/whatsapp-white-icon.png"
+              alt="WhatsApp"></a>
+          <a href="https://www.instagram.com/buonavibra_?igsh=MWR5NDhiZHd3MjY5MA==" target="_blank"><img class="icon"
+              src="images/instagram-white-icon.png" alt="Instagram"></a>
+        </div>
+      </div>
+    </div>
   </div>
-</div>
 
+  <!-- contact form -->
+  <div class="row mt-4">
+    <div class="col rounded">
+      <form>
+        <h3 class="highlight-txt">Contactar por Email.</h3>
+        <div class="mb-3">
+          <label for="name" class="form-label">Nombre</label>
+          <input type="text" class="form-control" id="name">
+        </div>
+        <div class="mb-3">
+          <label for="email" class="form-label">Correo Electrónico</label>
+          <input type="email" class="form-control" id="email">
+        </div>
+        <div class="mb-3">
+          <label for="message" class="form-label">Mensaje</label>
+          <textarea class="form-control" id="message" rows="3"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Enviar</button>
+      </form>
+    </div>
+  </div>
+ </div>
+</div>
