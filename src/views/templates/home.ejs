@@ -61,22 +61,23 @@
   <!-- contact form -->
   <div class="row mt-4">
     <div class="col rounded">
-      <form>
+      <form action="/send-email" method="POST">
         <h3 class="highlight-txt">Contactar por Email.</h3>
         <div class="mb-3">
           <label for="name" class="form-label">Nombre</label>
-          <input type="text" class="form-control" id="name">
+          <input type="text" class="form-control" id="name" name="name">
         </div>
         <div class="mb-3">
           <label for="email" class="form-label">Correo Electrónico</label>
-          <input type="email" class="form-control" id="email">
+          <input type="email" class="form-control" id="email" name="email">
         </div>
         <div class="mb-3">
           <label for="message" class="form-label">Mensaje</label>
-          <textarea class="form-control" id="message" rows="3"></textarea>
+          <textarea class="form-control" id="message" rows="3" name="message"></textarea>
         </div>
         <button type="submit" class="btn btn-primary">Enviar</button>
       </form>
+      
     </div>
   </div>
  </div>
