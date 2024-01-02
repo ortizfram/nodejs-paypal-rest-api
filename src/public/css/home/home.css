@@ -2,7 +2,7 @@
   background-image: url("../../images/hero-image.jpg");
   background-size: cover;
   background-position: center; /* Centers the background image */
-  height: 100vh;
+  height: 80vh;
   width: 100vw;
   display: flex; /* For centering content */
   justify-content: center; /* Center horizontally */
@@ -35,4 +35,17 @@
   width: 34px;
   height: 34px;
   margin-inline: 6px;
+}
+
+.footer-icon {
+    width: 64px;
+  height: 64px;
+  margin-inline: 6px;
+}
+
+#footer {
+    height: 50vh;
+    width: 100vw;
+    padding: 60px;
+    margin: 0;
 }
