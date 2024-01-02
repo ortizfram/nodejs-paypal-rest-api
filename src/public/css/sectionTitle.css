@@ -3,6 +3,9 @@
       margin-bottom: 10px;
       /*border-bottom: 2px solid #007bff; */ /* Change color as needed */
       padding-bottom: 5px;
+      justify-items: center;
+      color: rgb(98, 98, 232);
+      margin-bottom: 40px;
     }
 
     body {
