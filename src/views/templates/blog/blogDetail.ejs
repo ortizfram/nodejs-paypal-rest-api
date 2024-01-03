@@ -44,6 +44,7 @@
             <%= blog.description %>
           </h3>
           <div id="text_content">
-            <pre><code><%= blog.html_content %></code></pre>
+            <!-- Ensure to use <%- %> to render HTML unescaped / NOT <%= %> -->
+            <pre><code><%- htmlContent %></code></pre>
           </div>
         </div>

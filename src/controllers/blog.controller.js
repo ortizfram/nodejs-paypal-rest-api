@@ -15,8 +15,6 @@ import { __dirname } from "../apps.js";
 import { tableCheckQuery } from "../../db/queries/course.queries.js";
 import createTableIfNotExists from "../public/js/createTable.js";
 import { Marked, marked } from "marked";
-import TurndownService from "turndown";
-const turndownService = new TurndownService();
 
 const getblogCreate = async (req, res, next) => {
   console.log("\n\n*** getblogCreate\n\n");
@@ -69,9 +67,6 @@ const postblogCreate = async (req, res, next) => {
       title = String(title);
     }
 
-    // Use marked to convert markdown to HTML
-    const html_content = marked(text_content);
-
     // Generate blog slug
     const blogSlug = slugify(title, { lower: true, strict: true });
 
@@ -116,7 +111,7 @@ const postblogCreate = async (req, res, next) => {
             title,
             blogSlug,
             description,
-            html_content,
+            text_content,
             relativePath,
             authorId,
           ];
@@ -222,11 +217,8 @@ const getBlogDetail = async (req, res, next) => {
     console.log(formattedBlog.author);
 
     // Convert Markdown to HTML using marked
-    const markdownContent = blog.text_content; // Assuming blog.text_content contains Markdown
+    const markdownContent = blog.text_content; 
     const htmlContent = marked(markdownContent);
-
-    // Extend formattedBlog with HTML content from above
-    formattedBlog.html_content = htmlContent; // Pass this to your template
 
     // Render the blog details as JSON
     // res.json(blog);
@@ -235,6 +227,7 @@ const getBlogDetail = async (req, res, next) => {
       user,
       blogId,
       blog: formattedBlog,
+      htmlContent,
     });
   } catch (error) {
     console.error("Error fetching blog details:", error);
@@ -403,14 +396,12 @@ const postBlogUpdate = async (req, res) => {
       .slice(0, 19)
       .replace("T", " ");
 
-    // Use marked to convert markdown to HTML
-    const html_content =  marked(text_content);
 
     const updateParams = [
       title,
       blogSlug,
       description,
-      html_content,
+      text_content,
       thumbnailPath,
       blogId, // where
     ];

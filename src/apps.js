@@ -18,6 +18,7 @@ import jwt from "jsonwebtoken";
 import { validationResult, body } from "express-validator";
 import { pool } from "./db.js";
 import { getUserEnrolledCoursesQuery } from "../db/queries/course.queries.js";
+import { Marked, marked } from "marked";
 
 // load .ENV
 config();
@@ -48,6 +49,14 @@ app.set("layout", "../layouts/layout");
 app.set("view engine", "ejs");
 app.set("views", [path.join(__dirname, "views", "templates")]);
 
+// marked test route
+app.get('/markdown-to-html', (req, res) => {
+  const markdownContent = `# Heading\n\n**Bold text**\n\n*Italic text*`; // Replace with your Markdown content
+  const htmlContent = marked(markdownContent);
+
+  res.send(htmlContent);
+});
+
 // db use JSON
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -63,6 +72,8 @@ app.use(
     saveUninitialized: true,
   })
 );
+
+
 
 // Use routes app
 app.use(indexRoutes);
