@@ -35,8 +35,11 @@
               <p class="author-info"><strong><%= blog.author.username %></strong> • <%=blog.author.name%></p>
             </div>
             <h2><%= blog.title %></h2>
-              
-              <p><%= blog.description %></p>
+                
+            <!-- limit description 50 words -->
+              <% let descriptionWords = blog.description.split(' '); %>
+              <% let limitedDescription = descriptionWords.slice(0, 50).join(' '); %>
+              <p><%= limitedDescription %></p>
           </a>
           <% if (isAdmin) {%>
             <div class="course-actions">
