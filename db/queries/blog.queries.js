@@ -15,11 +15,8 @@ CREATE TABLE IF NOT EXISTS blogs (
     UNIQUE KEY(slug),
     FOREIGN KEY (author_id) REFERENCES users(id)
 );
-
 `;
-// ALTER TABLE courses
-// ADD CONSTRAINT fk_author
-// FOREIGN KEY (author_id) REFERENCES users(id)
+// ALTER TABLE blogs MODIFY COLUMN text_content LONGTEXT;
 
 const argentinaTimeZone =
   "CONVERT_TZ(NOW(), 'UTC', 'America/Argentina/Buenos_Aires')";

@@ -14,6 +14,9 @@ import path from "path";
 import { __dirname } from "../apps.js";
 import { tableCheckQuery } from "../../db/queries/course.queries.js";
 import createTableIfNotExists from "../public/js/createTable.js";
+import { Marked, marked } from "marked";
+import TurndownService from "turndown";
+const turndownService = new TurndownService();
 
 const getblogCreate = async (req, res, next) => {
   console.log("\n\n*** getblogCreate\n\n");
@@ -22,11 +25,19 @@ const getblogCreate = async (req, res, next) => {
   //   const userId = user.id || null;
   const userId = null;
   const errorMessage = "";
-  const title = 'Blog Create';
-  const submit = 'Create';
+  const title = "Blog Create";
+  const submit = "Create";
   const action = `/api/blog/create`;
 
-  res.render(`blog/blogCreate`, { user, userId, message, errorMessage,title,submit, action });
+  res.render(`blog/blogCreate`, {
+    user,
+    userId,
+    message,
+    errorMessage,
+    title,
+    submit,
+    action,
+  });
 };
 const postblogCreate = async (req, res, next) => {
   console.log("\n\n*** postblogCreate\n\n");
@@ -57,6 +68,9 @@ const postblogCreate = async (req, res, next) => {
     if (typeof title !== "string") {
       title = String(title);
     }
+
+    // Use marked to convert markdown to HTML
+    const html_content = marked(text_content);
 
     // Generate blog slug
     const blogSlug = slugify(title, { lower: true, strict: true });
@@ -102,7 +116,7 @@ const postblogCreate = async (req, res, next) => {
             title,
             blogSlug,
             description,
-            text_content,
+            html_content,
             relativePath,
             authorId,
           ];
@@ -207,9 +221,21 @@ const getBlogDetail = async (req, res, next) => {
     };
     console.log(formattedBlog.author);
 
+    // Convert Markdown to HTML using marked
+    const markdownContent = blog.text_content; // Assuming blog.text_content contains Markdown
+    const htmlContent = marked(markdownContent);
+
+    // Extend formattedBlog with HTML content from above
+    formattedBlog.html_content = htmlContent; // Pass this to your template
+
     // Render the blog details as JSON
     // res.json(blog);
-    res.render("blog/blogDetail", { message, user, blogId, blog: formattedBlog });
+    res.render("blog/blogDetail", {
+      message,
+      user,
+      blogId,
+      blog: formattedBlog,
+    });
   } catch (error) {
     console.error("Error fetching blog details:", error);
     res
@@ -309,11 +335,19 @@ const getBlogUpdate = async (req, res) => {
   const blogId = req.params.id;
   const userId = null;
   const errorMessage = "";
-  const title = 'Blog Update';
-  const submit = 'Update';
+  const title = "Blog Update";
+  const submit = "Update";
   const action = `/api/blog/${blogId}/update`;
 
-  res.render(`blog/blogCreate`, { user, userId, message, errorMessage, title,submit,action });
+  res.render(`blog/blogCreate`, {
+    user,
+    userId,
+    message,
+    errorMessage,
+    title,
+    submit,
+    action,
+  });
 };
 
 const postBlogUpdate = async (req, res) => {
@@ -324,11 +358,10 @@ const postBlogUpdate = async (req, res) => {
   const [blogRows] = await pool.query(getBlogFromIdQuery, [blogId]);
   const blog = blogRows[0];
   blogId = blog.id;
-  let thumbnailPath ='';
-  let thumbnail ='';
-  let blogSlug='';
+  let thumbnailPath = "";
+  let thumbnail = "";
+  let blogSlug = "";
   console.log(`\n--- blogId: ${blogId}\n`);
-
 
   // file upload check
   if (!req.files || Object.keys(req.files).length === 0) {
@@ -337,7 +370,6 @@ const postBlogUpdate = async (req, res) => {
       `/api/blog/${blogId}/update?blogId=${blogId}&message=${message}`
     );
   }
-
 
   // Check if thumbnail uploaded, encode, move
   if (req.files && req.files.thumbnail) {
@@ -358,17 +390,12 @@ const postBlogUpdate = async (req, res) => {
 
   try {
     // req fields
-    const {
-      title,
-      description,
-      text_content,
-    } = req.body;
+    const { title, description, text_content } = req.body;
 
     // Autogenerate slug from title
     if (typeof title === "string" && title.trim() !== "") {
       blogSlug = slugify(title, { lower: true, strict: true });
     }
-
 
     // Get current timestamp in the format 'YYYY-MM-DD HH:MM:SS'
     const currentTimestamp = new Date()
@@ -376,13 +403,16 @@ const postBlogUpdate = async (req, res) => {
       .slice(0, 19)
       .replace("T", " ");
 
+    // Use marked to convert markdown to HTML
+    const html_content =  marked(text_content);
+
     const updateParams = [
       title,
       blogSlug,
       description,
-      text_content,
+      html_content,
       thumbnailPath,
-      blogId, // where 
+      blogId, // where
     ];
 
     // msg
@@ -405,14 +435,10 @@ const postBlogUpdate = async (req, res) => {
 
       if (affectedRows > 0) {
         const message = "blog updated correctly";
-        res.redirect(
-          `/api/blog/${blogId}`
-        );
+        res.redirect(`/api/blog/${blogId}`);
       } else {
         const message = "no changes made to blog";
-        res.status(201).redirect(
-          `/api/blog/${blogId}`
-        );
+        res.status(201).redirect(`/api/blog/${blogId}`);
       }
     }
   } catch (error) {
