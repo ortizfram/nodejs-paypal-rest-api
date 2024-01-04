@@ -1,5 +1,5 @@
 <header class="header">
-  <a href="/" class="logo">Logo</a>
+  <a href="/" class="logo"><img src="images/white-logo-buonavibra.png" alt=""></a>
 
   <input type="checkbox" id="check">
   <label for="check" class="icons">
@@ -113,6 +113,15 @@
     color: #fff;
     text-decoration: none;
     font-weight: 700;
+    width: 100px; /* Adjust the width according to your image */
+    height: 50px; /* Adjust the height according to your image */
+    display: flex;
+    align-items: center;
+  }
+
+  .logo img {
+    width: 100%;
+    height: auto;
   }
 
   .navbar a {
@@ -181,12 +190,20 @@
       margin: 1rem 1.3rem;
       /* Add margin for better spacing */
     }
+
+    .logo {
+      width: 100px; /* Adjust width for larger screens */
+      height: 50px; /* Adjust height for larger screens */
+    }
   }
 
   @media (max-width: 768px) {
     /*MD ↓ *********************************/
     
-
+    .logo {
+      width: 100px; /* Adjust width for medium screens */
+      height: 50px; /* Adjust height for medium screens */
+    }
     .icons {
       display: inline-flex;
     }
@@ -245,7 +262,10 @@
 
   @media (max-width: 576px) {
     /* SM ↓ *********************************/
-
+    .logo {
+      width: 100px; /* Adjust width for smaller screens */
+      height: 50px; /* Adjust height for smaller screens */
+    }
     .navbar a {
       /* Adjust anchor tags to display in a single column */
       display: block;
