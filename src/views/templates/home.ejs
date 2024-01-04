@@ -1,3 +1,21 @@
+<script>
+  // Smooth scrolling to a specific element by offsetting scroll position
+  document.querySelector('a[href="/#about1"]').addEventListener('click', function(e) {
+    e.preventDefault(); // Prevent the default link behavior
+    const targetElement = document.querySelector('#about1'); // Select the target element
+    const offset = -108; // Offset adjustment value in pixels
+    
+    if (targetElement) {
+      // Calculate the target position and scroll to it
+      const targetPosition = targetElement.offsetTop + offset;
+      window.scrollTo({
+        top: targetPosition,
+        behavior: 'smooth'
+      });
+    }
+  });
+</script>
+
 <!-- hero -->
 <div class="hero-container home-hero">
   <img class="hero-logo" src="images/white-logo-buonavibra.png" alt="">
