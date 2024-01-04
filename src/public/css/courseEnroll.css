@@ -5,6 +5,17 @@ body {
     padding: 0;
 }
 
+.page-container {
+    height: 100vh;
+}
+
+.avatar {
+    border-radius: 50%;
+    width: 25px; /* Adjust the width and height as needed */
+    height: 25px; /* Adjust the width and height as needed */
+    object-fit: cover; /* Maintain aspect ratio and cover the container */
+  }
+
 /* Section Title */
 .section-title {
     text-align: center;
@@ -28,17 +39,14 @@ body {
     max-width: 300px;
     height: auto;
     border-radius: 5px;
-    margin-bottom: 20px;
 }
 
 .course-overview h2 {
     font-size: 1.8em;
     color: #444;
-    margin-bottom: 15px;
 }
 
 .course-overview div {
-    margin-bottom: 20px;
     font-size: 1.2em;
     color: #666;
 }
@@ -47,7 +55,6 @@ body {
     font-size: 1em;
     color: #666;
     line-height: 1.6;
-    margin-bottom: 20px;
 }
 
 .course-overview .price-text {
@@ -56,25 +63,17 @@ body {
 }
 
 /* Payment Options */
+/* Payment Options */
 .payment-options {
     text-align: center;
-    margin-top: 20px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
 }
 
 .payment-options h2 {
     font-size: 1.8em;
     color: #333;
-    margin-bottom: 20px;
 }
 
 .payment-options form {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-bottom: 10px; /* Adjust the spacing between buttons */
 }
 
 .payment-options button {
@@ -90,7 +89,7 @@ body {
     border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.3s ease;
-    margin-bottom: 10px;
+    width: 100%; /* Set width to 100% */
 }
 
 .payment-options button:hover {
@@ -98,12 +97,11 @@ body {
 }
 
 .payment-options button img {
-    width: 24px; /* Adjust the size of the image icon */
+    width: 24px;
     height: auto;
-    margin-right: 10px; /* Provide some space between the icon and text */
+    margin-right: 10px;
 }
 
 .payment-options button span {
-    margin: 0;
     font-size: 1em;
 }

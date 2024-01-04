@@ -1,41 +1,55 @@
-<div class='course-overview'>
-    <div class="section-title">
-        <h1>Payment Details</h1>
-    </div>
-    <!-- Payment Details -->
-    <img src="<%= course.thumbnail %>" alt="<%= course.title %> Image">
-    <h2>
-        <%= course.title %>
-    </h2>
-    <div>
-        <p>Instructor: <%= course.instructor %>
-        </p>
-        <p>Duration: <%= course.length %>
-        </p>
-        <p class="price-text">USD<%= course.usd_price %> | ARS<%= course.ars_price %>
-        </p>
-    </div>
-</div>
+<div class="page-container">
+    <div class='course-overview'>
+        <div class="section-title2 mt-4">
+            <h1>Payment Details</h1>
+        </div>
+        <!-- Payment Details -->
+        <img src="<%= course.thumbnail %>" alt="<%= course.title %> Image">
+        <h2>
+            <%= course.title %>
+        </h2>
+        <div>
 
-<div class='payment-options'>
-    <!--course enroll-->
-    <!-- The form to trigger the payment -->
-    <form action="/api/create-order-paypal?courseId=<%= course.id %>" method="POST">
-        <!-- Hidden input to pass the course slug to the server -->
-        <input type="hidden" name="courseId" value="<%= course.id %>">
-        <input type="hidden" name="userId" value="<%= userId %>">
-        <button type="submit">
-            <img src="/images/paypal.png" alt="paypal-icon">
-            <p>Continue with Paypal</p>
-        </button>
-    </form>
-    <form action="/api/create-order-mp?courseId=<%= course.id %>" method="POST">
-        <!-- Hidden input to pass the course slug to the server -->
-        <input type="hidden" name="courseId" value="<%= course.id %>">
-        <input type="hidden" name="userId" value="<%= userId %>">
-        <button type="submit">
-            <img src="/images/mercado-pago.png" alt="mercado-pago-icon">
-            <p>Continue with Mercado Pago</p>
-        </button>
-    </form>
+            <div class="row align-items-center">
+                <div class="col-auto">
+                    instructor: 
+                    <img src="<%= course.author.avatar %>" alt="User Avatar" class="rounded-circle me-2"
+                        style="width: 25px; height: 25px; object-fit: cover;">
+                </div>
+                <div class="col">
+                    <p class="mb-0">
+                        <strong><%= course.author.username %></strong> • <%= course.author.name %>
+                    </p>
+                </div>
+            </div>
+            
+            <p>Duration: <%= course.length %>
+            </p>
+            <p class="price-text">USD<%= course.usd_price %> | ARS<%= course.ars_price %>
+            </p>
+        </div>
+    </div>
+
+    <div class='payment-options'>
+        <!--course enroll-->
+        <!-- The form to trigger the payment -->
+        <form action="/api/create-order-paypal?courseId=<%= course.id %>" method="POST">
+            <!-- Hidden input to pass the course slug to the server -->
+            <input type="hidden" name="courseId" value="<%= course.id %>">
+            <input type="hidden" name="userId" value="<%= userId %>">
+            <button type="submit">
+                <img src="/images/paypal.png" alt="paypal-icon">
+                <p>Continue with Paypal</p>
+            </button>
+        </form>
+        <form action="/api/create-order-mp?courseId=<%= course.id %>" method="POST">
+            <!-- Hidden input to pass the course slug to the server -->
+            <input type="hidden" name="courseId" value="<%= course.id %>">
+            <input type="hidden" name="userId" value="<%= userId %>">
+            <button type="submit">
+                <img src="/images/mercado-pago.png" alt="mercado-pago-icon">
+                <p>Continue with Mercado Pago</p>
+            </button>
+        </form>
+    </div>
 </div>

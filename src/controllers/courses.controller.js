@@ -599,8 +599,7 @@ const courseEnroll = async (req, res) => {
 
   const user = req.session.user; // Retrieve the user from the session
   const message = req.query.message; // Retrieve success message from query params authcontroller
-  // Fetch the course slug from the request
-  const courseId = req.params.id;
+  const courseId = req.params.id; // Fetch the course slug from the request
 
   if (!req.session.user) {
     // Store the course slug in the query parameters to redirect after login
@@ -608,6 +607,7 @@ const courseEnroll = async (req, res) => {
       `/api/login?redirect=/course/${courseId}/enroll?courseId=${courseId}`
     );
   }
+
   const userId = req.session.user.id;
 
   try {
@@ -627,6 +627,12 @@ const courseEnroll = async (req, res) => {
         active: course.active,
         thumbnail: course.thumbnail,
         length: course.length,
+        author: {
+          // Include author details in courseData
+          name: course.author_name,
+          username: course.author_username,
+          avatar: course.author_avatar,
+        },
       };
 
       res.render("courseEnroll", { course: courseData, userId, user, message }); // Pass the courseData object
@@ -637,6 +643,7 @@ const courseEnroll = async (req, res) => {
     res.status(500).send("Error fetching the course");
   }
 };
+
 
 const courseDetail = async (req, res) => {
   console.log("\n*** courseDetail\n");
