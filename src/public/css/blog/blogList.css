@@ -3,8 +3,7 @@
     background-image: url("../../images/mountain-yoga.jpg");
     background-size: cover;
     background-position: center; /* Centers the background image */
-    height: 100%;
-    height: 100%;
+    height: 100vh;
     width: 100vw;
   }
   /* Reset styles */
@@ -25,10 +24,13 @@
   /* Section title */
   .section-title1 {
     text-align: center;
+    font-family: "Poppins", sans-serif;
     margin-bottom: 2px;
+    font-weight: 900;
   }
+
   .section-title1 h1{
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8); /* Adding shadow to the h1 */
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, .4); /* Adding shadow to the h1 */
   }
   
   .timestamp {
@@ -44,7 +46,7 @@
   /* Courses container */
   .blogs-container {
     max-width: 1200px;
-    margin: 0 auto;
+    margin: 6.2rem auto;
     padding: 20px;
     font-family: Arial, sans-serif;
   }
