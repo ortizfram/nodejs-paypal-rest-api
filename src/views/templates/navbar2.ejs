@@ -1,55 +1,60 @@
 <header class="header">
-  <a href="/" class="logo">Logo</a>
-
-  <input type="checkbox" id="check">
-  <label for="check" class="icons">
-    <i class='bx bx-menu' id="menu-icon"></i>
-    <i class='bx bx-x' id="close-icon"></i>
-  </label>
-
-  <nav class="navbar">
-    <!-- basic links -->
-    <a href="/" style="--i:0;">Home</a>
-    <a href="/#about" style="--i:1;">Acerca</a>
-    <a href="/api/courses?page=1&perPage=6" style="--i:2;">Cursos</a>
-    <a href="/api/blog?page=1&perPage=6" style="--i:3;">Blogs</a>
-    <!--  -->
-
-    <!-- loggedin links -->
-    <% if (user && user.name) { %>
-    <a href="/api/courses-owned?page=1&perPage=6" style="--i:4;">Mis Cursos</a>
-    <% } %>
-    <!--  -->
-
-    <!-- admin links -->
-    <% if (user && user.role==="admin" ) { %>
-    <a href="/api/course/create" style="--i:5;">Crear curso</a>
-    <a href="/api/blog/create" style="--i:6;">Crear Blog</a>
-    <a href="/api/admin/users" style="--i:7;">Panel de Usuarios</a>
-    <% } %>
-
-    <!-- edit profile link-->
-    <% if (user && user.avatar) { %>
-    <!-- Update Profile with user's avatar -->
-    <a href="/api/user-update/<%= user.id %>/confirm" style="--i:8;">
-      <img src="<%= user.avatar %>" alt="User Avatar" class="avatar">
-      Editar Perfil
-    </a>
-    <% } else { %>
-    <!-- If no avatar, use a placeholder -->
-    <a href="/api/user-update/<%= user.id %>/confirm" style="--i:9;">
-      <img src="images/user.png" alt="Placeholder Avatar" class="avatar">Editar Perfil</a>
-    <% } %>
-
-    <!-- sign out link-->
-    <% if (user) { %>
-    <a href="/api/logout" style="--i:10;">Salir</a>
-    <% } else { %>
-    <a href="/api/login" style="--i:11;">ingresar</a>
-    <a href="/api/signup" style="--i:12;">Registrar</a>
-    <% } %>
-  </nav>
-</header>
+    <a href="/" class="logo">Logo</a>
+  
+    <input type="checkbox" id="check">
+    <label for="check" class="icons">
+      <i class='bx bx-menu' id="menu-icon"></i>
+      <i class='bx bx-x' id="close-icon"></i>
+    </label>
+  
+    <nav class="navbar">
+      <!-- basic links -->
+      <a href="/" style="--i:0;">Home</a>
+      <a href="/#about" style="--i:1;">Acerca</a>
+      <!-- Dropdown for Courses and Blogs -->
+      <div class="dropdown">
+        <a href="#" class="dropdown-toggle" role="button">
+          Cursos y Blogs
+        </a>
+        <div class="dropdown-menu">
+          <a href="/api/courses?page=1&perPage=6" style="--i:2;">Cursos</a>
+          <a href="/api/blog?page=1&perPage=6" style="--i:3;">Blogs</a>
+        </div>
+      </div>
+      <!-- Loggedin Links -->
+      <% if (user && user.name) { %>
+        <a href="/api/courses-owned?page=1&perPage=6" style="--i:4;">Mis Cursos</a>
+        <!-- Admin Dropdown -->
+        <% if (user.role === "admin" ) { %>
+          <div class="dropdown">
+            <a href="#" class="dropdown-toggle" role="button">
+              Admin
+            </a>
+            <div class="dropdown-menu">
+              <a href="/api/course/create" style="--i:5;">Crear curso</a>
+              <a href="/api/blog/create" style="--i:6;">Crear Blog</a>
+              <a href="/api/admin/users" style="--i:7;">Panel de Usuarios</a>
+            </div>
+          </div>
+        <% } %>
+        <!-- Edit Profile and Logout -->
+        <% if (user.avatar) { %>
+          <a href="/api/user-update/<%= user.id %>/confirm" style="--i:8;">
+            <img src="<%= user.avatar %>" alt="User Avatar" class="avatar">Editar Perfil
+          </a>
+        <% } else { %>
+          <a href="/api/user-update/<%= user.id %>/confirm" style="--i:9;">
+            <img src="images/user.png" alt="Placeholder Avatar" class="avatar">Editar Perfil
+          </a>
+        <% } %>
+        <a href="/api/logout" style="--i:10;">Salir</a>
+      <% } else { %>
+        <!-- Links for non-loggedin users -->
+        <a href="/api/login" style="--i:11;">Ingresar</a>
+        <a href="/api/signup" style="--i:12;">Registrar</a>
+      <% } %>
+    </nav>
+  </header>
 
 <!-- =====================\ CSS /=============================== -->
 <style>
@@ -131,18 +136,48 @@
     display: none;
   }
 
-  /* BRAKPOINTS */
-  @media (max-width: 992px) {
+  /* dropdowns for conditionals */
+  .dropdown {
+    position: relative;
+    display: inline-block;
+  }
 
-    /*LG ↓*/
+  .dropdown-toggle {
+    cursor: pointer;
+  }
+
+  .dropdown-menu {
+    display: none;
+    position: absolute;
+    z-index: 1;
+    background: rgba(0, 0, 0, .1);
+    backdrop-filter: blur(50px);
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  }
+
+  .dropdown-menu a {
+    color: #fff;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: inline-block;
+  }
+
+  .dropdown:hover .dropdown-menu {
+    display: block;
+  }
+
+  /* BRAKPOINTS >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>*/
+  @media (max-width: 992px) {/*LG ↓ *********************************/
+
+    
     .header {
       padding: 1.3rem 5%;
     }
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: 768px) {/*MD ↓ *********************************/
 
-    /* MD ↓*/
     .icons {
       display: inline-flex;
     }
