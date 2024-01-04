@@ -25,6 +25,7 @@ hr {
 .section-title {
   text-align: center;
   margin-bottom: 2px;
+  color: #EF7F72;
 }
 .section-title h1{
 text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8); /* Adding shadow to the h1 */

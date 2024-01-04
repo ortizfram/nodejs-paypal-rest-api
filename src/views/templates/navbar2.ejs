@@ -1,163 +1,201 @@
 <header class="header">
-    <a href="#" class="logo">Logo</a>
+  <a href="/" class="logo">Logo</a>
 
-    <input type="checkbox" id="check">
-    <label for="check" class="icons">
-        <i class='bx bx-menu' id="menu-icon"></i>
-        <i class='bx bx-x' id="close-icon"></i>
-    </label>
+  <input type="checkbox" id="check">
+  <label for="check" class="icons">
+    <i class='bx bx-menu' id="menu-icon"></i>
+    <i class='bx bx-x' id="close-icon"></i>
+  </label>
 
-    <nav class="navbar">
-        <a href="/" style="--i:0;">Home</a>
-        <a href="/#about" style="--i:1;">Acerca</a>
-        <a href="/api/courses?page=1&perPage=6" style="--i:2;">Cursos</a>
-        <a href="/api/blog?page=1&perPage=6" style="--i:2;">Blogs</a>
-        <a href="#" style="--i:3;">ingresar</a>
-        <a href="#" style="--i:4;">Registrar</a>
-    </nav>
+  <nav class="navbar">
+    <!-- basic links -->
+    <a href="/" style="--i:0;">Home</a>
+    <a href="/#about" style="--i:1;">Acerca</a>
+    <a href="/api/courses?page=1&perPage=6" style="--i:2;">Cursos</a>
+    <a href="/api/blog?page=1&perPage=6" style="--i:3;">Blogs</a>
+    <!--  -->
+
+    <!-- loggedin links -->
+    <% if (user && user.name) { %>
+    <a href="/api/courses-owned?page=1&perPage=6" style="--i:4;">Mis Cursos</a>
+    <% } %>
+    <!--  -->
+
+    <!-- admin links -->
+    <% if (user && user.role==="admin" ) { %>
+    <a href="/api/course/create" style="--i:5;">Crear curso</a>
+    <a href="/api/blog/create" style="--i:6;">Crear Blog</a>
+    <a href="/api/admin/users" style="--i:7;">Panel de Usuarios</a>
+    <% } %>
+
+    <!-- edit profile link-->
+    <% if (user && user.avatar) { %>
+    <!-- Update Profile with user's avatar -->
+    <a href="/api/user-update/<%= user.id %>/confirm" style="--i:8;">
+      <img src="<%= user.avatar %>" alt="User Avatar" class="avatar">
+      Editar Perfil
+    </a>
+    <% } else { %>
+    <!-- If no avatar, use a placeholder -->
+    <a href="/api/user-update/<%= user.id %>/confirm" style="--i:9;">
+      <img src="images/user.png" alt="Placeholder Avatar" class="avatar">Editar Perfil</a>
+    <% } %>
+
+    <!-- sign out link-->
+    <% if (user) { %>
+    <a href="/api/logout" style="--i:10;">Salir</a>
+    <% } else { %>
+    <a href="/api/login" style="--i:11;">ingresar</a>
+    <a href="/api/signup" style="--i:12;">Registrar</a>
+    <% } %>
+  </nav>
 </header>
 
 <!-- =====================\ CSS /=============================== -->
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap');
 
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-        font-family: "Poppins", sans-serif;
-    }
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Poppins", sans-serif;
+  }
 
+  .header {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    padding: 1.3rem 10%;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 100;
+  }
+
+  .header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, .1);
+    backdrop-filter: blur(50px);
+    z-index: -1;
+  }
+
+  .header::after {
+    /* moving reflect inside header */
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .4));
+    transition: .5s;
+  }
+
+  .header:hover::after {
+    /* on hover move*/
+    left: 100%;
+  }
+
+  .logo {
+    font-size: 2rem;
+    color: #fff;
+    text-decoration: none;
+    font-weight: 700;
+  }
+
+  .navbar a {
+    font-size: 1.15rem;
+    color: #fff;
+    text-decoration: none;
+    font-weight: 500;
+    margin-left: 2.5rem;
+  }
+
+  #check {
+    display: none;
+  }
+
+  .icons {
+    position: absolute;
+    right: 5%;
+    font-size: 2.8rem;
+    color: #fff;
+    cursor: pointer;
+    display: none;
+  }
+
+  /* BRAKPOINTS */
+  @media (max-width: 992px) {
+
+    /*LG ↓*/
     .header {
-        position: fixed;
-        top: 0;
-        width: 100%;
-        padding: 1.3rem 10%;
+      padding: 1.3rem 5%;
+    }
+  }
 
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        z-index: 100;
+  @media (max-width: 768px) {
+
+    /* MD ↓*/
+    .icons {
+      display: inline-flex;
     }
 
-    .header::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, .1);
-        backdrop-filter: blur(50px);
-        z-index: -1;
+    #check:checked~.icons #menu-icon {
+      /* hide on click*/
+      display: none;
     }
 
-    .header::after { /* moving reflect inside header */
-        content: '';
-        position: absolute;
-        top: 0;
-        left: -100%;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(255,255,255, .4));
-        transition: .5s;
+    .icons #close-icon {
+      display: none;
     }
 
-    .header:hover::after { /* on hover move*/
-        left: 100%;
+    #check:checked~.icons #close-icon {
+      /* show on click*/
+      display: block;
     }
 
-    .logo {
-        font-size: 2rem;
-        color: #fff;
-        text-decoration: none;
-        font-weight: 700;
+    .navbar {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      height: 0;
+      background: rgba(0, 0, 0, .1);
+      backdrop-filter: blur(50px);
+      box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .1);
+      overflow: hidden;
+      transition: .3s ease;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    #check:checked~.navbar {
+      /* on click display navbar div*/
+      height: 17.7rem;
     }
 
     .navbar a {
-        font-size: 1.15rem;
-        color: #fff;
-        text-decoration: none;
-        font-weight: 500;
-        margin-left: 2.5rem;
+      display: block;
+      font-size: 1.1rem;
+      margin: 1.5rem 0;
+      text-align: center;
+      transition: .3s ease;
+      opacity: 0;
     }
 
-    #check {
-        display: none;
+    #check:checked~.navbar a {
+      /* on click hide navbar div*/
+      display: block;
+      transform: translateY(0);
+      opacity: 1;
+      transition-delay: calc(.15s * var(--1));
     }
-
-    .icons {
-        position: absolute;
-        right: 5%;
-        font-size: 2.8rem;
-        color: #fff;
-        cursor: pointer;
-        display: none;
-    }
-
-    /* BRAKPOINTS */
-    @media (max-width: 992px) {
-
-        /*LG ↓*/
-        .header {
-            padding: 1.3rem 5%;
-        }
-    }
-
-    @media (max-width: 768px) {
-
-        /* MD ↓*/
-        .icons {
-            display: inline-flex;
-        }
-
-        #check:checked~.icons #menu-icon {
-            /* hide on click*/
-            display: none;
-        }
-
-        .icons #close-icon {
-            display: none;
-        }
-
-        #check:checked~.icons #close-icon {
-            /* show on click*/
-            display: block;
-        }
-
-        .navbar {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            width: 100%;
-            height: 0;
-            background: rgba(0, 0, 0, .1);
-            backdrop-filter: blur(50px);
-            box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .1);
-            overflow: hidden;
-            transition: .3s ease;
-            flex-direction: column;
-            align-items: center;
-        }
-        
-        #check:checked~.navbar { /* on click display navbar div*/
-            height: 17.7rem;
-        }
-
-        .navbar a {
-            display: block;
-            font-size: 1.1rem;
-            margin: 1.5rem 0;
-            text-align: center;
-            transition: .3s ease;
-            opacity: 0;
-        }
-        
-        #check:checked~.navbar a { /* on click hide navbar div*/
-            display: block;
-            transform: translateY(0);
-            opacity: 1;
-            transition-delay: calc(.15s * var(--1));
-        }
-    }
+  }
 </style>
