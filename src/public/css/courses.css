@@ -1,6 +1,6 @@
 /* courses.css */
 .courses-page-container {
-    background-image: url("../../images/blog-image.jpg");
+  background-image: url("../../images/blog-image.jpg");
   background-size: cover;
   background-position: center; /* Centers the background image */
   height: 100%;
@@ -8,204 +8,210 @@
 }
 /* Reset styles */
 body {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 hr {
-    width: 100%;
-    margin: 20px 0;
-    border: none;
-    border-top: 1px solid #ccc;
+  width: 100%;
+  margin: 20px 0;
+  border: none;
+  border-top: 1px solid #ccc;
 }
 
 /* Section title */
 .section-title {
-    text-align: center;
-    margin-bottom: 2px;
+  text-align: center;
+  margin-bottom: 2px;
 }
 
 .timestamp {
-    color: #777;
-    text-decoration: none;
+  color: #777;
+  text-decoration: none;
 }
 
 h1 {
-    margin: 0;
-    padding: 0;
+  margin: 0;
+  padding: 0;
 }
 
 /* Courses container */
 .courses-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
-    font-family: Arial, sans-serif;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: Arial, sans-serif;
 }
 
 /* Style for the go back button */
 .courses-container button {
-    background-color: #333;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    cursor: pointer;
+  background-color: #333;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  cursor: pointer;
 }
 
 /* Style for the courses list */
 .courses-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr); /* Maximum of 4 columns */
-    gap: 20px; /* Adjust spacing between items */
+  display: grid;
+  grid-template-columns: repeat(4, 1fr); /* Maximum of 4 columns */
+  gap: 20px; /* Adjust spacing between items */
 }
 
 /* Adjust individual course item styles */
 .course-item {
-    border: 1px solid #ccc;
-    border-radius: 5%;
-    padding: 20px;
-    overflow: hidden; /* Ensure content doesn't overflow */
-    margin-bottom: 20px;
-    position: relative; /* Adjust for button positioning */
+  border: 1px solid #ccc;
+  border-radius: 5%;
+  padding: 20px;
+  overflow: hidden; /* Ensure content doesn't overflow */
+  margin-bottom: 20px;
+  position: relative; /* Adjust for button positioning */
 }
 
 /* Style for the course image */
 .course-item img {
-    width: 100%;
-    height: 200px; /* Adjust the height as needed */
-    object-fit: cover;
-    display: block;
-    margin-bottom: 5px; /* Space between image and content */
+  width: 100%;
+  height: 200px; /* Adjust the height as needed */
+  object-fit: cover;
+  display: block;
+  margin-bottom: 5px; /* Space between image and content */
 }
 
 /* Course details */
 .course-item .course-details {
-    color: #333;
+  color: #333;
 }
 
 /* Adjust the author section */
 .course-item .author {
-    display: flex;
-    align-items: center;
-    margin-bottom: 10px; /* Add spacing between author and course details */
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px; /* Add spacing between author and course details */
 }
 
 /* Style for the author's avatar */
 .course-item .author img.avatar {
-    width: 30px; /* Adjust the width as needed */
-    height: 30px; /* Adjust the height as needed */
-    border-radius: 50%; /* Circular shape */
-    margin-right: 10px; /* Add space between image and text */
-    color: #777;
+  width: 30px; /* Adjust the width as needed */
+  height: 30px; /* Adjust the height as needed */
+  border-radius: 50%; /* Circular shape */
+  margin-right: 10px; /* Add space between image and text */
+  color: #777;
 }
 .course-item .timestamp {
-    color: #777;
-    margin: 0;
+  color: #777;
+  margin: 0;
 }
 /* Style for the author's information */
 .course-item .author p.author-info {
-    margin: 0; /* Remove default margins */
-    color: #777;
+  margin: 0; /* Remove default margins */
+  color: #777;
 }
 
 /* Style for the course title */
 .course-item .course-details h2 {
-    margin-top: 0;
-    margin-bottom: 5px;
-    font-size: 18px;
+  margin-top: 0;
+  margin-bottom: 5px;
+  font-size: 18px;
 }
 
 /* Style for the course prices */
 .course-item .course-details .prices {
-    font-weight: bold;
-    margin-bottom: 10px;
+  font-weight: bold;
+  margin-bottom: 10px;
 }
 
 /* Style for the course description */
 .course-item .course-details p {
-    color: #777;
-    margin-bottom: 10px;
+  color: #777;
+  margin-bottom: 10px;
 }
 /* buttons==================================================== */
 .course-item .course-actions {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    margin-top: 15px;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 15px;
 }
 
 .course-item .course-actions a {
-    padding: 8px 15px;
-    text-decoration: none;
-    color: black;
-    border-radius: 5px;
+  padding: 8px 15px;
+  text-decoration: none;
+  color: black;
+  border-radius: 5px;
 }
 
 /* Adjust buttons' colors based on their actions */
 .course-item .course-actions .edit {
-    background-color: #007bff;
+  background-color: #007bff;
 }
 
 .course-item .course-actions .delete {
-    background-color: #dc3545;
+  background-color: #dc3545;
 }
 /* ========================================================= */
 /* Style links */
 .courses-container button a {
-    color: #FFFF;
+  color: #ffff;
 }
 
 .courses-container button a:hover {
-    color: #46c73d;
+  color: #46c73d;
 }
 
 /* Pagination bar */
 /* Pagination styles */
 .pagination {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
 }
 
 .pagination a {
-    padding: 8px 12px;
-    margin-right: 5px;
-    color: #333;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    text-decoration: none;
-    transition: background-color 0.3s, color 0.3s;
+  padding: 8px 12px;
+  margin-right: 5px;
+  color: #333;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  text-decoration: none;
+  transition: background-color 0.3s, color 0.3s;
 }
 
 .pagination a.active {
-    background-color: #333;
-    color: #fff;
+  background-color: #333;
+  color: #fff;
 }
 
 .pagination a:hover {
-    background-color: #eee;
-    color: #333;
+  background-color: #eee;
+  color: #333;
 }
 
 /* ========================================================= */
 /* Media query for responsive layout */
 @media screen and (max-width: 960px) {
-    .courses-grid {
-        grid-template-columns: repeat(3, 1fr); /* Adjust to 3 columns for smaller screens */
-    }
+  .courses-grid {
+    grid-template-columns: repeat(
+      3,
+      1fr
+    ); /* Adjust to 3 columns for smaller screens */
+  }
 }
 
 @media screen and (max-width: 768px) {
-    .courses-grid {
-        grid-template-columns: repeat(2, 1fr); /* Adjust to 2 columns for even smaller screens */
-    }
+  .courses-grid {
+    grid-template-columns: repeat(
+      2,
+      1fr
+    ); /* Adjust to 2 columns for even smaller screens */
+  }
 }
 
 @media screen and (max-width: 480px) {
-    .courses-grid {
-        grid-template-columns: 1fr; /* Single column for very small screens */
-    }
+  .courses-grid {
+    grid-template-columns: 1fr; /* Single column for very small screens */
+  }
 }
