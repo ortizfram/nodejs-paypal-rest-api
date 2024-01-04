@@ -1,6 +1,6 @@
 /* courses.css */
 .courses-page-container {
-  background-image: url("../../images/blog-image.jpg");
+  background-image: url("../../images/jay-castor-7AcMUSYRZpU-unsplash.jpg");
   background-size: cover;
   background-position: center; /* Centers the background image */
   height: 100%;
@@ -26,7 +26,9 @@ hr {
   text-align: center;
   margin-bottom: 2px;
 }
-
+.section-title h1{
+text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8); /* Adding shadow to the h1 */
+}
 .timestamp {
   color: #777;
   text-decoration: none;

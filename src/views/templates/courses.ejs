@@ -1,7 +1,7 @@
 <div class="courses-page-container">
   <div class="courses-container">
     <div class="section-title">
-      <h1><%= title %></h1>
+      <h1 class="text-white"><%= title %></h1>
     </div>
   
   <!-- pagination top -->
@@ -30,20 +30,20 @@
         <div class="course-item backdrop-filter">
           <a href="<%= course.next %>">
             <img src="<%= course.thumbnail %>" alt="thumbnail-<%= course.slug %>" />
-            <p class="timestamp"><%= course.updated_at %></p>
-            <div class="author">
+            <p class="timestamp text-white"><%= course.updated_at %></p>
+            <div class="author ">
               <img src="<%= course.author.avatar %>" alt="User Avatar" class="avatar">
-              <p class="author-info"><strong><%= course.author.username %></strong> • <%=course.author.name%></p>
+              <p class="author-info text-white"><strong><%= course.author.username %></strong> • <%=course.author.name%></p>
             </div>
-            <h2><%= course.title %></h2>
+            <h2 class="text-white"><%= course.title %></h2>
               <% if (course.usd_price || course.usd_price ) {%>
-                <p>USD <%= course.usd_price %> | ARS <%= course.ars_price %></p>
+                <p class="text-white">USD <%= course.usd_price %> | ARS <%= course.ars_price %></p>
               <% } %>
-              <p><%= course.description %></p>
+              <p class="text-white"><%= course.description %></p>
           </a>
           <% if (isAdmin) {%>
             <div class="course-actions">
-              <p>
+              <p class="text-white">
                 <a class='text-muted' href="/api/course/<%= course.id %>/update"><i class="fas fa-edit me-2"></i>Edit</a>
                 <input type="hidden" name="author" value="<%= course.author %>">
               </p>
