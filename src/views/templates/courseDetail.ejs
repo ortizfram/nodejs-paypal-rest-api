@@ -1,49 +1,59 @@
-
-
-<% if (user.role === "admin") { %>
+<div id="course-detail-container">
+  <% if (user.role==="admin" ) { %>
     <div class="course-admin-options opacity-50">
       <div>
         <div>
           <button class="btn">
-            <p><a class="text-muted" href="/api/course/<%= course.id %>/update?courseId=<%= course.id %>"><i class="fas fa-edit me-2"></i>Edit course</a></p>
+            <p><a class="text-muted" href="/api/course/<%= course.id %>/update?courseId=<%= course.id %>"><i
+                  class="fas fa-edit me-2"></i>Edit course</a></p>
           </button>
-          <button  class="btn">
-            <p><a class="text-muted" href="/api/course/<%= course.id %>/delete?courseId=<%= course.id %>"><i class="fas fa-trash-alt me-2"></i>Delete course</a></p>
+          <button class="btn">
+            <p><a class="text-muted" href="/api/course/<%= course.id %>/delete?courseId=<%= course.id %>"><i
+                  class="fas fa-trash-alt me-2"></i>Delete course</a></p>
           </button>
         </div>
       </div>
     </div>
-  <% } %>
+    <% } %>
 
-    <!-- PLAYER -->
-    <!-- ========================================================= -->
-    <div>
-            <div class="video-container mb-4">
-                <div class="row">
-                    <div class="col-lg-12">
-                        <iframe  src="<%= course.video_link %>" width="560" height="315" allowfullscreen controls></iframe>
-                    </div>
-                </div>
+      <!-- PLAYER -->
+      <!-- ========================================================= -->
+      <div>
+        <div class="video-container mb-4">
+          <div class="row">
+            <div class="col-lg-12">
+              <iframe src="<%= course.video_link %>" width="560" height="315" allowfullscreen controls></iframe>
             </div>
-              
+          </div>
+        </div>
 
-              
-    </div>
 
-    <!-- COURSE DETAIL -->
-    <!-- ========================================================= -->
-    <div>
-        <p class="text-muted"><%= course.updated_at %> <span><img class="avatar ms-4 me-2" src="<%= course.author.avatar %>" alt="author_avatar"></span><span class="fw-bold"><%= course.author.username %></span> • <span><%= course.author.name %></span></p>
+
+      </div>
+
+      <!-- COURSE DETAIL -->
+      <!-- ========================================================= -->
+      <div>
+        <p class="text-muted">
+          <%= course.updated_at %> <span><img class="avatar ms-4 me-2" src="<%= course.author.avatar %>"
+                alt="author_avatar"></span><span class="fw-bold">
+              <%= course.author.username %>
+            </span> • <span>
+              <%= course.author.name %>
+            </span>
+        </p>
         <div>
-            <h1>
-                <%= course.title %>
-            </h1>
+          <h1>
+            <%= course.title %>
+          </h1>
         </div>
         <h3>
-            <%= course.description %>
+          <%= course.description %>
         </h3>
-        <p><%= course.text_content %></p>
-    </div>
+        <p>
+          <%= course.text_content %>
+        </p>
+      </div>
 
-    <!--SCRIPTS-------------------------------------------------------------------------------------------------------------------->
-   
+      <!--SCRIPTS-------------------------------------------------------------------------------------------------------------------->
+</div>

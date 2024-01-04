@@ -5,6 +5,10 @@
   align-items: flex-start;
 }
 
+#course-detail-container{
+  margin: 8.2rem auto;
+}
+
 /* Styling for the first module */
 .first-module {
   /* Styles for the first module */
