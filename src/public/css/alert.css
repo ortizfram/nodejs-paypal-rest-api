@@ -4,8 +4,9 @@
     padding: 10px;
     border: 1px solid #74ce83;
     border-radius: 5px;
-    margin-bottom: 15px;
+    margin: 0 auto;
     animation: fadeInOut 5s forwards;
+    z-index: 5555;
 }
 
 @keyframes fadeInOut {
