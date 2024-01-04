@@ -386,7 +386,7 @@ const coursesList = async (req, res) => {
           username: course.author_username,
           avatar: course.author_avatar,
         },
-        next: `/api/course/${course.id}/overview`, // Dynamic course link
+        next: `/api/course/${course.id}/enroll`, // Dynamic course link
       };
     });
 
@@ -525,7 +525,7 @@ const coursesListOwned = async (req, res) => {
     // Render enrolled courses for the user
     res.render("courses", {
       route,
-      title: "My courses Library",
+      title: "Mis cursos",
       courses: enrolledCourses,
       totalItems,
       user,

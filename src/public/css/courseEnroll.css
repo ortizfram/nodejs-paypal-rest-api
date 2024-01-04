@@ -19,7 +19,6 @@ body {
 /* Section Title */
 .section-title {
     text-align: center;
-    margin-bottom: 20px;
 }
 
 .section-title h1 {
@@ -30,7 +29,6 @@ body {
 /* Course Overview */
 .course-overview {
     text-align: center;
-    margin: 0 auto;
     max-width: 600px;
 }
 
@@ -73,8 +71,6 @@ body {
     color: #333;
 }
 
-.payment-options form {
-}
 
 .payment-options button {
     display: flex;
