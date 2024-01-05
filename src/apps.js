@@ -136,7 +136,7 @@ export async function checkCourseEnrollment(req, res, next) {
     } else {
       // You are not enrolled in this course
       // Redirect the user to the course overview URL
-      return res.redirect(`/api/course/${courseId}/overview`);
+      return res.redirect(`/api/course/${courseId}/enroll`);
     }
   } catch (error) {
     console.error("Error checking user enrollment:", error);

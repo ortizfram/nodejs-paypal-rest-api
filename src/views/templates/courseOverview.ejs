@@ -19,11 +19,16 @@
             <p>Price: <span class="price-usd">USD<%= course.usd_price %></span> | <span class="price-ars">ARS<%= course.ars_price %></span></p>
         </div>
         <br>
-        <div class='course-enrollment'>
+        <div class='payment-options'>
             <button>
-                <a href="/api/course/<%= course.id %>/enroll">Enroll</a>
+                <a class="text-white" href="/api/course/<%= course.id %>/enroll">Enroll</a>
             </button>
         </div>
     </div>
 </div>
         
+<style>
+    .course-overview{
+        margin: 5rem auto;
+    }
+</style>
