@@ -301,7 +301,7 @@ const getblogList = async (req, res, next) => {
 
     res.render(`blog/blogList`, {
       route,
-      title: "Blogs and Latest News",
+      title: "Blogs y Noticias",
       blogs: blogsForPage,
       totalItems: totalFilteredItems,
       user,

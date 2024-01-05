@@ -466,7 +466,7 @@ const coursesList = async (req, res) => {
 
     res.render("courses", {
       route,
-      title: "All Courses",
+      title: "Cursos",
       courses: coursesForPage,
       totalItems: totalFilteredItems,
       user,

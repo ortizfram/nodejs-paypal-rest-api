@@ -9,21 +9,22 @@
 
   <nav class="navbar">
     <!-- basic links -->
-    <a href="/#contact" style="--i:0;">Contacto</a>
-    <a href="/#about1" style="--i:1;">Acerca</a>
+    <a href="/" style="--i:0;">Inicio</a>
+    <a href="/#contact" style="--i:1;">Contacto</a>
+    <a href="/#about1" style="--i:2;">Acerca</a>
     <!-- Dropdown for Courses and Blogs -->
     <div class="dropdown">
       <a href="#" class="dropdown-toggle" role="button">
         Cursos y Blogs
       </a>
       <div class="dropdown-menu">
-        <a href="/api/courses?page=1&perPage=6" style="--i:2;">Cursos</a>
-        <a href="/api/blog?page=1&perPage=6" style="--i:3;">Blogs</a>
+        <a href="/api/courses?page=1&perPage=6" style="--i:3;">Cursos</a>
+        <a href="/api/blog?page=1&perPage=6" style="--i:4;">Blogs</a>
       </div>
     </div>
     <!-- Loggedin Links -->
     <% if (user && user.name) { %>
-    <a href="/api/courses-owned?page=1&perPage=6" style="--i:4;">Mis Cursos</a>
+    <a href="/api/courses-owned?page=1&perPage=6" style="--i:5;">Mis Cursos</a>
     <!-- Admin Dropdown -->
     <% if (user.role==="admin" ) { %>
     <div class="dropdown">
@@ -31,27 +32,27 @@
         Admin
       </a>
       <div class="dropdown-menu">
-        <a href="/api/course/create" style="--i:5;">Crear curso</a>
-        <a href="/api/blog/create" style="--i:6;">Crear Blog</a>
-        <a href="/api/admin/users" style="--i:7;">Panel de Usuarios</a>
+        <a href="/api/course/create" style="--i:6;">Crear curso</a>
+        <a href="/api/blog/create" style="--i:7;">Crear Blog</a>
+        <a href="/api/admin/users" style="--i:8;">Panel de Usuarios</a>
       </div>
     </div>
     <% } %>
     <!-- Edit Profile and Logout -->
     <% if (user.avatar) { %>
-    <a href="/api/user-update/<%= user.id %>/confirm" style="--i:8;">
+    <a href="/api/user-update/<%= user.id %>/confirm" style="--i:9;">
       <img src="<%= user.avatar %>" alt="User Avatar" class="avatar">Editar Perfil
     </a>
     <% } else { %>
-    <a href="/api/user-update/<%= user.id %>/confirm" style="--i:9;">
+    <a href="/api/user-update/<%= user.id %>/confirm" style="--i:10;">
       <img src="images/user.png" alt="Placeholder Avatar" class="avatar">Editar Perfil
     </a>
     <% } %>
-    <a href="/api/logout" style="--i:10;">Salir</a>
+    <a href="/api/logout" style="--i:11;">Salir</a>
     <% } else { %>
     <!-- Links for non-loggedin users -->
-    <a href="/api/login" style="--i:11;">Ingresar</a>
-    <a href="/api/signup" style="--i:12;">Registrar</a>
+    <a href="/api/login" style="--i:12;">Ingresar</a>
+    <a href="/api/signup" style="--i:13;">Registrar</a>
     <% } %>
   </nav>
 </header>
