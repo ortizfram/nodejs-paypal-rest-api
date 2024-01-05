@@ -44,9 +44,9 @@ const postCourseCreate = async (req, res) => {
 
     const authorId = req.session.user.id;
 
-    // File upload check
-    if (!req.files || !req.files.thumbnail) {
-      return res.status(400).send("No thumbnail file uploaded");
+    // Files upload check
+    if (!req.files || !req.files.thumbnail || !req.files.video) {
+      return res.status(400).send("No thumbnail or video file uploaded");
     }
 
     // Extract necessary data from request body
@@ -54,7 +54,6 @@ const postCourseCreate = async (req, res) => {
       title,
       description,
       text_content,
-      video_link,
       ars_price,
       usd_price,
       discount,
@@ -73,71 +72,108 @@ const postCourseCreate = async (req, res) => {
     // Manage discount value
     const discountValue = discount !== "" ? discount : null;
 
-    // Generate unique filename for the thumbnail
+    // Generate unique filename for thumbnail
     const timestamp = Date.now();
     const filename = req.files.thumbnail.name;
     const uniqueFilename = encodeURIComponent(`${timestamp}_${filename}`);
     const relativePath = "/uploads/" + uniqueFilename;
 
+    // Generate unique filename for video
+    const videoFile = req.files.video;
+    const videoFilename = videoFile.name;
+    const uniqueVideoFilename = encodeURIComponent(
+      `${timestamp}_${videoFilename}`
+    );
+    const videoPath = "/uploads/videos/" + uniqueVideoFilename;
+
     // Move uploaded thumbnail to the server
-    req.files.thumbnail.mv(path.join(__dirname, "uploads", uniqueFilename), async (err) => {
-      if (err) {
-        console.error(err);
-        return res.status(500).send("Error uploading the file");
+    req.files.thumbnail.mv(
+      path.join(__dirname, "uploads", uniqueFilename),
+      async (err) => {
+        if (err) {
+          console.error(err);
+          return res.status(500).send("Error uploading the file");
+        }
+
+        // video file upload handling
+        videoFile.mv(path.join(__dirname, "uploads/videos", uniqueVideoFilename), async (err) => {
+          if (err) {
+            console.error(err);
+            return res.status(500).send("Error uploading the video file");
+          }
+        
+          try {
+            // Get current timestamp
+            const currentDate = new Date();
+            const currentTimestamp = `${currentDate
+              .getDate()
+              .toString()
+              .padStart(2, "0")}-${(currentDate.getMonth() + 1)
+              .toString()
+              .padStart(2, "0")}-${currentDate
+              .getFullYear()
+              .toString()} ${currentDate
+              .getHours()
+              .toString()
+              .padStart(2, "0")}:${currentDate
+              .getMinutes()
+              .toString()
+              .padStart(2, "0")}:${currentDate
+              .getSeconds()
+              .toString()
+              .padStart(2, "0")}`;
+
+            // Prepare course data
+            const courseData = [
+              title,
+              courseSlug,
+              description,
+              text_content,
+              ars_price,
+              usd_price,
+              discountValue,
+              active === "true" ? true : false,
+              relativePath,
+              length,
+              videoPath,
+              authorId,
+            ];
+
+            console.log("\n\ncourseData: ", courseData);
+
+            // Create the new course using the SQL query
+            const [courseRow] = await pool.query(createCourseQuery, courseData);
+
+            // Fetch the created course & JOIN with user as author
+            const [fetchedCourse] = await pool.query(
+              getCourseFromSlugQuery,
+              courseSlug
+            );
+            const course = fetchedCourse[0];
+            const courseId = course.id;
+
+            console.log("\n\n◘ Creating course...");
+            console.log("\n\ncourse :", course);
+
+            // Redirect after creating the course
+            res.redirect(`/api/course/${courseId}`);
+          } catch (error) {
+            console.error("Error creating the course:", error);
+            return res
+              .status(500)
+              .json({
+                message: "Error creating the course",
+                error: error.message,
+              });
+          }
+        }); // Closing bracket for video file upload
       }
-
-      try {
-        // Get current timestamp
-        const currentDate = new Date();
-        const currentTimestamp = `${currentDate.getDate().toString().padStart(2, "0")}-${
-          (currentDate.getMonth() + 1).toString().padStart(2, "0")
-        }-${currentDate.getFullYear().toString()} ${currentDate
-          .getHours()
-          .toString()
-          .padStart(2, "0")}:${currentDate.getMinutes().toString().padStart(2, "0")}:${currentDate
-          .getSeconds()
-          .toString()
-          .padStart(2, "0")}`;
-
-        // Prepare course data
-        const courseData = [
-          title,
-          courseSlug,
-          description,
-          text_content,
-          video_link,
-          ars_price,
-          usd_price,
-          discountValue,
-          active === "true" ? true : false,
-          relativePath,
-          length,
-          authorId,
-        ];
-
-        console.log("\n\ncourseData: ", courseData);
-
-        // Create the new course using the SQL query
-        const [courseRow] = await pool.query(createCourseQuery, courseData);
-
-        // Fetch the created course & JOIN with user as author
-        const [fetchedCourse] = await pool.query(getCourseFromSlugQuery, courseSlug);
-        const course = fetchedCourse[0];
-        const courseId = course.id;
-
-        console.log("\n\n◘ Creating course...");
-        console.log("\n\ncourse :", course);
-
-        // Redirect after creating the course
-        res.redirect(`/api/course/${courseId}`);
-      } catch (error) {
-        console.error("Error creating the course:", error);
-        return res.status(500).json({ message: "Error creating the course", error: error.message });
-      }
-    });
+    );
   } catch (error) {
     console.error("General error:", error);
-    res.status(500).json({ message: "Error creating the course", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Error creating the course", error: error.message });
   }
 };
 
@@ -362,11 +398,16 @@ const coursesList = async (req, res) => {
     let perPage = parseInt(req.query.perPage) || 1;
 
     // count courses
-    const [totalCourses] = await pool.query("SELECT COUNT(*) AS count FROM courses");
+    const [totalCourses] = await pool.query(
+      "SELECT COUNT(*) AS count FROM courses"
+    );
     const totalItems = totalCourses[0].count;
 
     // fetch all courses
-    const [coursesRows] = await pool.query(courseFieldsPlusAuthor_q, [0, totalItems]);
+    const [coursesRows] = await pool.query(courseFieldsPlusAuthor_q, [
+      0,
+      totalItems,
+    ]);
 
     // map courses
     let courses = coursesRows.map((course) => {
@@ -393,11 +434,18 @@ const coursesList = async (req, res) => {
     let enrolledCourseIds = [];
 
     if (user) {
-      const [enrolledCoursesRows] = await pool.query(getUserEnrolledCoursesQuery, [user.id]);
-      enrolledCourseIds = enrolledCoursesRows.map((enrolledCourse) => enrolledCourse.id.toString());
+      const [enrolledCoursesRows] = await pool.query(
+        getUserEnrolledCoursesQuery,
+        [user.id]
+      );
+      enrolledCourseIds = enrolledCoursesRows.map((enrolledCourse) =>
+        enrolledCourse.id.toString()
+      );
     }
 
-    courses = courses.filter((course) => !enrolledCourseIds.includes(course.id));
+    courses = courses.filter(
+      (course) => !enrolledCourseIds.includes(course.id)
+    );
 
     const totalFilteredItems = courses.length;
     const totalPages = Math.ceil(totalFilteredItems / perPage) || 1;
@@ -422,7 +470,9 @@ const coursesList = async (req, res) => {
       courses: coursesForPage,
       totalItems: totalFilteredItems,
       user,
-      message: user ? "These courses are available for today, enjoy!" : "All courses",
+      message: user
+        ? "These courses are available for today, enjoy!"
+        : "All courses",
       isAdmin,
       perPage,
       page,
@@ -436,13 +486,9 @@ const coursesList = async (req, res) => {
   }
 };
 
-
-
-
-
 const coursesListOwned = async (req, res) => {
   console.log("\n*** courseListOwned\n");
-  const route  = "courses-owned";
+  const route = "courses-owned";
 
   try {
     const user = req.session.user || null;
@@ -457,8 +503,8 @@ const coursesListOwned = async (req, res) => {
         getUserEnrolledCoursesQuery,
         [user.id]
       );
-      enrolledCourseIds = enrolledCoursesRows.map(
-        (enrolledCourse) => enrolledCourse.id.toString()
+      enrolledCourseIds = enrolledCoursesRows.map((enrolledCourse) =>
+        enrolledCourse.id.toString()
       );
     }
 
@@ -505,7 +551,7 @@ const coursesListOwned = async (req, res) => {
         };
       });
 
-      let totalPages = Math.ceil(totalItems / perPage) || 1;
+    let totalPages = Math.ceil(totalItems / perPage) || 1;
 
     // Ensure that the currentPage doesn't exceed the total pages calculated
     if (page > totalPages) {
@@ -520,7 +566,6 @@ const coursesListOwned = async (req, res) => {
     }
 
     console.log("enrolled courses: ", enrolledCourses);
-
 
     // Render enrolled courses for the user
     res.render("courses", {
@@ -537,7 +582,7 @@ const coursesListOwned = async (req, res) => {
       page,
       offset,
       currentPage: page,
-      totalPages ,
+      totalPages,
     });
   } catch (error) {
     console.log("Error fetching courses:", error);
@@ -644,7 +689,6 @@ const courseEnroll = async (req, res) => {
   }
 };
 
-
 const courseDetail = async (req, res) => {
   console.log("\n*** courseDetail\n");
 
@@ -676,7 +720,9 @@ const courseDetail = async (req, res) => {
     }
 
     // Fetching author details
-    const [authorRows] = await pool.query(getCourseAuthorQuery, [course.author_id]);
+    const [authorRows] = await pool.query(getCourseAuthorQuery, [
+      course.author_id,
+    ]);
     const author = authorRows[0];
     console.log(author);
 
@@ -692,11 +738,12 @@ const courseDetail = async (req, res) => {
     };
     console.log(formattedCourse.author);
 
-
     // Fill array with query result
     let enrolledCourses = [];
     if (user) {
-      const [enrolledRows] = await pool.query(getUserEnrolledCoursesQuery, [user.id]);
+      const [enrolledRows] = await pool.query(getUserEnrolledCoursesQuery, [
+        user.id,
+      ]);
       enrolledCourses = enrolledRows[0]?.enrolled_courses || [];
     }
 
@@ -712,9 +759,6 @@ const courseDetail = async (req, res) => {
     res.status(500).send("Error fetching the course");
   }
 };
-
-
-
 
 export default {
   coursesList,

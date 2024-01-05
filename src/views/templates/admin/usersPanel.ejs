@@ -1,5 +1,6 @@
-<div class="section-title">
-    <h1>Admin Panel - Users</h1>
+<div id="users-panel-container">
+  <div>
+    <h1 class="section-title">Admin Panel - Users</h1>
   </div>
 
   <div class="searchbar">
@@ -9,6 +10,11 @@
       <input type="text" id="search" name="search" placeholder="Search users">
       <button type="submit">Search</button>
     </form>
+
+    <div class="save-button">
+      <!-- Save button -->
+      <button onclick="saveAndReload()" class="bg-success">Save</button>
+    </div>
   </div>
 
   <table class="users-table">
@@ -60,21 +66,24 @@
     </tbody>
   </table>
 
-  <div class="save-button">
-    <!-- Save button -->
-    <button onclick="saveAndReload()">Save</button>
-  </div>
+</div>
 
-<!-- scripts -->
-<!-- ================================================================================= -->
-  <script id="save-and-reload">
-    function saveAndReload() {
-      // Redirect to the desired URL
-      window.location.href = '/api/admin/users';
-      
-      // Reload the page after 1 second (adjust timing as needed)
-      setTimeout(function() {
-        location.reload();
-      }, 1000);
-    }
-  </script>
+<!-- =======================================\scripts/========================================== -->
+<script id="save-and-reload">
+  function saveAndReload() {
+    // Redirect to the desired URL
+    window.location.href = '/api/admin/users';
+
+    // Reload the page after 1 second (adjust timing as needed)
+    setTimeout(function () {
+      location.reload();
+    }, 1000);
+  }
+</script>
+
+<!-- =====================================\ styles /=========================================== -->
+<style>
+  #users-panel-container {
+    margin: 6.2rem auto;
+  }
+</style>

@@ -8,13 +8,13 @@ CREATE TABLE IF NOT EXISTS courses (
     slug VARCHAR(255) NOT NULL,
     description VARCHAR(255) DEFAULT NULL,
     text_content TEXT DEFAULT NULL,
-    video_link VARCHAR(255) NOT NULL,
     ars_price DECIMAL(10, 2) NOT NULL,
     usd_price DECIMAL(10, 2) NOT NULL,
     discount DECIMAL(10, 2) DEFAULT NULL,
     active BOOLEAN DEFAULT true,
     thumbnail VARCHAR(255) DEFAULT NULL,
     length INT DEFAULT 0,
+    video VARCHAR(255) DEFAULT NULL,  // Modified to include the video field
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     author_id INT NOT NULL,
@@ -33,9 +33,9 @@ const argentinaTimeZone =
   "CONVERT_TZ(NOW(), 'UTC', 'America/Argentina/Buenos_Aires')";
 
 export const createCourseQuery = `
-INSERT INTO courses (title, slug, description, text_content, video_link, ars_price, usd_price, discount, active, thumbnail, length, created_at, updated_at, author_id)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ${argentinaTimeZone}, ${argentinaTimeZone}, ?);
-`;
+  INSERT INTO courses (title, slug, description, text_content,  ars_price, usd_price, discount, active, thumbnail, length, video, created_at, updated_at, author_id)
+  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ${argentinaTimeZone}, ${argentinaTimeZone}, ?);
+  `;
 
 export const courseFieldsPlusAuthor_q = `
 SELECT 
@@ -53,7 +53,7 @@ LIMIT ?,?
 
 export const updateCourseQuery = `
   UPDATE courses
-  SET title = ?, slug = ?, description = ?, text_content = ?, video_link = ?, ars_price = ?, usd_price = ?, discount = ?, active = ?, thumbnail = ?, length = ?, updated_at = ${argentinaTimeZone}
+  SET title = ?, slug = ?, description = ?, text_content = ?, ars_price = ?, usd_price = ?, discount = ?, active = ?, thumbnail = ?, length = ?, video = ?, updated_at = ${argentinaTimeZone}
   WHERE id = ?;
 `;
 

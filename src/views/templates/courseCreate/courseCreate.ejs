@@ -1,25 +1,26 @@
-
-    <h1>Create New Course</h1>
+<div id="create-course-container">
+    
+    <h1 class="section-title">Create New Course</h1>
     <div>
         <form id="courseForm" action="/api/course/create" method="POST" enctype="multipart/form-data">
             <!-- Form action should match the route for creating a course -->
             <h3>Course description</h3>
-            <label for="title">Name:</label><br>
+            <label for="title">titulo:</label><br>
             <input type="text" id="title" name="title"><br><br>
 
-            <label for="description">Description:</label><br>
+            <label for="description">Descripcion:</label><br>
             <input id="description" name="description"><br><br>
 
-            <label for="text_content">Text Content:</label><br>
+            <label for="text_content">contenido texto:</label><br>
             <textarea id="text_content" name="text_content"></textarea><br><br>
 
-            <label for="video_link">Video Link:</label><br>
-            <input id="video_link" name="video_link"><br><br>
+            <label for="video">subir video:</label><br>
+            <input type="file" name="video" accept="video/*">
 
-            <label for="thumbnail">Thumbnail:</label><br>
+            <label for="thumbnail">subir miniatura:</label><br>
             <input type="file" name="thumbnail" accept="image/*"><br><br>
 
-            <h3>Price settings</h3>
+            <h3>Configurar precio</h3>
             <label for="price">ARS Price:</label><br>
             <input type="number" id="ars_price" name="ars_price"><br><br>
 
@@ -27,7 +28,7 @@
             <input type="number" id="usd_price" name="usd_price"><br><br>
 
             <h3>Aditional configs</h3>
-            <label for="discount">Discount:</label><br>
+            <label for="discount">descuento:</label><br>
             % <input type="number" id="discount" name="discount"><br><br>
 
             <div style="display: flex;">
@@ -37,7 +38,7 @@
                 </div>
 
                 <div style="margin-left: 40px;">
-                    <label for="length">Length:</label><br>
+                    <label for="length">tiempo estimado de aprendizaje:</label><br>
                     <input type="number" id="length" name="length" style="width: 80px;"><br><br>
                 </div>
             </div>
@@ -52,3 +53,13 @@
                 <% } %>
         </form>
     </div>
+</div>
+
+<style>
+    #create-course-container{
+        margin: 6.2rem auto;
+    }
+    #courseForm{
+        margin: 2.2rem 0;
+    }
+</style>
