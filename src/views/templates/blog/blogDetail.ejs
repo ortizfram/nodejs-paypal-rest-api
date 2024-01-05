@@ -1,51 +1,67 @@
-<% if (user && user.role==="admin" ) { %>
-  <div class="course-admin-options opacity-50">
-    <div>
-      <div>
-        <button class="btn">
-          <p><a class="text-muted" href="/api/blog/<%= blog.id %>/update?blogId=<%= blog.id %>"><i
-                class="fas fa-edit me-2"></i>Edit blog</a></p>
-        </button>
-        <button class="btn">
-          <p><a class="text-muted" href="/api/blog/<%= blog.id %>/delete?blogId=<%= blog.id %>"><i
-                class="fas fa-trash-alt me-2"></i>Delete blog</a></p>
-        </button>
-      </div>
-    </div>
+<!-- Blog DETAIL -->
+<!-- ========================================================= -->
+<div id="blog-detail-container">
+  <!-- thumbnail -->
+  <div class="thumbnail mb-4">
+    <img src="<%= blog.thumbnail %>" alt="blog thumbnail" />
   </div>
-  <% } else if (user && !user.role==="admin" ) { %>
-    <!-- This section will be displayed for logged-in non-admin users -->
-    <div></div>
-    <% } else { %>
-      <!-- This section will be displayed for non-logged-in users -->
-      <div></div>
-      <% } %>
+  <div></div>
 
-        <!-- Blog DETAIL -->
-        <!-- ========================================================= -->
-        <div class="thumbnail mb-4">
-          <img src="<%= blog.thumbnail %>" alt="blog thumbnail">
-        </div>
-        <div>
-          <p class="text-muted">
-            <%= blog.updated_at %> <span><img class="avatar ms-4 me-2" src="<%= blog.author.avatar %>"
-                  alt="author_avatar"></span><span class="fw-bold">
-                <%= blog.author.username %>
-              </span> • <span>
-                <%= blog.author.name %>
-              </span>
-          </p>
-          <div>
-            <h1 class="fw-bolder text-uppercase blog-title">
-              <%= blog.title %>
-            </h1>
-          </div>
-          <h3 class="">
-            <%= blog.description %>
-          </h3>
-          <hr>
-          <div id="text_content">
-            <!-- Ensure to use <%- %> to render HTML unescaped / NOT <%= %> -->
-            <pre><code><%- htmlContent %></code></pre>
-          </div>
-        </div>
+  <!-- blog info -->
+  <p id="blog-info" class="text-muted">
+    <span> <%= blog.updated_at %></span>
+    <span
+      ><img
+        class="avatar ms-4 me-2"
+        src="<%= blog.author.avatar %>"
+        alt="author_avatar"
+    /></span>
+    <span> <%= blog.author.username %> </span> •
+    <span> <%= blog.author.name %> </span>
+    <!-- blog actions -->
+    <% if (user && user.role==="admin" ) { %>
+    <span class="course-admin-options opacity-50">
+      <button class="btn">
+        <p>
+          <a
+            id="edit-btn"
+            href="/api/blog/<%= blog.id %>/update?blogId=<%= blog.id %>"
+            ><i class="fas fa-edit me-2"></i
+          ></a>
+        </p>
+      </button>
+      <button class="btn">
+        <p>
+          <a
+            class="delete-btn"
+            href="/api/blog/<%= blog.id %>/delete?blogId=<%= blog.id %>"
+            ><i class="fas fa-trash-alt me-2"></i
+          ></a>
+        </p>
+      </button>
+    </span>
+    <% } %>
+  </p>
+
+  <!-- blog content -->
+  <div>
+    <h1 class="fw-bolder text-uppercase blog-title"><%= blog.title %></h1>
+  </div>
+  <h3 class=""><%= blog.description %></h3>
+  <hr />
+  <div id="text_content">
+    <!-- Ensure to use <%- %> to render HTML unescaped / NOT <%= %> -->
+    <pre><code><%- htmlContent %></code></pre>
+  </div>
+</div>
+
+<style>
+  body {
+    background: #f7e3bf;
+  }
+  #blog-detail-container {
+    margin: 5.5rem auto;
+    background: #fff;
+    padding: 0 2rem;
+  }
+</style>
