@@ -242,19 +242,23 @@ const postCourseUpdate = async (req, res) => {
     thumbnailPath = course.thumbnail; // Assuming course.thumbnail holds the existing thumbnail path
   }
 
+
   try {
     // req fields
     const {
       title,
       description,
       text_content,
-      video_link,
+      video,
       ars_price,
       usd_price,
       discount,
       active,
       length,
     } = req.body;
+
+     
+
 
     // Autogenerate slug from title
     if (typeof title === "string" && title.trim() !== "") {
@@ -270,12 +274,28 @@ const postCourseUpdate = async (req, res) => {
       .slice(0, 19)
       .replace("T", " ");
 
+       // Generate unique filename for video
+  const videoFile = req.files.video;
+  const videoFilename = videoFile.name;
+  const uniqueVideoFilename = encodeURIComponent(
+    `${currentTimestamp}_${videoFilename}`
+  );
+  const videoPath = "/uploads/videos/" + uniqueVideoFilename;
+
+  // video file upload handling
+  videoFile.mv(path.join(__dirname, "uploads/videos", uniqueVideoFilename), async (err) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).send("Error uploading the video file");
+    }
+  })
+
     const updateParams = [
       title,
       courseSlug,
       description,
       text_content,
-      video_link,
+      videoPath,
       ars_price,
       usd_price,
       discountValue,
@@ -712,7 +732,6 @@ const courseDetail = async (req, res) => {
       ...course,
       created_at: new Date(course.created_at).toLocaleString(),
       updated_at: new Date(course.updated_at).toLocaleString(),
-      video_link: course.video_link.replace("watch?v=", "embed/"),
     };
 
     if (!course) {

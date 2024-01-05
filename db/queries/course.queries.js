@@ -53,7 +53,7 @@ LIMIT ?,?
 
 export const updateCourseQuery = `
   UPDATE courses
-  SET title = ?, slug = ?, description = ?, text_content = ?, ars_price = ?, usd_price = ?, discount = ?, active = ?, thumbnail = ?, length = ?, video = ?, updated_at = ${argentinaTimeZone}
+  SET title = ?, slug = ?, description = ?, text_content = ?,video = ?, ars_price = ?, usd_price = ?, discount = ?, active = ?, thumbnail = ?, length = ?, updated_at = ${argentinaTimeZone}
   WHERE id = ?;
 `;
 
