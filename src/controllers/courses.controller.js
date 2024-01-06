@@ -472,7 +472,7 @@ const coursesList = async (req, res) => {
           username: course.author_username,
           avatar: course.author_avatar,
         },
-        next: `/api/course/${course.id}/enroll`, // Dynamic course link
+        next: `/api/course/${course.id}/`, // Dynamic course link
       };
     });
 
