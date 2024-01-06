@@ -160,9 +160,6 @@ const postCourseCreate = async (req, res) => {
               console.log("\n\n◘ Creating course...");
               console.log("\n\ncourse :", course);
 
-              // Redirect after creating the course
-              res.redirect(`/api/course/${courseId}`);
-
               // Set MIME type for the uploaded video
               setCustomMimeTypes(
                 {
@@ -171,6 +168,10 @@ const postCourseCreate = async (req, res) => {
                 res,
                 () => {} // Empty callback as it's not required in this context
               );
+              
+              // Redirect after creating the course
+              res.redirect(`/api/course/${courseId}`);
+
             } catch (error) {
               console.error("Error creating the course:", error);
               return res.status(500).json({
