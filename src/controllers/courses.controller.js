@@ -380,6 +380,7 @@ const getCourseDelete = async (req, res) => {
     const courseId = req.query.courseId;
     const [courseRows] = await pool.query(getCourseFromIdQuery, [courseId]);
     const course = courseRows[0];
+    const action = `/api/course/${courseId}/delete`;
 
     //msg
     console.log(`\n\ncourse: ${course.title}\n\n`);
@@ -389,20 +390,20 @@ const getCourseDelete = async (req, res) => {
       user,
       message,
       course,
+      action,
     });
   } catch (error) {
     console.log("Error fetching course for deletion:", error);
-    res.redirect(`/api/courses/`);
+    res.redirect(`/api/courses/?page=1&perPage=6`);
   }
 };
 
 const postCourseDelete = async (req, res) => {
-  // Deletes course from Id of tables: courses user_courses
   console.log("\n\n*** postCourseDelete\n\n");
 
   try {
     // get course
-    let courseId = req.body.courseId;
+    let courseId = req.params.id;
     const [courseRows] = await pool.query(getCourseFromIdQuery, [courseId]);
     const course = courseRows[0];
     courseId = course.id;
@@ -419,11 +420,11 @@ const postCourseDelete = async (req, res) => {
     console.log(`\n\n${message}`);
 
     // Redirect after successful deletion
-    res.redirect(`/api/courses?message=${message}`);
+    res.redirect(`/api/courses?page=1&perPage=6&message=${message}`);
   } catch (error) {
     const message = `Error deleting course: ${error}`;
     console.log(`\n\n${message}`);
-    res.redirect(`/api/courses?message=${message}`);
+    res.redirect(`/api/courses?page=1&perPage=6&message=${message}`);
   }
 };
 
@@ -515,9 +516,7 @@ const coursesList = async (req, res) => {
       courses: coursesForPage,
       totalItems: totalFilteredItems,
       user,
-      message: user
-        ? "These courses are available for today, enjoy!"
-        : "All courses",
+      message,
       isAdmin,
       perPage,
       page,
@@ -620,7 +619,7 @@ const coursesListOwned = async (req, res) => {
       totalItems,
       user,
       message: user
-        ? "These are your joined courses"
+        ? message
         : "Not courses joined yet",
       isAdmin,
       perPage,
