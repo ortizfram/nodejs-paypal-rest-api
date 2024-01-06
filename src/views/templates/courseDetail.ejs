@@ -1,65 +1,64 @@
-<div id="course-detail-container">
-  
+<div id="page-coursedetail-container">
+  <div id="course-detail-container">
+    <!-- PLAYER -->
+    <!-- ========================================================= -->
 
-  <!-- PLAYER -->
-  <!-- ========================================================= -->
-
-  <!-- Video player for streaming -->
-  <div class="video-container mb-4">
-    <div class="row">
-      <div class="col-lg-12">
-        <video id="course-video" controls>
-          <source src="<%= course.video %>" type="video/mp4" />
-          <source src="<%= course.video %>" type="video/webm" />
-          <source src="<%= course.video %>" type="video/ogg" />
-          Your browser does not support the video tag.
-        </video>
+    <!-- Video player for streaming -->
+    <div class="video-container mb-4">
+      <div class="row">
+        <div class="col-lg-12">
+          <video id="course-video" controls>
+            <source src="<%= course.video %>" type="video/mp4" />
+            <source src="<%= course.video %>" type="video/webm" />
+            <source src="<%= course.video %>" type="video/ogg" />
+            Your browser does not support the video tag.
+          </video>
+        </div>
       </div>
     </div>
-  </div>
 
-  <!-- COURSE DETAIL -->
-  <!-- ========================================================= -->
-  <div id="course-text-container">
-    <p class="text-muted">
-      <%= course.updated_at %>
-      <span
-        ><img
-          class="avatar ms-4 me-2"
-          src="<%= course.author.avatar %>"
-          alt="author_avatar" /></span
-      ><span class="fw-bold"> <%= course.author.username %> </span> •
-      <span> <%= course.author.name %> </span>
-      <% if (user.role==="admin" ) { %>
+    <!-- COURSE DETAIL -->
+    <!-- ========================================================= -->
+    <div id="course-text-container">
+      <p class="text-muted">
+        <%= course.updated_at %>
+        <span
+          ><img
+            class="avatar ms-4 me-2"
+            src="<%= course.author.avatar %>"
+            alt="author_avatar" /></span
+        ><span class="fw-bold"> <%= course.author.username %> </span> •
+        <span> <%= course.author.name %> </span>
+        <% if (user.role==="admin" ) { %>
         <span class="course-admin-options opacity-50">
-              <button class="btn">
-                <p>
-                  <a
-                    class="text-muted"
-                    href="/api/course/<%= course.id %>/update?courseId=<%= course.id %>"
-                    ><i class="fas fa-edit me-2"></i
-                  ></a>
-                </p>
-              </button>
-              <button class="btn">
-                <p>
-                  <a
-                    class="text-muted"
-                    href="/api/course/<%= course.id %>/delete?courseId=<%= course.id %>"
-                    ><i class="fas fa-trash-alt me-2"></i
-                  ></a>
-                </p>
-              </button>
-            </span>
+          <button class="btn">
+            <p>
+              <a
+                class="text-muted"
+                href="/api/course/<%= course.id %>/update?courseId=<%= course.id %>"
+                ><i class="fas fa-edit me-2"></i
+              ></a>
+            </p>
+          </button>
+          <button class="btn">
+            <p>
+              <a
+                class="text-muted"
+                href="/api/course/<%= course.id %>/delete?courseId=<%= course.id %>"
+                ><i class="fas fa-trash-alt me-2"></i
+              ></a>
+            </p>
+          </button>
+        </span>
         <% } %>
-    </p>
-    <div>
-      <h1><%= course.title %></h1>
+      </p>
+      <div>
+        <h1><%= course.title %></h1>
+      </div>
+      <h3><%= course.description %></h3>
+      <p><%= course.text_content %></p>
     </div>
-    <h3><%= course.description %></h3>
-    <p><%= course.text_content %></p>
-    
-  </div>
 
-  <!--SCRIPTS-------------------------------------------------------------------------------------------------------------------->
+    <!--SCRIPTS-------------------------------------------------------------------------------------------------------------------->
+  </div>
 </div>
