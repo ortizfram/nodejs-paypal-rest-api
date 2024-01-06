@@ -73,8 +73,37 @@ app.use(
   })
 );
 
+// Define a function to set MIME types based on file extensions
+export const setCustomMimeTypes = (req, res, next) => {
+  const extension = req.path.split('.').pop();
+  let contentType = '';
 
+  switch (extension) {
+    case 'mp4':
+    case 'm4v':
+    case 'f4v':
+    case 'f4p':
+      contentType = 'video/mp4';
+      break;
+    case 'ogv':
+      contentType = 'video/ogg';
+      break;
+    case 'webm':
+      contentType = 'video/webm';
+      break;
+    case 'flv':
+      contentType = 'video/x-flv';
+      break;
+    default:
+      contentType = 'application/octet-stream'; // Default MIME type for unknown files
+  }
 
+  res.set('Content-Type', contentType);
+  next();
+};
+
+// Middleware to set MIME types for videos
+app.use('/uploads/videos', setCustomMimeTypes, express.static(path.join(__dirname, 'uploads/videos')));
 // Use routes app
 app.use(indexRoutes);
 app.use("/api", authRoutes);
@@ -92,6 +121,8 @@ app.use((req, res) => {
     message: "endpoint Not Found",
   });
 });
+
+
 
 // middleware for admin&staff
 export function admin_staff_check (req, res, next) {

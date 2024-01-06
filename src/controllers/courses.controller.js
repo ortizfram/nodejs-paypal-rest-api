@@ -17,7 +17,7 @@ import {
   tableCheckQuery,
   updateCourseQuery,
 } from "../../db/queries/course.queries.js";
-import { __dirname } from "../apps.js";
+import { __dirname, setCustomMimeTypes } from "../apps.js";
 import { fetchUserByField } from "../../db/queries/auth.queries.js";
 
 //COURSE CREATE/UPDATE/DELETE
@@ -96,77 +96,90 @@ const postCourseCreate = async (req, res) => {
         }
 
         // video file upload handling
-        videoFile.mv(path.join(__dirname, "uploads/videos", uniqueVideoFilename), async (err) => {
-          if (err) {
-            console.error(err);
-            return res.status(500).send("Error uploading the video file");
-          }
-        
-          try {
-            // Get current timestamp
-            const currentDate = new Date();
-            const currentTimestamp = `${currentDate
-              .getDate()
-              .toString()
-              .padStart(2, "0")}-${(currentDate.getMonth() + 1)
-              .toString()
-              .padStart(2, "0")}-${currentDate
-              .getFullYear()
-              .toString()} ${currentDate
-              .getHours()
-              .toString()
-              .padStart(2, "0")}:${currentDate
-              .getMinutes()
-              .toString()
-              .padStart(2, "0")}:${currentDate
-              .getSeconds()
-              .toString()
-              .padStart(2, "0")}`;
+        videoFile.mv(
+          path.join(__dirname, "uploads/videos", uniqueVideoFilename),
+          async (err) => {
+            if (err) {
+              console.error(err);
+              return res.status(500).send("Error uploading the video file");
+            }
 
-            // Prepare course data
-            const courseData = [
-              title,
-              courseSlug,
-              description,
-              text_content,
-              ars_price,
-              usd_price,
-              discountValue,
-              active === "true" ? true : false,
-              relativePath,
-              length,
-              videoPath,
-              authorId,
-            ];
+            try {
+              // Get current timestamp
+              const currentDate = new Date();
+              const currentTimestamp = `${currentDate
+                .getDate()
+                .toString()
+                .padStart(2, "0")}-${(currentDate.getMonth() + 1)
+                .toString()
+                .padStart(2, "0")}-${currentDate
+                .getFullYear()
+                .toString()} ${currentDate
+                .getHours()
+                .toString()
+                .padStart(2, "0")}:${currentDate
+                .getMinutes()
+                .toString()
+                .padStart(2, "0")}:${currentDate
+                .getSeconds()
+                .toString()
+                .padStart(2, "0")}`;
 
-            console.log("\n\ncourseData: ", courseData);
+              // Prepare course data
+              const courseData = [
+                title,
+                courseSlug,
+                description,
+                text_content,
+                ars_price,
+                usd_price,
+                discountValue,
+                active === "true" ? true : false,
+                relativePath,
+                length,
+                videoPath,
+                authorId,
+              ];
 
-            // Create the new course using the SQL query
-            const [courseRow] = await pool.query(createCourseQuery, courseData);
+              console.log("\n\ncourseData: ", courseData);
 
-            // Fetch the created course & JOIN with user as author
-            const [fetchedCourse] = await pool.query(
-              getCourseFromSlugQuery,
-              courseSlug
-            );
-            const course = fetchedCourse[0];
-            const courseId = course.id;
+              // Create the new course using the SQL query
+              const [courseRow] = await pool.query(
+                createCourseQuery,
+                courseData
+              );
 
-            console.log("\n\n◘ Creating course...");
-            console.log("\n\ncourse :", course);
+              // Fetch the created course & JOIN with user as author
+              const [fetchedCourse] = await pool.query(
+                getCourseFromSlugQuery,
+                courseSlug
+              );
+              const course = fetchedCourse[0];
+              const courseId = course.id;
 
-            // Redirect after creating the course
-            res.redirect(`/api/course/${courseId}`);
-          } catch (error) {
-            console.error("Error creating the course:", error);
-            return res
-              .status(500)
-              .json({
+              console.log("\n\n◘ Creating course...");
+              console.log("\n\ncourse :", course);
+
+              // Redirect after creating the course
+              res.redirect(`/api/course/${courseId}`);
+
+              // Set MIME type for the uploaded video
+              setCustomMimeTypes(
+                {
+                  path: `/uploads/videos/${uniqueVideoFilename}`,
+                },
+                res,
+                () => {} // Empty callback as it's not required in this context
+              );
+            } catch (error) {
+              console.error("Error creating the course:", error);
+              return res.status(500).json({
                 message: "Error creating the course",
                 error: error.message,
               });
+            }
           }
-        }); // Closing bracket for video file upload
+        ); // Closing bracket for video file upload
       }
     );
   } catch (error) {
@@ -242,7 +255,6 @@ const postCourseUpdate = async (req, res) => {
     thumbnailPath = course.thumbnail; // Assuming course.thumbnail holds the existing thumbnail path
   }
 
-
   try {
     // req fields
     const {
@@ -256,9 +268,6 @@ const postCourseUpdate = async (req, res) => {
       active,
       length,
     } = req.body;
-
-     
-
 
     // Autogenerate slug from title
     if (typeof title === "string" && title.trim() !== "") {
@@ -274,21 +283,24 @@ const postCourseUpdate = async (req, res) => {
       .slice(0, 19)
       .replace("T", " ");
 
-       // Generate unique filename for video
-  const videoFile = req.files.video;
-  const videoFilename = videoFile.name;
-  const uniqueVideoFilename = encodeURIComponent(
-    `${currentTimestamp}_${videoFilename}`
-  );
-  const videoPath = "/uploads/videos/" + uniqueVideoFilename;
+    // Generate unique filename for video
+    const videoFile = req.files.video;
+    const videoFilename = videoFile.name;
+    const uniqueVideoFilename = encodeURIComponent(
+      `${currentTimestamp}_${videoFilename}`
+    );
+    const videoPath = "/uploads/videos/" + uniqueVideoFilename;
 
-  // video file upload handling
-  videoFile.mv(path.join(__dirname, "uploads/videos", uniqueVideoFilename), async (err) => {
-    if (err) {
-      console.error(err);
-      return res.status(500).send("Error uploading the video file");
-    }
-  })
+    // video file upload handling
+    videoFile.mv(
+      path.join(__dirname, "uploads/videos", uniqueVideoFilename),
+      async (err) => {
+        if (err) {
+          console.error(err);
+          return res.status(500).send("Error uploading the video file");
+        }
+      }
+    );
 
     const updateParams = [
       title,
@@ -326,10 +338,22 @@ const postCourseUpdate = async (req, res) => {
       if (affectedRows > 0) {
         const message = "course updated correctly";
         console.log(`\n\n\→ Go to courseModules: ${message}`);
+        
+        // Set MIME type for the uploaded video
+        setCustomMimeTypes(
+          {
+            path: `/uploads/videos/${uniqueVideoFilename}`,
+          },
+          res,
+          () => {} // Empty callback as it's not required in this context
+        );
+
         res.redirect(
           `/api/course/${courseId}`
           // `/api/course/${courseId}/module/update?courseId=${courseId}`
         );
+
+        
       } else {
         const message = "no changes made to course";
         console.log(`\n\n\→ Go to courseModules: ${message}`);
@@ -725,6 +749,8 @@ const courseDetail = async (req, res) => {
     }
 
     const course = courseRows[0];
+    console.log(course);
+    console.log("\n\ncourse.video", course.video);
     courseId = course.id;
 
     // Format course timestamps and video_link
