@@ -133,16 +133,6 @@ export function admin_staff_check (req, res, next) {
   next();
 }
 
-// middleware for login user
-export function is_loggedin_check (req, res, next) {
-  const user = req.session.user || null;
-  if(!user) {
-    // Redirect the user to the login page
-    return res.status(403).redirect('/api/login');
-  }
-  next();
-}
-
 // Middleware for checking course enrollment
 export async function checkCourseEnrollment(req, res, next) {
   console.log("\n\n*** middleware: checkCourseEnrollment\n\n");
@@ -173,6 +163,28 @@ export async function checkCourseEnrollment(req, res, next) {
     console.error("Error checking user enrollment:", error);
     return res.status(500).send("Error checking user enrollment");
   }
+}
+
+// middleware for admin&staff clinking a course
+export async function admin_staff_clicking_course (req, res, next) {
+  const user = req.session.user || null;
+  if(!user || (user.role !== 'staff' && user.role !== 'admin')){
+    // if not staff/admin, send to course enrollment middleware
+    await checkCourseEnrollment(req, res, next);
+  }
+
+  // if staff/admin render course detail without passing through enrollment middleware
+  next();
+}
+
+// middleware for login user
+export function is_loggedin_check (req, res, next) {
+  const user = req.session.user || null;
+  if(!user) {
+    // Redirect the user to the login page
+    return res.status(403).redirect('/api/login');
+  }
+  next();
 }
 
 
