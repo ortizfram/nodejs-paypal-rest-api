@@ -13,6 +13,10 @@
   margin-bottom: 2rem; /* Adjust as needed */
 }
 
+#course-text-container{
+  padding: 0 .8rem;
+}
+
 #course-video {
   position: absolute;
   width: 100%;
@@ -42,4 +46,18 @@
   .modules-list {
     flex-basis: 100%; /* On smaller screens, modules take full width */
   }
+}
+
+/* Scale text based on video container width */
+#course-detail-container {
+  font-size: calc(0.9vw + 0.5rem); /* Adjust the base font size as needed */
+}
+
+/* Additional styling for text elements if necessary */
+h1,
+h3,
+p {
+  /* Your styles for headings and paragraphs */
+  /* For example: */
+  margin-bottom: 1rem;
 }
