@@ -54,13 +54,13 @@
           <% if (isAdmin) {%>
             <div class="blog-actions text-white">
               <p>
-                <a class=' text-muted' href="/api/blog/<%= blog.id %>/update"><i class="fas fa-edit me-2"></i>Edit
+                <a class=' text-muted' href="/api/blog/<%= blog.id %>/update"><i class="fas fa-edit me-2"></i>
           </a>
           <input type="hidden" name="author" value="<%= blog.author %>">
           </p>
           <p>
             <a class='text-muted' href="/api/blog/<%= blog.id %>/delete?blogId=<%= blog.id %>"><i
-                class="fas fa-trash-alt me-2"></i>Delete</a>
+                class="fas fa-trash-alt me-2"></i></a>
           </p>
         </div>
         <% }%>

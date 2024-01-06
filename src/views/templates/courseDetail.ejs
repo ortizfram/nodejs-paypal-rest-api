@@ -1,30 +1,5 @@
 <div id="course-detail-container">
-  <% if (user.role==="admin" ) { %>
-  <div class="course-admin-options opacity-50">
-    <div>
-      <div>
-        <button class="btn">
-          <p>
-            <a
-              class="text-muted"
-              href="/api/course/<%= course.id %>/update?courseId=<%= course.id %>"
-              ><i class="fas fa-edit me-2"></i>Edit course</a
-            >
-          </p>
-        </button>
-        <button class="btn">
-          <p>
-            <a
-              class="text-muted"
-              href="/api/course/<%= course.id %>/delete?courseId=<%= course.id %>"
-              ><i class="fas fa-trash-alt me-2"></i>Delete course</a
-            >
-          </p>
-        </button>
-      </div>
-    </div>
-  </div>
-  <% } %>
+  
 
   <!-- PLAYER -->
   <!-- ========================================================= -->
@@ -55,12 +30,35 @@
           alt="author_avatar" /></span
       ><span class="fw-bold"> <%= course.author.username %> </span> •
       <span> <%= course.author.name %> </span>
+      <% if (user.role==="admin" ) { %>
+        <span class="course-admin-options opacity-50">
+              <button class="btn">
+                <p>
+                  <a
+                    class="text-muted"
+                    href="/api/course/<%= course.id %>/update?courseId=<%= course.id %>"
+                    ><i class="fas fa-edit me-2"></i
+                  ></a>
+                </p>
+              </button>
+              <button class="btn">
+                <p>
+                  <a
+                    class="text-muted"
+                    href="/api/course/<%= course.id %>/delete?courseId=<%= course.id %>"
+                    ><i class="fas fa-trash-alt me-2"></i
+                  ></a>
+                </p>
+              </button>
+            </span>
+        <% } %>
     </p>
     <div>
       <h1><%= course.title %></h1>
     </div>
     <h3><%= course.description %></h3>
     <p><%= course.text_content %></p>
+    
   </div>
 
   <!--SCRIPTS-------------------------------------------------------------------------------------------------------------------->

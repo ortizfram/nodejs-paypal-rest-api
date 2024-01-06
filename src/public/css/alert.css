@@ -1,3 +1,8 @@
+#alert-container{
+    margin: 0;
+    background: transparent;
+}
+
 .alert {
     background-color: #74ce83;
     color: #ffff;
