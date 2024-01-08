@@ -259,7 +259,7 @@ const postCourseUpdate = async (req, res) => {
 
   // Generate unique filename for video
   const videoFile = req.files.video;
-  const videoFilename = videoFile.name.split(' ')[0];;
+  const videoFilename = videoFile.name.split(' ')[0];
   const uniqueVideoFilename = encodeURIComponent(
     `${timestamp}_${videoFilename}`
   );
