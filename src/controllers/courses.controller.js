@@ -80,7 +80,7 @@ const postCourseCreate = async (req, res) => {
 
     // Generate unique filename for video
     const videoFile = req.files.video;
-    const videoFilename = videoFile.name;
+    const videoFilename = videoFile.name.split(' ')[0];
     const uniqueVideoFilename = encodeURIComponent(
       `${timestamp}_${videoFilename}`
     );
@@ -239,9 +239,10 @@ const postCourseUpdate = async (req, res) => {
     );
   }
 
+  const timestamp = Date.now();
+
   // Check if thumbnail uploaded, encode, move
   if (req.files && req.files.thumbnail) {
-    const timestamp = Date.now();
     const filename = req.files.thumbnail.name;
     const uniqueFilename = encodeURIComponent(`${timestamp}_${filename}`);
     thumbnailPath = "/uploads/" + uniqueFilename;
@@ -255,6 +256,26 @@ const postCourseUpdate = async (req, res) => {
     // If no new thumbnail uploaded, retain the existing thumbnail path
     thumbnailPath = course.thumbnail; // Assuming course.thumbnail holds the existing thumbnail path
   }
+
+  // Generate unique filename for video
+  const videoFile = req.files.video;
+  const videoFilename = videoFile.name.split(' ')[0];;
+  const uniqueVideoFilename = encodeURIComponent(
+    `${timestamp}_${videoFilename}`
+  );
+  const videoPath = "/uploads/videos/" + uniqueVideoFilename;
+
+  // video file upload handling
+  videoFile.mv(
+    path.join(__dirname, "uploads/videos", uniqueVideoFilename),
+    async (err) => {
+      if (err) {
+        console.error(err);
+        return res.status(500).send("Error uploading the video file");
+      }
+    }
+  );
+
 
   try {
     // req fields
@@ -284,25 +305,7 @@ const postCourseUpdate = async (req, res) => {
       .slice(0, 19)
       .replace("T", " ");
 
-    // Generate unique filename for video
-    const videoFile = req.files.video;
-    const videoFilename = videoFile.name;
-    const uniqueVideoFilename = encodeURIComponent(
-      `${currentTimestamp}_${videoFilename}`
-    );
-    const videoPath = "/uploads/videos/" + uniqueVideoFilename;
-
-    // video file upload handling
-    videoFile.mv(
-      path.join(__dirname, "uploads/videos", uniqueVideoFilename),
-      async (err) => {
-        if (err) {
-          console.error(err);
-          return res.status(500).send("Error uploading the video file");
-        }
-      }
-    );
-
+    
     const updateParams = [
       title,
       courseSlug,
@@ -321,7 +324,7 @@ const postCourseUpdate = async (req, res) => {
     // msg
     console.log("\n\n---Update Parameters:", updateParams); // Log the update parameters
 
-    // query
+    // Execute update query
     const result = await pool.query(updateCourseQuery, updateParams);
 
     //msg of query & result of query
@@ -351,7 +354,6 @@ const postCourseUpdate = async (req, res) => {
 
         res.redirect(
           `/api/course/${courseId}`
-          // `/api/course/${courseId}/module/update?courseId=${courseId}`
         );
 
         
