@@ -3,7 +3,7 @@
 <div id="blog-detail-container">
   <!-- thumbnail -->
   <div class="thumbnail mb-4">
-    <img src="<%= blog.thumbnail %>" alt="blog thumbnail" />
+    <img src="<%= blog.thumbnail %>" class="img-fluid shadow-lg" alt="blog thumbnail" />
   </div>
   <div></div>
 
@@ -56,9 +56,24 @@
 </div>
 
 <style>
+ .detail-container {
+    position: relative; /* Ensures z-index works correctly */
+    z-index: 1; /* Places the content above the blurred background */
+    color: white;
+    padding: 20px;
+  }
+
+  /* Additional specific styles for each detail */
+  .thumbnail {
+    border-bottom: 1px solid #ccc; /* Add border to thumbnail */
+    padding-bottom: 10px; /* Add space below thumbnail */
+  }
+
+  /* Blog Detail Styles */
   body {
     background: #f7e3bf;
   }
+
   #blog-detail-container {
     margin: 5.5rem auto;
     background: #fff;

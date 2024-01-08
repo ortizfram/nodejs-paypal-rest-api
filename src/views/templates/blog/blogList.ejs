@@ -29,7 +29,7 @@
     <!-- blogs -->
     <div class="blogs-grid">
       <% blogs.forEach((blog, index)=> { %>
-        <div class="blog-item backdrop-filter">
+        <div class="blog-item backdrop-filter shadow-lg">
           <a href="<%= blog.next %>">
             <img src="<%= blog.thumbnail %>" alt="thumbnail-<%= blog.slug %>" />
             <p class="timestamp text-white">

@@ -5,6 +5,9 @@
   background-position: center; /* Centers the background image */
   height: 100%;
   width: 100vw;
+  min-height: 100vh; /* Ensures the container takes at least the full height of the viewport */
+  display: flex;
+  flex-direction: column;
 }
 /* Reset styles */
 body {
@@ -46,6 +49,8 @@ h1 {
   margin: 6.2rem auto;
   padding: 20px;
   font-family: Arial, sans-serif;
+  flex-grow: 1; /* Allows the container to grow and take available space */
+  overflow-y: auto; /* Enables vertical scrolling when content overflows */
 }
 
 /* Style for the go back button */

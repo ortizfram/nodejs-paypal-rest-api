@@ -4,7 +4,7 @@
   </div>
   <div class="courses-grid">
     <% courses.reverse().forEach((course, index)=> { %>
-      <div class="course-item">
+      <div class="course-item  backdrop-filter shadow-lg">
         <a href="/api/course/<%= course.id %>">
           <img src="<%= course.thumbnail %>" alt="thumbnail-<%= course.slug %>" />
           <p class="timestamp">

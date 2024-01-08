@@ -26,13 +26,12 @@
   margin-top: 20px;
 }
 
-#about {}
-
 .backdrop-filter {
   background-color: rgba(255, 255, 255, 0.098); /* Adjust opacity as needed */
   backdrop-filter: blur(20px); /* Adjust blur amount as needed */
 }
 
+/* FOOTER ########################## */
 .icon {
   width: 34px;
   height: 34px;
@@ -46,8 +45,22 @@
 }
 
 #footer {
-    height: 50vh;
-    width: 100vw;
-    padding: 60px;
-    margin: 0;
+  padding: 60px;
+  padding-left: auto; /* Auto-adjust left padding */
+  padding-right: auto; /* Auto-adjust right padding */
+  margin: 0;
+  width: 100%;
+}
+
+/* Footer content area */
+#footer .row {
+  margin-bottom: 20px; /* Adjust spacing between rows if needed */
+}
+
+/* Adjust the footer height based on content */
+footer {
+  padding-top: 60px; /* Set a top padding */
+  padding-bottom: 30px; /* Set a bottom padding */
+  background-color: #343a40; /* Set background color */
+  color: white; /* Set text color */
 }
