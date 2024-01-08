@@ -1,6 +1,7 @@
 /* courses.css */
 .courses-page-container {
   background-image: url("../../images/jay-castor-7AcMUSYRZpU-unsplash.jpg");
+   /* background: radial-gradient(circle, #EF7F72, #F7E3BF); */
   background-size: cover;
   background-position: center; /* Centers the background image */
   height: 100%;
@@ -9,6 +10,17 @@
   display: flex;
   flex-direction: column;
 }
+/* vignete overlay */
+.courses-page-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0.7) 100%);
+}
+
 /* Reset styles */
 body {
   display: flex;
