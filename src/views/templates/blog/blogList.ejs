@@ -29,7 +29,7 @@
     <!-- blogs -->
     <div class="blogs-grid">
       <% blogs.forEach((blog, index)=> { %>
-        <div class="blog-item backdrop-filter shadow-lg">
+        <div class="blog-item backdrop-filter">
           <a href="<%= blog.next %>">
             <img src="<%= blog.thumbnail %>" alt="thumbnail-<%= blog.slug %>" />
             <p class="timestamp text-white">
@@ -66,10 +66,8 @@
         <% }%>
     </div>
     <% if ((index + 1) % 4===0 && index !==blogs.length - 1) { %>
-  </div>
-  <div class="blogs-grid">
-    <% } %>
-      <% }); %>
+      <% } %>
+        <% }); %>
   </div>
 
 </div>
