@@ -1,11 +1,13 @@
 // index.js
 import app from "./src/apps.js";
-import { HOST, PORT } from "./src/config.js";
+import { config } from "dotenv"
 
+// load .ENV
+config();
 
-// RUN
-app.listen(PORT);
-console.log(" ");
-console.log(" ");
-console.log("Server on port ", PORT);
-console.log("Open on browser: ", HOST);
+const PORT = process.env.PORT || 3000; // Use PORT from .env or default to 3000
+const HOST = process.env.HOST || 'localhost'; // Use HOST from .env or default to localhost
+
+app.listen(PORT, HOST, () => {
+  console.log(`Server is running on http://${HOST}:${PORT}`);
+});
