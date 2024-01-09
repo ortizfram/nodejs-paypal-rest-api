@@ -2,6 +2,14 @@
   
 }
 
+  /* vignete overlay */
+  .home-page-container::before {
+    content: '';
+    background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0.7) 100%);
+    z-index: 0; /* Set a lower z-index to stay beneath the content */
+    height: 100%;
+  }
+
 .home-hero {
   background-image: url("../../images/hero-image.jpg");
   background-size: cover;
