@@ -1,6 +1,6 @@
 // index.js
 import app from "./src/apps.js";
-import { config } from "dotenv"
+import { config } from "dotenv";
 
 // load .ENV
 config();
