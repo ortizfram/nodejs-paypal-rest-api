@@ -57,8 +57,6 @@ const postCourseCreate = async (req, res) => {
       ars_price,
       usd_price,
       discount,
-      active,
-      length,
     } = req.body;
 
     // Ensure title is a string
@@ -134,9 +132,7 @@ const postCourseCreate = async (req, res) => {
                 ars_price,
                 usd_price,
                 discountValue,
-                active === "true" ? true : false,
                 relativePath,
-                length,
                 videoPath,
                 authorId,
               ];
@@ -287,8 +283,6 @@ const postCourseUpdate = async (req, res) => {
       ars_price,
       usd_price,
       discount,
-      active,
-      length,
     } = req.body;
 
     // Autogenerate slug from title
@@ -315,9 +309,7 @@ const postCourseUpdate = async (req, res) => {
       ars_price,
       usd_price,
       discountValue,
-      active === "true" ? true : false,
       thumbnailPath,
-      length,
       courseId, // where course.id
     ];
 
@@ -672,9 +664,7 @@ const courseOverview = async (req, res) => {
       ars_price: course.ars_price,
       usd_price: course.usd_price,
       discount: course.discount,
-      active: course.active,
       thumbnail: course.thumbnail,
-      length: course.length,
     };
 
     // Render the course overview page if not enrolled
@@ -715,9 +705,7 @@ const courseEnroll = async (req, res) => {
         ars_price: course.ars_price,
         usd_price: course.usd_price,
         discount: course.discount,
-        active: course.active,
         thumbnail: course.thumbnail,
-        length: course.length,
         author: {
           // Include author details in courseData
           name: course.author_name,

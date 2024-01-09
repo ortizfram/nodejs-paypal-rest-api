@@ -29,13 +29,6 @@
         <label for="discount">Discount:</label><br>
         <input type="number" id="discount" name="discount" value="<%= course.discount %>"><br><br>
 
-        <label for="active">Active:</label><br>
-        <input type="checkbox" id="active" name="active" value="true" <% if (course.active) { %> checked <% } %>
-            ><br><br>
-
-            <label for="length">Length:</label><br>
-            <input type="number" id="length" name="length" value="<%= course.length %>"><br><br>
-
             <input type="hidden" id="courseId" name="courseId" value="<%= course.id %>">
             <button type="submit">Update Course</button>
     </form>
