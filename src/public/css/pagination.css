@@ -1,0 +1,37 @@
+/* Style for pagination links */
+.pagination a {
+    display: inline-block;
+    padding: 12px;
+    text-decoration: none;
+    color: #000;
+    background-color: #fff; /* Purple background color */
+    border-radius: 10px;
+    transition: background-color 0.3s ease;
+    margin-bottom: 20px;
+}
+
+/* Hover effect for pagination links */
+.pagination a:hover {
+    background-color: #ffe48a; /* Darker purple on hover */
+}
+
+/* Active/current page link style */
+.pagination a.active {
+    background-color: #d65fde; /* Darker purple for the active/current page */
+}
+
+/* Hover effect for active/current page link */
+.pagination a.active:hover {
+    background-color: #d65fde; /* Darker shade on hover for active page */
+}
+
+/* Center the pagination links */
+.pagination {
+    text-align: center;
+    margin-top: 20px;
+}
+
+/* Adjust spacing between pagination links */
+.pagination a:not(:last-child) {
+    margin-right: 5px;
+}

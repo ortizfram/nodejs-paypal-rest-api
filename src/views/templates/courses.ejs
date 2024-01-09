@@ -1,0 +1,85 @@
+<div class="courses-page-container">
+  <div class="courses-container">
+    <div class="section-title z-index-1">
+      <h1 class="text-white"><%= title %></h1>
+    </div>
+
+    <!-- pagination top -->
+    <div class="pagination">
+      <% if (page && page> 1) { %>
+      <a href="/api/<%= route %>?page=<%= page - 1 %>&perPage=<%= perPage %>"
+        >Previous</a
+      >
+      <% } %> <% for (let i=1; i <=totalPages; i++) { %> <% if (!(i===totalPages
+      && courses.length===0)) { %>
+      <a
+        href="/api/<%= route %>?page=<%= i %>&perPage=<%= perPage %>"
+        class="<%= currentPage === i ? 'active' : '' %>"
+      >
+        <%= i %>
+      </a>
+      <% } %> <% } %> <% if (page && page < totalPages) { %>
+      <a href="/api/<%= route %>?page=<%= page + 1 %>&perPage=<%= perPage %>"
+        >Next</a
+      >
+      <% } %>
+    </div>
+
+    <!-- courses -->
+    <div class="courses-grid">
+      <% courses.forEach((course, index)=> { %>
+      <div class="course-item backdrop-filter shadow-lg">
+        <a href="<%= course.next %>">
+          <img
+            src="<%= course.thumbnail %>"
+            alt="thumbnail-<%= course.slug %>"
+          />
+          <p class="timestamp text-white"><%= course.updated_at %></p>
+          <div class="author">
+            <img
+              src="<%= course.author.avatar %>"
+              alt="User Avatar"
+              class="avatar"
+            />
+            <p class="author-info text-white">
+              <strong> <%= course.author.username %> </strong> •
+              <%=course.author.name%>
+            </p>
+          </div>
+          <h2 class="text-white"><%= course.title %></h2>
+
+          <% if (course.usd_price || course.usd_price ) {%>
+          <p class="text-white">
+            USD <%= course.usd_price %> | ARS <%= course.ars_price %>
+          </p>
+          <% } %>
+
+          <!-- limit description 50 words -->
+          <% let descriptionWords=course.description.split(' '); %> <% let
+          limitedDescription = descriptionWords.slice(0, 50).join(' '); %>
+          <p class="text-white"><%= limitedDescription %></p>
+          
+        </a>
+        <% if (isAdmin) {%>
+        <div class="course-actions">
+          <p class="text-white">
+            <a class="text-muted" href="/api/course/<%= course.id %>/update"
+              ><i class="fas fa-edit me-2"></i
+            ></a>
+            <input type="hidden" name="author" value="<%= course.author %>" />
+          </p>
+          <p>
+            <a
+              class="text-muted"
+              href="/api/course/<%= course.id %>/delete?courseId=<%= course.id %>"
+              ><i class="fas fa-trash-alt me-2"></i
+            ></a>
+          </p>
+        </div>
+        <% }%>
+      </div>
+      <% if ((index + 1) % 4===0 && index !==courses.length - 1) { %>
+    </div>
+    <div class="courses-grid"><% } %> <% }); %></div>
+  </div>
+</div>

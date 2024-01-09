@@ -1,0 +1,26 @@
+
+    <!-- Create Modules Form -->
+    <form id="moduleForm" action="/api/course/<%= course.id %>/module/update" method="POST"
+        enctype="multipart/form-data">
+
+        <h1>
+            <%= course.title %>
+        </h1>
+        <h3>Change course video</h3>
+        <div id="moduleFields">
+            <div class="moduleField">
+                <div id="moduleFields">
+                    <div class="moduleField">
+
+                        <label for="video_link">Video Link:</label><br>
+                        <input type="text" class="video_link" name="video_link" value="<%= module.video_link %>"><br><br>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Button to submit module creation -->
+        <!-- Remove space before "hidden" to avoid input being hidden -->
+        <input type="hidden" name="courseId" value="<%= courseId %>">
+        <button type="submit">Update Video</button>
+    </form>

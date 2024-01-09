@@ -1,0 +1,48 @@
+#alert-container{
+    margin: 0;
+    background: transparent;
+}
+
+.alert {
+    background-color: #74ce83;
+    color: #ffff;
+    padding: 10px;
+    border: 1px solid #74ce83;
+    border-radius: 5px;
+    margin: 0 auto;
+    animation: fadeInOut 5s forwards;
+    z-index: 5555;
+}
+
+@keyframes fadeInOut {
+    0% {
+        opacity: 0;
+        height: 0;
+        padding: 0;
+        border: none;
+        margin: 0;
+    }
+    5% {
+        opacity: 1;
+        height: auto;
+        padding: 10px;
+        border: 1px solid #74ce83;
+        border-radius: 5px;
+        margin-bottom: 15px;
+    }
+    95% {
+        opacity: 1;
+        height: auto;
+        padding: 10px;
+        border: 1px solid #74ce83;
+        border-radius: 5px;
+        margin-bottom: 15px;
+    }
+    100% {
+        opacity: 0;
+        height: 0;
+        padding: 0;
+        border: none;
+        margin: 0;
+    }
+}

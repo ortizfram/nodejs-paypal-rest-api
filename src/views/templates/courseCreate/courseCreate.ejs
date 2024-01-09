@@ -1,0 +1,58 @@
+<div id="create-course-container">
+    
+    <h1 class="section-title">Create New Course</h1>
+    <div>
+        <form id="courseForm" action="/api/course/create" method="POST" enctype="multipart/form-data">
+            <!-- Form action should match the route for creating a course -->
+            <h3>Course description</h3>
+            <label for="title">titulo:</label><br>
+            <input type="text" id="title" name="title"><br><br>
+
+            <label for="description">Descripcion:</label><br>
+            <input id="description" name="description"><br><br>
+
+            <label for="text_content">contenido texto:</label><br>
+            <textarea id="text_content" name="text_content"></textarea><br><br>
+
+            <label for="video">subir video:</label><br>
+            <input type="file" name="video" accept="video/*"><br><br>
+            <hr>
+            <label for="thumbnail">subir miniatura:</label><br>
+            <input type="file" name="thumbnail" accept="image/*"><br><br>
+            <hr>
+            <h3>Configurar precio</h3>
+            <label for="price">ARS Price:</label><br>
+            <input type="number" id="ars_price" name="ars_price"><br><br>
+
+            <label for="price">USD Price:</label><br>
+            <input type="number" id="usd_price" name="usd_price"><br><br>
+
+            <h3>Aditional configs</h3>
+            <label for="discount">descuento:</label><br>
+            % <input type="number" id="discount" name="discount"><br><br>
+
+           
+            <input type="hidden" name="author" value="<%= user %>">  
+            <button type="submit">Create Course</button>
+
+            <!-- Display error message -->
+            <% if (typeof errorMessage !=='undefined' ) { %>
+                <p style="color: red;">
+                    <%= errorMessage %>
+                </p>
+                <% } %>
+        </form>
+    </div>
+</div>
+
+<style>
+    #create-course-container{
+        margin: 6.2rem auto;
+    }
+    #courseForm{
+        margin: 2.2rem 0;
+    }
+    body{
+        background: #f7e3bf;
+      }
+</style>

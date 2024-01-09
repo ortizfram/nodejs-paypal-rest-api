@@ -1,0 +1,69 @@
+<!-- Add this line to include the SimpleMDE library -->
+<script src="https://cdn.jsdelivr.net/npm/simplemde@1.11.2/dist/simplemde.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/simplemde@1.11.2/dist/simplemde.min.css">
+
+<div id="create-blog-container">
+  
+<h1 class="section-title">
+  <%= title %>
+</h1>
+<div>
+  <form id="courseForm" action="<%= action %>" method="POST" enctype="multipart/form-data">
+    <!-- Form action should match the route for creating a course -->
+    <label for="title">Titulo:</label><br>
+    <input type="text" id="title" name="title"><br><br>
+
+    <label for="description">Descripcion:</label><br>
+    <input id="description" name="description"><br><br>
+
+    <label for="text_content">contenido de texto:</label><br>
+    <!-- Make sure to remove the style="display: none;" -->
+    <textarea id="text_content" name="text_content"></textarea><br><br>
+    <div id="markdownEditor"></div>
+
+    <label for="thumbnail">subir miniatura:</label><br>
+    <input type="file" name="thumbnail" accept="image/*"><br><br>
+
+    <input type="hidden" name="author" value="<%= user %>">
+    <button type="submit">
+      <%= submit %>
+    </button>
+
+    <!-- Display error message -->
+    <% if (errorMessage) { %>
+      <p class="bg-red">
+        <%= errorMessage %>
+      </p>
+    <% } %>
+  </form>
+</div>
+</div>
+
+<script>
+  const simplemde = new SimpleMDE({
+    element: document.getElementById("text_content"), // Use the ID of the textarea
+    autofocus: true,
+    spellChecker: false,
+    hideIcons: ["guide", "fullscreen", "side-by-side"],
+  });
+
+  // Listen for form submission and update the hidden textarea
+  const form = document.getElementById("courseForm");
+  form.addEventListener("submit", function(event) {
+    const markdownValue = simplemde.value();
+    document.getElementById("text_content").value = markdownValue;
+  });
+</script>
+
+
+<style>
+  #create-blog-container{
+    margin: 6.2rem auto;
+  }
+  #courseForm{
+        margin: 2.2rem 0;
+    }
+  body{
+    background: #f7e3bf;
+  }
+</style>

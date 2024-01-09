@@ -1,0 +1,45 @@
+<div class="courses-container">
+  <div class="section-title">
+    <h1>Mis cursos</h1>
+  </div>
+  <div class="courses-grid">
+    <% courses.reverse().forEach((course, index)=> { %>
+      <div class="course-item  backdrop-filter shadow-lg">
+        <a href="/api/course/<%= course.id %>">
+          <img src="<%= course.thumbnail %>" alt="thumbnail-<%= course.slug %>" />
+          <p class="timestamp">
+            <%= course.updated_at %>
+          </p>
+          <div class="author">
+            <img src="<%= course.author.avatar %>" alt="User Avatar" class="avatar">
+            <p class="author-info"><strong>
+                <%= course.author.username %>
+              </strong> • <%=course.author.name%>
+            </p>
+          </div>
+          <h2>
+            <%= course.title %>
+          </h2>
+          <p>
+            <%= course.description %>
+          </p>
+        </a>
+        <% if (isAdmin) {%>
+          <div class="course-actions">
+            <p>
+              <a href="/api/course/<%= course.id %>/update">Edit</a>
+            </p>
+            <p>
+              <a href="/api/course/<%= course.id %>/delete?courseId=<%= course.id %>">Delete</a>
+            </p>
+          </div>
+          <% } %>
+
+      </div>
+      <% if ((index + 1) % 4===0 && index !==courses.length - 1) { %>
+  </div>
+  <div class="courses-grid">
+    <% } %>
+      <% }); %>
+  </div>
+</div>
