@@ -1,6 +1,6 @@
 // index.js
-import app from "./apps.js";
-import { HOST, PORT } from "./config.js";
+import app from "./src/apps.js";
+import { HOST, PORT } from "./src/config.js";
 
 
 // RUN
