@@ -544,6 +544,12 @@ const coursesListOwned = async (req, res) => {
       enrolledCourseIds = enrolledCoursesRows.map((enrolledCourse) =>
         enrolledCourse.id.toString()
       );
+
+      // If the user has not enrolled in any courses, redirect to '/api/courses'
+      if (enrolledCourseIds.length === 0) {
+        res.redirect('/api/courses?page=1&perPage=6&message=No courses joined yet');
+        return;
+      }
     }
 
     // Get pagination parameters from query or set default values
@@ -558,6 +564,7 @@ const coursesListOwned = async (req, res) => {
       [enrolledCourseIds]
     );
     const totalItems = totalEnrolledCourses[0].count;
+    
 
     // Fetch enrolled courses for the user with pagination
     const [coursesRows] = await pool.query(
