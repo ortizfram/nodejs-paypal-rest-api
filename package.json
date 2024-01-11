@@ -9,6 +9,7 @@
   "type": "module",
   "scripts": {
     "start": "node index.js",
+    "prod": "node --omit=dev index.js",
     "vercel-build": "echo hello"
   },
   "repository": {
