@@ -4,27 +4,34 @@ import session from "express-session";
 import path from "path";
 import { fileURLToPath } from "url";
 import { config } from "dotenv";
-import authRoutes from "./routes/auth.routes.js";
-import blogRoutes from "./routes/blog.routes.js";
-import adminRoutes from "./routes/admin.routes.js";
-import paymentRoutes from "./routes/payment.routes.js";
-import employeeRoutes from "./routes/employee.routes.js";
-import coursesRoutes from "./routes/courses.routes.js";
-import indexRoutes from "./routes/index.routes.js";
+import authRoutes from "./src/routes/auth.routes.js";
+import blogRoutes from "./src/routes/blog.routes.js";
+import adminRoutes from "./src/routes/admin.routes.js";
+import paymentRoutes from "./src/routes/payment.routes.js";
+import employeeRoutes from "./src/routes/employee.routes.js";
+import coursesRoutes from "./src/routes/courses.routes.js";
+import indexRoutes from "./src/routes/index.routes.js";
 import morgan from "morgan";
 import methodOverride from "method-override";
 import fileUpload from "express-fileupload";
 import jwt from "jsonwebtoken";
 import { validationResult, body } from "express-validator";
-import { pool } from "./db.js";
-import { getUserEnrolledCoursesQuery } from "../db/queries/course.queries.js";
+import { pool } from "./src/db.js";
+import { getUserEnrolledCoursesQuery } from "./db/queries/course.queries.js";
 import { Marked, marked } from "marked";
 
 // load .ENV
 config();
+const PORT = process.env.PORT || 3000; 
+const HOST = process.env.HOST || 'localhost'; 
 
 // call express
 const app = express();
+
+// Connection
+app.listen(PORT, HOST, () => {
+  console.log(`Server is rrrunning on http://${HOST}:${PORT}`);
+});
 
 // configure methodOverride
 app.use(methodOverride('_method'));
@@ -40,14 +47,14 @@ export const __dirname = path.dirname(__filename);
 app.use(fileUpload());
 
 //Set up serving static files in Express:
-app.use(express.static(path.join(__dirname, "public")));
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+app.use(express.static(path.join(__dirname, "src","public")));
+app.use("/uploads", express.static(path.join(__dirname, "src","uploads")));
 
 // config templates and EJS
 app.use(expressEjsLayouts);
-app.set("layout", "../layouts/layout");
+app.set("layout", "../layouts/layout.ejs");
 app.set("view engine", "ejs");
-app.set("views", [path.join(__dirname, "views", "templates")]);
+app.set("views", [path.join(__dirname, "src","views", "templates")]);
 
 // marked test route
 app.get('/markdown-to-html', (req, res) => {

@@ -17,7 +17,7 @@ import {
   tableCheckQuery,
   updateCourseQuery,
 } from "../../db/queries/course.queries.js";
-import { __dirname, setCustomMimeTypes } from "../apps.js";
+import { __dirname, setCustomMimeTypes } from "../../apps.js";
 import { fetchUserByField } from "../../db/queries/auth.queries.js";
 
 //COURSE CREATE/UPDATE/DELETE

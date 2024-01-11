@@ -11,7 +11,7 @@ import {
 import slugify from "slugify";
 import { pool } from "../db.js";
 import path from "path";
-import { __dirname } from "../apps.js";
+import { __dirname } from "../../apps.js";
 import { tableCheckQuery } from "../../db/queries/course.queries.js";
 import createTableIfNotExists from "../public/js/createTable.js";
 import { Marked, marked } from "marked";

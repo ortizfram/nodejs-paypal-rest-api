@@ -20,7 +20,7 @@ import jwt from "jsonwebtoken";
 import { HOST } from "../config.js";
 import sendResetEmail from "../utils/sendEmail.js";
 import path from "path";
-import { __dirname } from "../apps.js";
+import { __dirname } from "../../apps.js";
 
 // load .ENV
 config();

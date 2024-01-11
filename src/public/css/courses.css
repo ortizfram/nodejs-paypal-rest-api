@@ -1,6 +1,6 @@
 /* courses.css */
 .courses-page-container {
-  background-image: url("../../images/jay-castor-7AcMUSYRZpU-unsplash.jpg");
+  background-image: url("/images/jay-castor-7AcMUSYRZpU-unsplash.jpg");
    /* background: radial-gradient(circle, #EF7F72, #F7E3BF); */
   background-size: cover;
   background-position: center; /* Centers the background image */

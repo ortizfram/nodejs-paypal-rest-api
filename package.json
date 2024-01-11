@@ -2,14 +2,14 @@
   "name": "nodejs-paypal-rest-api",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "apps.js",
   "engines": {
     "node": "18.x"
   },
   "type": "module",
   "scripts": {
-    "start": "node index.js",
-    "prod": "node --omit=dev index.js",
+    "start": "node apps.js",
+    "prod": "node --omit=dev apps.js",
     "vercel-build": "echo hello"
   },
   "repository": {

@@ -11,7 +11,7 @@
   }
 
 .home-hero {
-  background-image: url("../../images/hero-image.jpg");
+  background-image: url("/images/hero-image.jpg");
   background-size: cover;
   background-position: center; /* Centers the background image */
   height: 90vh;
@@ -27,7 +27,7 @@
 }
 
 #contact {
-  background-image: url("../../images/lotus-flower.jpg");
+  background-image: url("/images/lotus-flower.jpg");
   background-size: cover;
   background-position: center; /* Centers the background image */
   height: 100vh;

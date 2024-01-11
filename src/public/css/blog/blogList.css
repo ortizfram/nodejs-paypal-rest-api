@@ -1,6 +1,6 @@
 /* courses.css */
 .blogs-page-container {
-    background-image: url("../../images/mountain-yoga.jpg");
+    background-image: url("/images/mountain-yoga.jpg");
     background-size: cover;
     background-position: center; /* Centers the background image */
     height: 100vh;
