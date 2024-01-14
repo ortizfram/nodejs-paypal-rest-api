@@ -1,28 +1,13 @@
 {
-  "name": "nodejs-paypal-rest-api",
-  "version": "1.0.0",
-  "description": "",
-  "main": "apps.js",
-  "engines": {
-    "node": "18.x"
-  },
+  "name": "client",
+  "private": true,
+  "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "start": "node apps.js",
-    "prod": "node --omit=dev apps.js",
-    "vercel-build": "echo hello"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/ortizfram/nodejs-paypal-rest-api.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/ortizfram/nodejs-paypal-rest-api/issues"
-  },
-  "homepage": "https://github.com/ortizfram/nodejs-paypal-rest-api#readme",
   "dependencies": {
     "@fortawesome/fontawesome-free": "^6.5.1",
     "axios": "^1.6.0",
@@ -54,6 +39,7 @@
     "turndown": "^7.1.2"
   },
   "devDependencies": {
+    "vite": "^5.0.8",
     "nodemon": "^3.0.1"
   }
 }

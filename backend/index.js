@@ -1,9 +1,10 @@
-import express from "express";
+import cors from 'cors'
+import { config } from 'dotenv';
+import express from 'express';
 import expressEjsLayouts from "express-ejs-layouts";
 import session from "express-session";
 import path from "path";
 import { fileURLToPath } from "url";
-import { config } from "dotenv";
 import authRoutes from "./src/routes/auth.routes.js";
 import blogRoutes from "./src/routes/blog.routes.js";
 import adminRoutes from "./src/routes/admin.routes.js";
@@ -20,18 +21,34 @@ import { pool } from "./src/db.js";
 import { getUserEnrolledCoursesQuery } from "./db/queries/course.queries.js";
 import { Marked, marked } from "marked";
 
-// load .ENV
 config();
+
 const PORT = process.env.PORT || 3000; 
 const HOST = process.env.HOST || 'localhost'; 
+const FRONTEND_URL = process.env.FRONTEND_URL || 'http://127.0.0.1:5173'; 
+const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:3000'; 
 
 // call express
 const app = express();
 
 // Connection
+
 app.listen(PORT, HOST, () => {
-  console.log(`Server is rrrunning on http://${HOST}:${PORT}`);
-});
+    console.log(`Server is running on http://${HOST}:${PORT}`);
+  });
+
+app.use(cors({
+    origin: FRONTEND_URL
+})); // frontend app can ask data
+
+// Use routes app
+app.use(indexRoutes);
+app.use("/api", authRoutes);
+app.use("/api/admin", adminRoutes);
+app.use("/api", paymentRoutes);
+app.use("/api", coursesRoutes);
+app.use("/api", employeeRoutes);
+app.use("/api", blogRoutes);
 
 // configure methodOverride
 app.use(methodOverride('_method'));
@@ -52,9 +69,10 @@ app.use("/uploads", express.static(path.join(__dirname, "src","uploads")));
 
 // config templates and EJS
 app.use(expressEjsLayouts);
-app.set("layout", "../layouts/layout.ejs");
+app.set("layout",  path.join(__dirname, "../client/src/layouts/layout.ejs"));
 app.set("view engine", "ejs");
-app.set("views", [path.join(__dirname, "src","views", "templates")]);
+
+app.set("views", [path.join(__dirname, "../client/src/views", "templates")]);
 
 // marked test route
 app.get('/markdown-to-html', (req, res) => {
@@ -79,6 +97,20 @@ app.use(
     saveUninitialized: true,
   })
 );
+
+// Set a default user for testing (if needed)
+app.use((req, res, next) => {
+  req.session.user = {
+    id: 1,
+    username: 'testuser',
+    name:'testuser',
+    email :'testuser@testuser.com',
+    password :'testuser',
+    role: 'user'
+  };
+  next();
+});
+
 
 // Define a function to set MIME types based on file extensions
 export const setCustomMimeTypes = (req, res, next) => {
@@ -111,14 +143,7 @@ export const setCustomMimeTypes = (req, res, next) => {
 
 // Middleware to set MIME types for videos
 app.use('/uploads/videos', setCustomMimeTypes, express.static(path.join(__dirname, 'uploads/videos')));
-// Use routes app
-app.use(indexRoutes);
-app.use("/api", authRoutes);
-app.use("/api/admin", adminRoutes);
-app.use("/api", paymentRoutes);
-app.use("/api", coursesRoutes);
-app.use("/api", employeeRoutes);
-app.use("/api", blogRoutes);
+
 
 // MIDDLEWARE
 // =============================================================
@@ -129,6 +154,15 @@ app.use((req, res) => {
   });
 });
 
+// middleware for login user
+export function is_loggedin_check (req, res, next) {
+  const user = req.session.user || null;
+  if(!user) {
+    // Redirect the user to the login page
+    return res.status(403).redirect('/api/login');
+  }
+  next();
+}
 
 
 // middleware for admin&staff
@@ -184,15 +218,11 @@ export async function admin_staff_clicking_course (req, res, next) {
   next();
 }
 
-// middleware for login user
-export function is_loggedin_check (req, res, next) {
-  const user = req.session.user || null;
-  if(!user) {
-    // Redirect the user to the login page
-    return res.status(403).redirect('/api/login');
-  }
-  next();
-}
 
 
 export default app;
+
+
+
+
+
