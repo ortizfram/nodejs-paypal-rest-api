@@ -37,6 +37,7 @@ app.listen(PORT, HOST, () => {
     console.log(`Server is running on http://${HOST}:${PORT}`);
   });
 
+// Use cors middleware to handle CORS headers
 app.use(cors({
     origin: FRONTEND_URL
 })); // frontend app can ask data
@@ -63,15 +64,16 @@ export const __dirname = path.dirname(__filename);
 //default option
 app.use(fileUpload());
 
-//Set up serving static files in Express:
+//Set up serving static files in Express: [backend]
 app.use(express.static(path.join(__dirname, "src","public")));
+
+// set up uploads [backend]
 app.use("/uploads", express.static(path.join(__dirname, "src","uploads")));
 
-// config templates and EJS
+// config templates layout and EJS
 app.use(expressEjsLayouts);
 app.set("layout",  path.join(__dirname, "../client/src/layouts/layout.ejs"));
 app.set("view engine", "ejs");
-
 app.set("views", [path.join(__dirname, "../client/src/views", "templates")]);
 
 // marked test route
@@ -97,19 +99,6 @@ app.use(
     saveUninitialized: true,
   })
 );
-
-// Set a default user for testing (if needed)
-app.use((req, res, next) => {
-  req.session.user = {
-    id: 1,
-    username: 'testuser',
-    name:'testuser',
-    email :'testuser@testuser.com',
-    password :'testuser',
-    role: 'user'
-  };
-  next();
-});
 
 
 // Define a function to set MIME types based on file extensions
