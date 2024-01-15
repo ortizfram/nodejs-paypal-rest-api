@@ -4,12 +4,13 @@ import { Link } from "react-router-dom";
 
 // NodeJS endpoint reference
 const URI = "http://localhost:3000/"; // Update the base URL
+const URI_sendEmail = "http://localhost:3000/send-email"; // Update the base URL
 
 const CompHome = () => {
-    const me_about_img_style = {
-        maxWidth: '300px',
-        height: 'auto',
-      };
+  const me_about_img_style = {
+    maxWidth: "300px",
+    height: "auto",
+  };
   const [home, setHome] = useState([]);
 
   useEffect(() => {
@@ -26,11 +27,34 @@ const CompHome = () => {
     }
   };
 
+  // send contact Email
+  const sendEmail = async (e) => {
+    try {
+      e.preventDefault();
+
+      // Assuming you are sending form data with name, email, and msg
+      const formData = new FormData();
+      formData.append("name", e.target.name.value);
+      formData.append("email", e.target.email.value);
+      formData.append("msg", e.target.msg.value);
+
+      const res = await axios.post(URI_sendEmail); //  endpoint
+      console.log("Email sent successfully!", res.data);
+      setHome(res.data);
+    } catch (error) {
+      console.error("Error sending Email:", error);
+    }
+  };
+
   return (
     <div className="home-page-container">
       {/* <!-- hero --> */}
       <div className="hero-container home-hero">
-        <img className="hero-logo" src="images/home/white-logo-buonavibra.png" alt="" />
+        <img
+          className="hero-logo"
+          src="images/home/white-logo-buonavibra.png"
+          alt=""
+        />
       </div>
 
       {/* <!-- about --> */}
@@ -87,7 +111,9 @@ const CompHome = () => {
       >
         <div className="">
           <div className="">
-            <h1 className="section-title italic font-bold text-white">Contacto.</h1>
+            <h1 className="section-title italic font-bold text-white">
+              Contacto.
+            </h1>
 
             {/* <!-- Row for contact icons --> */}
             <div className="row mt-4 container">
@@ -118,7 +144,9 @@ const CompHome = () => {
           {/* <!-- contact form --> */}
           <div className="row mt-4">
             <div className="col rounded">
-              <form action="/send-email" method="POST">
+              <form onSubmit={sendEmail}>
+                {" "}
+                {/* /send-email */}
                 <h3 className="highlight-txt">Contactar por Email.</h3>
                 <div className="mb-3">
                   <label for="name" className="form-label">
