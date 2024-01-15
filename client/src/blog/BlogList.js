@@ -1,33 +1,66 @@
-import axios from 'axios'
-import {useState, useEffect} from 'react'
-import {Link} from 'react-router-dom'
+import axios from "axios";
+import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 
 // NodeJS endpoint reference
-const URI = 'http://localhost:3000/'
+const URI = "http://localhost:3000/api/blog/";
 
 const CompBlogList = () => {
-    const [blogs, setBlog] = useState([])
-    useEffect( () => {
-        getBlogs()
-    }, [])
+// 
+  const [blogs, setBlogs] = useState([]);
+  useEffect(() => {
+    getBlogs();
+  }, []);
 
-    // mostrar blog
-    const getBlogs = async ()=> {
-        const res = await axios.get(`${URI}api/blog}`) 
-        setBlog(res.data)
+  // mostrar blogs -----------------------------------
+  const getBlogs = async () => {
+    try {
+        const res = await axios.get(`${URI}`);  // Updated route
+        setBlogs(res.data);
+      } catch (error) {
+        console.error("Error fetching blogs:", error);
+      }
+  };
+
+  // eliminar blog -----------------------------------
+  const deleteBlog = async (id) => {
+    try {
+        await axios.delete(`${URI}${id}/delete`);
+        getBlogs();
+    } catch (error) {
+        console.error("Error deleting blog:", error);
     }
+  };
 
-    // eliminar blog
-    const deleteBlog = async (id)=> {
-        const res = await axios.delete(`${URI}${id}/delete`) 
-        getBlogs()
+  // update blog -----------------------------------
+  const updateBlog = async (id) => {
+    try {
+        await axios.delete(`${URI}${id}/update`);
+        getBlogs();
+    } catch (error) {
+        console.error("Error updating blog:", error);
     }
+  };
 
-    return(
-        <div>
-
+  return (
+    <div class="blogs-page-container">
+      <div class="blogs-container">
+        <div class="section-title1">
+          <h1 class="text-white">Blogs and Latest News</h1>
         </div>
-    )
-}
 
-export default CompBlogList
+        <ul>
+          {blogs.map((blog) => (
+            <li key={blog.id}>
+              <Link to={`/blog/${blog.id}`}>{blog.title}</Link>
+              <button onClick={() => deleteBlog(blog.id)}>Delete</button>
+              <button onClick={() => updateBlog(blog.id)}>Edit</button>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  );
+};
+
+export default CompBlogList;
