@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Videos</title>
+    <link rel="stylesheet" href="/css/courseCreateVideo.css">
+</head>
+
+<body>
+
+    <!-- Create Videos Form -->
+    <form id="videoForm" action="/api/course/<%= course.id %>/video/create" method="POST">
+        <!-- Video details section -->
+        <h1>
+            <%= course.title %>
+        </h1>
+        <h3>Add Videos</h3>
+        <div id="videoFields">
+            <% modules.forEach(module=> { %>
+                <div class="videoField">
+                    <div>
+                        <!-- Display module titles as selectable input -->
+                        <label for="moduleId">Module:</label><br>
+                        <h4><%= module.title %></h4><br><br>
+                    </div>
+                    <label for="videoId">Video ID: (From Youtube)</label><br>
+                    <input type="text" class="videoId" name="videoId[]" required><br><br>
+                    <input type="hidden" name="moduleId[]" value="<%= module.id %>">
+                </div>
+                <hr>
+            <% }); %>
+        </div>
+
+        <!-- Button to submit video creation -->
+        <input type="hidden" name="courseId" value="<%= courseId %>">
+        <button type="submit">Create Videos</button>
+        <!-- Include error handling for any form submission errors -->
+    </form>
+
+</body>
+
+</html>

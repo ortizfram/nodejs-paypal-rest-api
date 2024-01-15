@@ -1,0 +1,92 @@
+<div id="users-panel-container">
+  <div>
+    <h1 class="section-title">Admin Panel - Users</h1>
+  </div>
+
+  <div class="searchbar">
+    <!-- Add a search input field -->
+    <form action="/api/admin/users" method="GET">
+      <label for="search"></label>
+      <input type="text" id="search" name="search" placeholder="Search users">
+      <button type="submit">Search</button>
+    </form>
+
+    <div class="save-button">
+      <!-- Save button -->
+      <button onclick="saveAndReload()" class="bg-success">Save</button>
+    </div>
+  </div>
+
+  <table class="users-table">
+    <thead class="table-headers">
+      <tr>
+        <th>Username</th>
+        <th></th>
+        <th>Name</th>
+        <th></th>
+        <th>Email</th>
+        <th></th>
+        <th>Role</th>
+        <!-- Add more columns as needed -->
+      </tr>
+    </thead>
+    <tbody class="table-rows">
+      <% users.forEach(user=> { %>
+        <tr>
+          <td>
+            <%= user.username %>
+          </td>
+          <td></td>
+          <td>
+            <%= user.name %>
+          </td>
+          <td></td>
+          <td>
+            <%= user.email %>
+          </td>
+          <td></td>
+          <!-- <td>
+            <%= user.role %>
+          </td> -->
+          <td class="change-role"> <!-- Modified this line -->
+            <!-- Button to change user role -->
+            <form action="/api/admin/users/change-role" method="POST">
+              <input type="hidden" name="userEmail" value="<%= user.email %>">
+              <select name="newRole" onchange="this.form.submit()"> <!-- Changed here -->
+                <option value="user" <% if (user.role==='user' ) { %> selected <% } %>>User</option>
+                <option value="admin" <% if (user.role==='admin' ) { %> selected <% } %>>Admin</option>
+                <option value="staff" <% if (user.role==='staff' ) { %> selected <% } %>>Staff</option>
+                <!-- Add more roles if needed -->
+              </select>
+            </form>
+          </td>
+          <!-- Display more user information -->
+        </tr>
+        <% }); %>
+    </tbody>
+  </table>
+
+</div>
+
+<!-- =======================================\scripts/========================================== -->
+<script id="save-and-reload">
+  function saveAndReload() {
+    // Redirect to the desired URL
+    window.location.href = '/api/admin/users';
+
+    // Reload the page after 1 second (adjust timing as needed)
+    setTimeout(function () {
+      location.reload();
+    }, 1000);
+  }
+</script>
+
+<!-- =====================================\ styles /=========================================== -->
+<style>
+  #users-panel-container {
+    margin: 6.2rem auto;
+  }
+  body{
+    background: #f7e3bf;
+  }
+</style>

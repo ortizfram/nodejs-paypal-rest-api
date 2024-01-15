@@ -1,0 +1,55 @@
+<div id="login-page-container">
+    <div id="login-page-content">
+    <div class="section-title ">
+        <h1 class="text-white">Ingresa</h1>
+    </div>
+
+    <form action="/api/login" method="post" class="vertical-form">
+        <input type="text" name="username" placeholder="Nombre de Usuario">
+        <input type="password" name="password" placeholder="contraseña">
+        <input type="submit" value="Login">
+    </form>
+    <div class="links-container">
+        <p><a class="text-white" href="/api/signup">No tengo cuenta aún.</a></p>
+        <p><a class="text-white" href="/api/forgot-password">Olvidaste tu contraseña ?</a></p>
+    </div>
+</div>
+</div>
+
+<style>
+    #login-page-container {
+        background-image: url("/images/natural-background.jpg");
+        background-size: cover;
+        background-position: center;
+        /* Centers the background image */
+        height: 100%;
+        width: 100vw;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        /* Center-align text within the container */
+    }
+    
+    #login-page-content{
+        margin: 6.2rem auto;
+    }
+
+    .links-container p {
+        margin: 5px 0;
+        /* Adjust margin for individual links */
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+        /* Adding shadow to the links */
+    }
+
+    .links-container {
+        margin-bottom: 20px;
+        margin-top: 10px;
+    }
+
+    .section-title h1 {
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+        /* Adding shadow to the h1 */
+    }
+</style>

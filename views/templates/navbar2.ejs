@@ -1,0 +1,350 @@
+<header class="header shadow-lg">
+  <a href="/" class="logo"><img src="/images/white-logo-buonavibra.png" alt=""></a>
+
+  <input type="checkbox" id="check">
+  <label for="check" class="icons">
+    <i class='bx bx-menu' id="menu-icon"></i>
+    <i class='bx bx-x' id="close-icon"></i>
+  </label>
+
+  <nav class="navbar">
+    <!-- basic links -->
+    <a href="/" style="--i:0;">Inicio</a>
+    <a href="/#contact" style="--i:1;">Contacto</a>
+    <a href="/#about1" style="--i:2;">Acerca</a>
+    <!-- Dropdown for Courses and Blogs -->
+    <div class="dropdown">
+      <a href="#" class="dropdown-toggle" role="button">
+        Cursos y Blogs
+      </a>
+      <div class="dropdown-menu">
+        <a href="/api/courses?page=1&perPage=6" style="--i:3;">Cursos</a>
+        <a href="/api/blog?page=1&perPage=6" style="--i:4;">Blogs</a>
+      </div>
+    </div>
+    <!-- Loggedin Links -->
+    <% if (user && user.name) { %>
+    <a href="/api/courses-owned?page=1&perPage=6" style="--i:5;">Mis Cursos</a>
+    <!-- Admin Dropdown -->
+    <% if (user.role==="admin" ) { %>
+    <div class="dropdown">
+      <a href="#" class="dropdown-toggle" role="button">
+        Admin
+      </a>
+      <div class="dropdown-menu">
+        <a href="/api/course/create" style="--i:6;">Crear curso</a>
+        <a href="/api/blog/create" style="--i:7;">Crear Blog</a>
+        <a href="/api/admin/users" style="--i:8;">Panel de Usuarios</a>
+      </div>
+    </div>
+    <% } %>
+    <!-- Edit Profile and Logout -->
+    <% if (user.avatar) { %>
+    <a href="/api/user-update/<%= user.id %>/confirm" style="--i:9;">
+      <img src="<%= user.avatar %>" alt="User Avatar" class="avatar">Editar Perfil
+    </a>
+    <% } else { %>
+    <a href="/api/user-update/<%= user.id %>/confirm" style="--i:10;">
+      <img src="/images/user.png" alt="Placeholder Avatar" class="avatar">Editar Perfil
+    </a>
+    <% } %>
+    <a href="/api/logout" style="--i:11; border: 2px solid white; border-radius: 10%; padding: 8px;">Salir</a>
+    <% } else { %>
+    <!-- Links for non-loggedin users -->
+    <a href="/api/login" style="--i:12; border: 2px solid white; border-radius: 10%; padding: 8px;">Ingresar</a>
+    <a href="/api/signup" style="--i:13; border: 2px solid white; border-radius: 10%; padding: 8px;">Registrar</a>
+    <% } %>
+  </nav>
+</header>
+
+<!-- =====================\ CSS /=============================== -->
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap');
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Poppins", sans-serif;
+  }
+
+  .header {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    padding: 1.3rem 10%;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 100;
+  }
+
+  .header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, .1);
+    backdrop-filter: blur(50px);
+    z-index: -1;
+  }
+
+  .header::after {
+    /* moving reflect inside header */
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .4));
+    transition: .5s;
+  }
+
+  .header:hover::after {
+    /* on hover move*/
+    left: 100%;
+  }
+
+  .logo {
+    font-size: 2rem;
+    color: #fff;
+    text-decoration: none;
+    font-weight: 700;
+    width: 100px; /* Adjust the width according to your image */
+    height: 50px; /* Adjust the height according to your image */
+    display: flex;
+    align-items: center;
+    z-index: 9999 !important;
+    position: relative; /* Ensure the z-index works properly */
+  }
+
+  .logo img {
+    width: 100%;
+    height: auto;
+  }
+
+  .navbar a {
+    font-size: 1.15rem;
+    color: #fff;
+    text-decoration: none;
+    font-weight: 500;
+    margin-left: 2.5rem;
+  }
+
+  #check {
+    display: none;
+  }
+
+  .icons {
+    position: absolute;
+    right: 5%;
+    font-size: 2.8rem;
+    color: #fff;
+    cursor: pointer;
+    display: none;
+  }
+
+  /* dropdowns for conditionals */
+  .dropdown {
+    position: relative;
+    display: inline-block;
+  }
+
+  .dropdown-toggle {
+    cursor: pointer;
+  }
+
+  .dropdown-menu {
+    display: none;
+    position: absolute;
+    z-index: 1;
+    background: rgba(0, 0, 0, .1);
+    backdrop-filter: blur(50px);
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+  }
+
+  .dropdown-menu a {
+    color: #fff;
+    padding: 6px 16px;
+    text-decoration: none;
+    display: inline-block;
+  }
+
+  .dropdown:hover .dropdown-menu {
+    display: block;
+    z-index: 1001;
+  }
+
+  /* BRAKPOINTS >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>*/
+  @media (max-width: 1408px) {
+    /*XL ↓ *********************************/
+
+
+  .icons {
+    display: inline-flex;
+  }
+
+  #check:checked ~ .icons #menu-icon {
+    display: none;
+  }
+
+  .icons #close-icon {
+    display: none;
+  }
+
+  #check:checked ~ .icons #close-icon {
+    display: block;
+  }
+
+  .navbar {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    height: 0;
+    background: rgba(0, 0, 0, .5);
+    backdrop-filter: blur(50px);
+    box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .1);
+    transition: .3s ease;
+    flex-direction: column;
+    align-items: center;
+    opacity: 0;
+  }
+
+  #check:checked ~ .navbar { /*show menu*/
+    height: 20.8rem;
+    opacity: 100;
+  }
+
+  .navbar a {
+    display: block;
+    font-size: 1.1rem;
+    margin: .3rem 0;
+    text-align: center;
+    transition: .3s ease;
+    opacity: 0;
+  }
+
+  #check:checked ~ .navbar a {
+    display: block;
+    transform: translateY(0);
+    opacity: 1;
+    transition-delay: calc(.15s * var(--1));
+  }
+}
+
+
+  @media (max-width: 992px) {
+    /*LG ↓ *********************************/
+
+    .header {
+      padding: 1.3rem 5%;
+    }
+
+    .navbar{
+      background: rgba(0, 0, 0, .5);
+    }
+
+    .navbar a {
+      /* Adjust anchor tags to display in a single column */
+      display: inline-block;
+      margin: .3rem 1.3rem;
+      /* Add margin for better spacing */
+    }
+
+    .logo {
+      width: 100px; /* Adjust width for larger screens */
+      height: 50px; /* Adjust height for larger screens */
+      z-index: 9999 !important;
+    position: relative; /* Ensure the z-index works properly */
+    }
+  }
+
+  @media (max-width: 768px) {
+    /*MD ↓ *********************************/
+    
+    .logo {
+      width: 100px; /* Adjust width for medium screens */
+      height: 50px; /* Adjust height for medium screens */
+      z-index: 9999 !important;
+    position: relative; /* Ensure the z-index works properly */
+    }
+    .icons {
+      display: inline-flex;
+    }
+
+    #check:checked~.icons #menu-icon {
+      /* hide on click*/
+      display: none;
+    }
+
+    .icons #close-icon {
+      display: none;
+    }
+
+    #check:checked~.icons #close-icon {
+      /* show on click*/
+      display: block;
+    }
+
+    .navbar {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      height: 0;
+      background: rgba(0, 0, 0, .5);
+      backdrop-filter: blur(50px);
+      box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .1);
+      transition: .3s ease;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    #check:checked~.navbar {
+      /* on click display navbar div*/
+      height: 20.8rem;
+    }
+
+    .navbar a {
+      display: block;
+      font-size: 1.1rem;
+      margin: .3rem 0;
+      text-align: center;
+      transition: .3s ease;
+      opacity: 0;
+    }
+
+    #check:checked~.navbar a {
+      /* on click hide navbar div*/
+      display: block;
+      transform: translateY(0);
+      opacity: 1;
+      transition-delay: calc(.15s * var(--1));
+    }
+  }
+
+  @media (max-width: 576px) {
+    /* SM ↓ *********************************/
+    .logo {
+      width: 100px; /* Adjust width for smaller screens */
+      height: 50px; /* Adjust height for smaller screens */
+      z-index: 9999 !important;
+    position: relative; /* Ensure the z-index works properly */
+    }
+    .navbar{
+      background: rgba(0, 0, 0, .5);
+    }
+    .navbar a {
+      /* Adjust anchor tags to display in a single column */
+      display: block;
+      margin: .3rem 0;
+      /* Adjust margin for better spacing */
+    }
+  }
+</style>

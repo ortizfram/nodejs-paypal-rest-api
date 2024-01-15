@@ -1,0 +1,19 @@
+<div id="course-delete-confirmation-cont">
+    <h3 class="section-title">Borrar Curso</h3>
+    <p>Seguro que quieres borrar:<br> <%= course.title %>?</h3>
+        <form method="POST" action="<%= action %>" style="display: flex; align-items: center;">
+            <input type="hidden" name="_method" value="DELETE">
+            <input type="hidden" name="courseId" value="<%= course.id %>">
+            <input type="submit" value="Delete" class="btn btn-success text-white" style="margin-right: 10px;">
+            <a href="/api/courses?page=1&perPage=6&message=No hay cursos afectados" class="btn btn-danger">Cancel</a>
+          </form>
+  </div>
+
+    <style>
+        #course-delete-confirmation-cont {
+            margin: 10.2rem auto;
+        }
+        p{
+            text-align: center;
+        }
+    </style>

@@ -1,0 +1,47 @@
+<div id="update-course-container">
+    
+    <h1 class="section-title">Edit Course</h1>
+    <form id="courseEditForm" action="/api/course/<%= course.id %>/update" method="POST"
+        enctype="multipart/form-data">
+        <label for="title">Title:</label><br>
+        <input type="text" id="title" name="title" value="<%= course.title %>"><br><br>
+
+        <label for="description">Description:</label><br>
+        <input id="description" name="description" value="<%= course.description %>">
+        </input><br><br>
+
+        <label for="text_content">Text Content:</label><br>
+        <textarea id="text_content" name="text_content" value="<%= course.text_content %>"></textarea><br><br>
+
+        <label for="video">subir video:</label><br>
+    <input type="file" name="video" accept="video/*"><br><br>
+    <hr>
+    <label for="thumbnail">subir miniatura:</label><br>
+    <input type="file" name="thumbnail" accept="image/*"><br><br>
+    <hr>
+
+        <label for="ars_price">ARS Price:</label><br>
+        <input type="number" id="ars_price" name="ars_price" value="<%= course.ars_price %>"><br><br>
+
+        <label for="usd_price">USD Price:</label><br>
+        <input type="number" id="usd_price" name="usd_price" value="<%= course.usd_price %>"><br><br>
+
+        <label for="discount">Discount:</label><br>
+        <input type="number" id="discount" name="discount" value="<%= course.discount %>"><br><br>
+
+            <input type="hidden" id="courseId" name="courseId" value="<%= course.id %>">
+            <button type="submit">Update Course</button>
+    </form>
+</div>
+
+<style>
+    #update-course-container{
+        margin: 6.2rem auto;
+    }
+    #courseEditForm{
+        margin: 2.2rem 0;
+    }
+    body{
+        background: #f7e3bf;
+      }
+</style>

@@ -13,7 +13,11 @@ function App() {
         <img src={logo} className="App-logo" alt="logo" />
         <BrowserRouter>
           <Routes>
+            {/* INDEX */}
             <Route path="/" element={ <CompBlogList />}/>
+
+            {/* BLOGS */}
+            <Route path="/api/blog" element={ <CompBlogList />}/>
             <Route path="/api/blog/create" element={ <CompBlogCreate />}/>
             <Route path="/api/blog/:id/update" element={ <CompBlogUpdate />}/>
           </Routes>

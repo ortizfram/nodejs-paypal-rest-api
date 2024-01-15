@@ -1,0 +1,61 @@
+<div id="signup-page-container">
+    <div id="signup-content-container">
+        <div class="section-title">
+            <h1 class="text-white">Registrate</h1>
+        </div>
+
+        <form action="/api/signup" method="post" class="vertical-form">
+            <label for="username"></label>
+            <input type="text" id="username" name="username" placeholder="Nombre de Usuario" required>
+            <label for="name"></label>
+            <input type="text" id="name" name="name" placeholder="Nombre" required>
+            <label for="email"></label>
+            <input type="text" id="email" name="email" placeholder="Email" required>
+            <label for="password"></label>
+            <input type="password" id="password" name="password" placeholder="contraseña" required>
+
+            <input type="submit" value="Signup">
+        </form>
+
+        <div class="links-container">
+            <p c><a class="text-white" href="/api/login">Ya estoy registrado.</a></p>
+        </div>
+    </div>
+</div>
+
+<style>
+    #signup-page-container {
+        background-image: url("/images/buonavibra-marce-frio.png");
+        background-size: cover;
+        background-position: center;
+        /* Centers the background image */
+        height: 100%;
+        width: 100vw;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+    }
+
+    #signup-content-container {
+        margin: 6.2rem auto;
+    }
+
+    .links-container p {
+        margin: 5px 0;
+        /* Adjust margin for individual links */
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+        /* Adding shadow to the links */
+    }
+
+    .links-container {
+        margin-bottom: 20px;
+        margin-top: 10px;
+    }
+
+    .section-title h1 {
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+        /* Adding shadow to the h1 */
+    }
+</style>

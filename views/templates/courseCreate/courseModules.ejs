@@ -1,0 +1,22 @@
+<!-- Create Modules Form -->
+    <form id="moduleForm" action="/api/course/<%= course.id %>/module/create" method="POST" enctype="multipart/form-data">
+        <!-- Module details section -->
+        <h1>
+            <%= course.title %> 
+        </h1>
+        <h3>Add a video</h3>
+        <div id="moduleFields">
+            <div class="moduleField">
+                
+                <label for="video_link">Video Link:</label><br>
+                <input type="text" class="video_link" name="video_link"><br><br>
+            </div>
+        </div>
+        
+        <!-- Use appropriate input fields, labels, and elements -->
+
+        <!-- Button to submit module creation -->
+        <input type="hidden" name="courseId" value="<%= courseId %>">
+        <button type="submit">Update Modules</button>
+        <!-- Include error handling for any form submission errors -->
+    </form>

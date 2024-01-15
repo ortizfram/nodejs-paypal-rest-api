@@ -1,0 +1,33 @@
+<div class="course-container">
+    <div class="course-overview mt-4">
+        <div class="section-title2">
+            <h1>Course Overview</h1>
+        </div>
+        <hr>
+        
+        <img src="<%= course.thumbnail %>" alt="<%= course.title %> Image">
+
+        <h2>
+            <%= course.title %>
+        </h2>
+        <p>
+            <%= course.description %>
+        </p>
+        <div class="course-details">
+            <p>Instructor: <%= course.instructor %></p>
+            <p>Price: <span class="price-usd">USD<%= course.usd_price %></span> | <span class="price-ars">ARS<%= course.ars_price %></span></p>
+        </div>
+        <br>
+        <div class='payment-options'>
+            <button>
+                <a class="text-white" href="/api/course/<%= course.id %>/enroll">Enroll</a>
+            </button>
+        </div>
+    </div>
+</div>
+        
+<style>
+    .course-overview{
+        margin: 5rem auto;
+    }
+</style>
