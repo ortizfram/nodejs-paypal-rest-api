@@ -1,0 +1,19 @@
+  .section-title {
+      margin-top: 20px;
+      margin-bottom: 10px;
+      /*border-bottom: 2px solid #007bff; */ /* Change color as needed */
+      padding-bottom: 5px;
+      justify-items: center;
+      color: #EF7F72;
+      margin-bottom: 40px;
+      font-family: "Poppins", sans-serif;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+    }
+
+    h1 {
+      color: #333;
+    }

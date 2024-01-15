@@ -1,0 +1,103 @@
+/* General Styles */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+.page-container {
+    height: 100vh;
+}
+
+.avatar {
+    border-radius: 50%;
+    width: 25px; /* Adjust the width and height as needed */
+    height: 25px; /* Adjust the width and height as needed */
+    object-fit: cover; /* Maintain aspect ratio and cover the container */
+  }
+
+/* Section Title */
+.section-title {
+    text-align: center;
+}
+
+.section-title h1 {
+    font-size: 2.5em;
+    color: #333;
+}
+
+/* Course Overview */
+.course-overview {
+    text-align: center;
+    max-width: 600px;
+}
+
+.course-overview img {
+    width: 100%;
+    max-width: 300px;
+    height: auto;
+    border-radius: 5px;
+}
+
+.course-overview h2 {
+    font-size: 1.8em;
+    color: #444;
+}
+
+.course-overview div {
+    font-size: 1.2em;
+    color: #666;
+}
+
+.course-overview p {
+    font-size: 1em;
+    color: #666;
+    line-height: 1.6;
+}
+
+.course-overview .price-text {
+    font-weight: bold;
+    font-size: larger;
+}
+
+/* Payment Options */
+/* Payment Options */
+.payment-options {
+    text-align: center;
+}
+
+.payment-options h2 {
+    font-size: 1.8em;
+    color: #333;
+}
+
+
+.payment-options button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 24px;
+    font-size: 1em;
+    font-weight: bold;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    width: 100%; /* Set width to 100% */
+}
+
+.payment-options button:hover {
+    background-color: #45a049;
+}
+
+.payment-options button img {
+    width: 24px;
+    height: auto;
+    margin-right: 10px;
+}
+
+.payment-options button span {
+    font-size: 1em;
+}

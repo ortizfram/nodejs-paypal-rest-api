@@ -1,0 +1,78 @@
+.home-page-container{
+  
+}
+
+  /* vignete overlay */
+  .home-page-container::before {
+    content: '';
+    background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0.7) 100%);
+    z-index: 0; /* Set a lower z-index to stay beneath the content */
+    height: 100%;
+  }
+
+.home-hero {
+  background-image: url("../../../../public/images/home/hero-image.jpg"); 
+  background-size: cover;
+  background-position: center; /* Centers the background image */
+  height: 90vh;
+  width: 100vw;
+  display: flex; /* For centering content */
+  justify-content: center; /* Center horizontally */
+  align-items: center; /* Center vertically */
+}
+
+.hero-logo {
+  max-width: 50%; /* Adjust the logo size */
+  max-height: 20rem; /* Maintain aspect ratio */
+}
+
+#contact {
+  background-image: url("../../../../public/images/home/lotus-flower.jpg");
+  background-size: cover;
+  background-position: center; /* Centers the background image */
+  height: 100vh;
+  width: 100vw;
+  display: flex; /* For centering content */
+  justify-content: center; /* Center horizontally */
+  align-items: center; /* Center vertically */
+  margin-top: 20px;
+}
+
+.backdrop-filter {
+  background-color: rgba(255, 255, 255, 0.098); /* Adjust opacity as needed */
+  backdrop-filter: blur(20px); /* Adjust blur amount as needed */
+}
+
+/* FOOTER ########################## */
+.icon {
+  width: 34px;
+  height: 34px;
+  margin-inline: 6px;
+}
+
+.footer-icon {
+    width: 64px;
+  height: 64px;
+  margin-inline: 6px;
+}
+
+#footer {
+  padding: 60px;
+  padding-left: auto; /* Auto-adjust left padding */
+  padding-right: auto; /* Auto-adjust right padding */
+  margin: 0;
+  width: 100%;
+}
+
+/* Footer content area */
+#footer .row {
+  margin-bottom: 20px; /* Adjust spacing between rows if needed */
+}
+
+/* Adjust the footer height based on content */
+footer {
+  padding-top: 60px; /* Set a top padding */
+  padding-bottom: 30px; /* Set a bottom padding */
+  background-color: #343a40; /* Set background color */
+  color: white; /* Set text color */
+}

@@ -1,0 +1,240 @@
+/* courses.css */
+.blogs-page-container {
+    background-image: url("/images/mountain-yoga.jpg");
+    background-size: cover;
+    background-position: center; /* Centers the background image */
+    height: 100vh;
+    width: 100vw;
+    min-height: 100vh; /* Ensures the container takes at least the full height of the viewport */
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* vignete overlay */
+.blog-page-container::before {
+  content: '';
+  background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0.7) 100%);
+  z-index: 0; /* Set a lower z-index to stay beneath the content */
+  height: 100%;
+}
+
+  /* Reset styles */
+  body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  hr {
+    width: 100%;
+    margin: 20px 0;
+    border: none;
+    border-top: 1px solid #ccc;
+  }
+  
+  /* Section title */
+  .section-title1 {
+    text-align: center;
+    font-family: "Poppins", sans-serif;
+    margin-bottom: 2px;
+    font-weight: 900;
+  }
+
+  .section-title1 h1{
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, .4); /* Adding shadow to the h1 */
+  }
+  
+  .timestamp {
+    color: #777;
+    text-decoration: none;
+  }
+  
+  h1 {
+    margin: 0;
+    padding: 0;
+  }
+  
+  /* Courses container */
+  .blogs-container {
+    max-width: 1200px;
+    margin: 6.2rem auto;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+    flex-grow: 1; /* Allows the container to grow and take available space */
+    overflow-y: auto; /* Enables vertical scrolling when content overflows */
+  }
+  
+  /* Style for the go back button */
+  .blogs-container button {
+    background-color: #333;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+  }
+  
+  /* Style for the courses list */
+  .blogs-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); /* Maximum of 4 columns */
+    gap: 20px; /* Adjust spacing between items */
+  }
+  
+  /* Adjust individual course item styles */
+  .blog-item {
+    border-radius: 5%;
+    padding: 10px;
+    overflow: hidden; /* Ensure content doesn't overflow */
+    margin-bottom: 20px;
+    position: relative; /* Adjust for button positioning */
+  }
+  
+  /* Style for the course image */
+  .blog-item img {
+    width: 100%;
+    height: 200px; /* Adjust the height as needed */
+    object-fit: cover;
+    display: block;
+    margin-bottom: 5px; /* Space between image and content */
+  }
+  
+  /* Course details */
+  .blog-item .blog-details {
+    color: #333;
+  }
+  
+  /* Adjust the author section */
+  .blog-item .author {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px; /* Add spacing between author and course details */
+  }
+  
+  /* Style for the author's avatar */
+  .blog-item .author img.avatar {
+    width: 30px; /* Adjust the width as needed */
+    height: 30px; /* Adjust the height as needed */
+    border-radius: 50%; /* Circular shape */
+    margin-right: 10px; /* Add space between image and text */
+    color: #777;
+  }
+  .blog-item .timestamp {
+    color: #777;
+    margin: 0;
+  }
+  /* Style for the author's information */
+  .blog-item .author p.author-info {
+    margin: 0; /* Remove default margins */
+    color: #777;
+  }
+  
+  /* Style for the course title */
+  .blog-item .blog-details h2 {
+    margin-top: 0;
+    margin-bottom: 5px;
+    font-size: 18px;
+  }
+  
+  /* Style for the course prices */
+  .blog-item .blog-details .prices {
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+  
+  /* Style for the course description */
+  .blog-item .blog-details p {
+    color: #777;
+    margin-bottom: 10px;
+  }
+  /* buttons==================================================== */
+  .blog-item .blog-actions {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 15px;
+  }
+  .blog-actions i {
+    color: #fff;
+  }
+  
+  .blog-item .blog-actions a {
+    padding: 8px 15px;
+    text-decoration: none;
+    color: black;
+    border-radius: 5px;
+  }
+  
+  /* Adjust buttons' colors based on their actions */
+  .blog-item .blog-actions .edit {
+    background-color: #007bff;
+  }
+  
+  .blog-item .course-actions .delete {
+    background-color: #dc3545;
+  }
+  /* ========================================================= */
+  /* Style links */
+  .blogs-container button a {
+    color: #ffff;
+  }
+  
+  .blogs-container button a:hover {
+    color: #46c73d;
+  }
+  
+  /* Pagination bar */
+  /* Pagination styles */
+  .pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+  }
+  
+  .pagination a {
+    padding: 8px 12px;
+    margin-right: 5px;
+    color: #333;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    text-decoration: none;
+    transition: background-color 0.3s, color 0.3s;
+  }
+  
+  .pagination a.active {
+    background-color: #333;
+    color: #fff;
+  }
+  
+  .pagination a:hover {
+    background-color: #eee;
+    color: #333;
+  }
+  
+  /* ========================================================= */
+  /* Media query for responsive layout */
+  @media screen and (max-width: 960px) {
+    .blogs-grid {
+      grid-template-columns: repeat(
+        3,
+        1fr
+      ); /* Adjust to 3 columns for smaller screens */
+    }
+  }
+  
+  @media screen and (max-width: 768px) {
+    .blogs-grid {
+      grid-template-columns: repeat(
+        2,
+        1fr
+      ); /* Adjust to 2 columns for even smaller screens */
+    }
+  }
+  
+  @media screen and (max-width: 480px) {
+    .blogs-grid {
+      grid-template-columns: 1fr; /* Single column for very small screens */
+    }
+  }
+  

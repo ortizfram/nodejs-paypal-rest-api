@@ -30,7 +30,7 @@ const CompHome = () => {
     <div className="home-page-container">
       {/* <!-- hero --> */}
       <div className="hero-container home-hero">
-        <img className="hero-logo" src="home/white-logo-buonavibra.png" alt="" />
+        <img className="hero-logo" src="images/home/white-logo-buonavibra.png" alt="" />
       </div>
 
       {/* <!-- about --> */}
@@ -40,7 +40,7 @@ const CompHome = () => {
         <div className="row">
           <div className="col-md-6 text-center">
             <img
-              src="home/me-about.jpg"
+              src="images/home/me-about.jpg"
               style={me_about_img_style}
               className="shadow-2xl rounded-circle w-100"
               alt="Marcela Marzetti Gimenez"
@@ -96,7 +96,7 @@ const CompHome = () => {
                   <a href="https://wa.me/2615996913" target="_blank">
                     <img
                       className="icon"
-                      src="home/whatsapp-white-icon.png"
+                      src="images/home/whatsapp-white-icon.png"
                       alt="WhatsApp"
                     />
                   </a>
@@ -106,7 +106,7 @@ const CompHome = () => {
                   >
                     <img
                       className="icon"
-                      src="home/instagram-white-icon.png"
+                      src="images/home/instagram-white-icon.png"
                       alt="Instagram"
                     />
                   </a>

@@ -1,0 +1,7 @@
+.avatar {
+  border-radius: 50%;
+  width: 25px; /* Adjust the width and height as needed */
+  height: 25px; /* Adjust the width and height as needed */
+  object-fit: cover; /* Maintain aspect ratio and cover the container */
+}
+
