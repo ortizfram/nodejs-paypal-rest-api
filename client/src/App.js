@@ -4,6 +4,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 //import components
 import CompBlogList from "./blog/BlogList";
 import CompBlogCreate from "./blog/BlogCreate";
+import CompBlogUpdate from "./blog/BlogUpdate";
 // 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
           <Routes>
             <Route path="/" element={ <CompBlogList />}/>
             <Route path="/api/blog/create" element={ <CompBlogCreate />}/>
+            <Route path="/api/blog/:id/update" element={ <CompBlogUpdate />}/>
           </Routes>
         </BrowserRouter>
       </header>

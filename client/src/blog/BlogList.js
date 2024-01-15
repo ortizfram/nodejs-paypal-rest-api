@@ -49,6 +49,7 @@ const CompBlogList = () => {
           <h1 class="text-white">Blogs and Latest News</h1>
         </div>
 
+        <Link to={`${URI}create`}>CrearBlog</Link>
         <ul>
           {blogs.map((blog) => (
             <li key={blog.id}>
