@@ -1,5 +1,6 @@
 import axios from "axios";
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 
 // NodeJS endpoint reference
@@ -11,6 +12,13 @@ const CompHome = () => {
     maxWidth: "300px",
     height: "auto",
   };
+
+  // mail form data declaration
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [msg, setMsg] = useState('');
+  const navigate = useNavigate();
+
   const [home, setHome] = useState([]);
 
   useEffect(() => {
@@ -29,18 +37,12 @@ const CompHome = () => {
 
   // send contact Email
   const sendEmail = async (e) => {
+   
     try {
       e.preventDefault();
-
-      // Assuming you are sending form data with name, email, and msg
-      const formData = new FormData();
-      formData.append("name", e.target.name.value);
-      formData.append("email", e.target.email.value);
-      formData.append("msg", e.target.msg.value);
-
-      const res = await axios.post(URI_sendEmail); //  endpoint
+      const res = await axios.post(URI_sendEmail, {name:name, email:email, msg:msg})//  endpoint
       console.log("Email sent successfully!", res.data);
-      setHome(res.data);
+      navigate('/')
     } catch (error) {
       console.error("Error sending Email:", error);
     }
@@ -156,7 +158,8 @@ const CompHome = () => {
                     type="text"
                     className="form-control"
                     id="name"
-                    name="name"
+                    value={name}
+                    onChange={ (e)=> setName(e.target.value)} 
                   />
                 </div>
                 <div className="mb-3">
@@ -167,7 +170,8 @@ const CompHome = () => {
                     type="email"
                     className="form-control"
                     id="email"
-                    name="email"
+                    value={email}
+                    onChange={ (e)=> setEmail(e.target.value)} 
                   />
                 </div>
                 <div className="mb-3">
@@ -178,7 +182,8 @@ const CompHome = () => {
                     className="form-control"
                     id="message"
                     rows="3"
-                    name="msg"
+                    value={email}
+                    onChange={ (e)=> setMsg(e.target.value)} 
                   ></textarea>
                 </div>
                 <button type="submit" className="btn btn-primary">
