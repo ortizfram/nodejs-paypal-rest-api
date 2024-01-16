@@ -20,7 +20,7 @@ async function testConnection() {
     const [result] = await pool.query('SELECT DATABASE() AS database_name');
     const [tablesResult] = await pool.query('SHOW TABLES');
     console.log('✅ Database connection successful. Result:', result[0]);
-    console.log('tables:', tablesResult);
+    console.log('tables:', [tablesResult]);
   } catch (error) {
     console.error('Error connecting to the database:', error);
   }
