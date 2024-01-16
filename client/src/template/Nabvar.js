@@ -12,7 +12,7 @@ const CompNavbar = (req) => {
     return (
         <>
           <header className="header shadow-lg">
-            <a href="/" className="logo"><img src="../../../../public/images/home/white-logo-buonavibra.png" alt="" /></a>
+            <a href="/" className="logo"><img src="/images/home/white-logo-buonavibra.png" alt="" /></a>
       
             <input type="checkbox" id="check" />
             <label htmlFor="check" className="icons">

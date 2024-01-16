@@ -7,12 +7,58 @@ import { Link } from "react-router-dom";
 const URI = "http://localhost:3000/"; // Update the base URL
 
 const CompFooter = () => {
-
-    return(
-        <>
-        <div>Footer</div>
-        </>
-    )
-}
+  return (
+    <>
+      <footer class="bg-dark text-white py-5" id="footer">
+        <div>
+          <div class="row">
+            <div class="col-md-4">
+              <img
+                class="footer-icon"
+                src="/images/white-logo-buonavibra.png"
+                alt=""
+              />
+              <h5>Acerca</h5>
+              <p>
+                Bienvenidos a mi espacio de bienestar! quiero que recorramos
+                juntos el camino del Kundalini Yoga.
+              </p>
+            </div>
+            <div class="col-md-4">
+              <h5>Links</h5>
+              <ul class="list-unstyled">
+                <li>
+                  <a href="/">Home</a>
+                </li>
+                <li>
+                  <a href="/#about">Acerca</a>
+                </li>
+                <li>
+                  <a href="api/courses?page=1&perPage=6">courses</a>
+                </li>
+                <li>
+                  <a href="api/blog?page=1&perPage=6">blog</a>
+                </li>
+                <li>
+                  <a href="/#contact">Contact</a>
+                </li>
+              </ul>
+            </div>
+            <div class="col-md-4">
+              <h5>Contacto</h5>
+              <p>
+                Email: buonavibraclub@gmail.com
+                <br />
+                Phone: +549 2615 996913
+              </p>
+            </div>
+          </div>
+          <hr class="my-4" />
+          <p class="text-center">© 2024 buonavibra. All rights reserved.</p>
+        </div>
+      </footer>
+    </>
+  );
+};
 
 export default CompFooter;
