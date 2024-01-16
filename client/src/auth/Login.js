@@ -10,20 +10,15 @@ const CompLogin = () => {
     //   declare form fields
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [page, setPage] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
-    loginUser();
+
   }, []);
 
   //procedimiento guardar -----------------------------------
   const loginUser = async (e) => {
     try {
-      const res = await axios.get(URI); //  endpoint
-      setPage(res.data);
-
-      //send form
       e.preventDefault();
       await axios.post(URI, {
         username: username,

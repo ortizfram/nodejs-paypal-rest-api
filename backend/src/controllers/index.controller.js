@@ -1,5 +1,6 @@
 // controllers/indexController.js
 import { pool } from "../db.js";
+import path from "path";
 import sendEmailContactForm from "../utils/sendEmailContactForm.js";
 
 const getPing = async (req, res) => {
@@ -11,10 +12,6 @@ const getPing = async (req, res) => {
   res.render('navbar2', {user,message});
 };
 
-const getHome = async (req, res) => {
- console.log(`\n\n*** getHome\n\n`)
- res.render('auth/home')
-};
 
 const sendEmail = async (req, res) => {
   const { name, email, msg } = req.body;
@@ -36,6 +33,5 @@ const sendEmail = async (req, res) => {
 
 export default {
   getPing,
-  getHome,
   sendEmail,
 };

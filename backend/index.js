@@ -28,10 +28,23 @@ const HOST = process.env.HOST || 'localhost';
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://127.0.0.1:5173'; 
 const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:3000'; 
 
-// call express
+// shortcuts for files/dirs
+export const __filename = fileURLToPath(import.meta.url);
+export const __dirname = path.dirname(__filename);
+
+
+// call express **********************************************************
 const app = express();
 
 app.use(express.json()); // Add this line to parse JSON bodies
+
+// Serve static files from React build directory
+app.use(express.static(path.join(__dirname, '../client/build')));
+
+// Catch-all route to serve the React app
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../client/build/index.html'));
+});
 
 // Connection
 app.listen(PORT, HOST, () => {
@@ -40,8 +53,19 @@ app.listen(PORT, HOST, () => {
 
 // Use cors middleware to handle CORS headers
 app.use(cors({
-    origin: FRONTEND_URL
+  origin: 'http://localhost:3000', 
+  credentials: true,
 })); // frontend app can ask data
+
+// Use sessions
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET || 'secret', // Change this to a secure secret key
+    resave: false,
+    saveUninitialized: true,
+  })
+);
+
 
 // Use routes app
 app.use(indexRoutes);
@@ -52,15 +76,13 @@ app.use("/api", coursesRoutes);
 app.use("/api", employeeRoutes);
 app.use("/api", blogRoutes);
 
+
 // configure methodOverride
 app.use(methodOverride('_method'));
 
 // Set default time zone
 Intl.DateTimeFormat = Intl.DateTimeFormat(undefined, { timeZone: 'America/Argentina/Buenos_Aires' });
 
-// shortcuts for files/dirs
-export const __filename = fileURLToPath(import.meta.url);
-export const __dirname = path.dirname(__filename);
 
 //default option
 app.use(fileUpload());
@@ -139,9 +161,18 @@ app.use((req, res) => {
   });
 });
 
+// middleware for session
+const initSession = (req, res, next) => {
+  if (!req.session) {
+    console.error('Session not initialized!');
+  }
+  next();
+};
+app.use(initSession);
+
 // middleware for login user
 export function is_loggedin_check (req, res, next) {
-  const user = req.session.user || null;
+  const user = req.session
   if(!user) {
     // Redirect the user to the login page
     return res.status(403).redirect('/api/login');

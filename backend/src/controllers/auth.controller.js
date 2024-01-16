@@ -29,10 +29,8 @@ config();
 const JWT_SECRET = process.env.JWT_SECRET;
 
 //------------login-------------------------
-const getLogin = async (req, res) => {
+const getLogin = async (req, res, next) => {
   console.log(`\n\n*** getLogin\n\n`);
-  res.render(`auth/login`)
-  
 };
 
 const postLogin = async (req, res, next) => {
@@ -65,6 +63,7 @@ const postLogin = async (req, res, next) => {
 //------------signup-------------------------
 const getSignup = async (req, res) => {
   const message = req.query.message; // Retrieve success message from query params authcontroller
+  console.log(`\n\n*** getSignup\n\n`);
 };
 
 const postSignup = async (req, res) => {
@@ -89,14 +88,12 @@ const postSignup = async (req, res) => {
     // If the email already exists, handle the duplicate case
     if (existingEmail.length > 0) {
       return res.status(400).render("auth/signup", {
-        user,
         message: "This email is already registered.",
       });
     }
     // If the username already exists, handle the duplicate case
     if (existingUsername.length > 0) {
       return res.status(400).render("auth/signup", {
-        user,
         message: "This username is already registered.",
       });
     }
@@ -126,12 +123,12 @@ const postSignup = async (req, res) => {
     console.log(`\n\n🧍UserCreated\nInserted userId = ${id}\n`);
 
     //signup user & singin
-    req.session.user = { id, username, name, email, role };
+    req.session= { id, username, name, email, role };
 
     //set up role
-    const emailCheck = req.session.user.email === process.env.ADMIN_EMAIL;
+    const emailCheck = req.session.email === process.env.ADMIN_EMAIL;
     if (emailCheck) {
-      setUserRole("admin", req.session.user.email); // Use the retrieved ID here
+      setUserRole("admin", req.session.email); // Use the retrieved ID here
     }
 
     //redirect

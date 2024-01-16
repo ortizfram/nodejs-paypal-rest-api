@@ -23,17 +23,15 @@ const CompHome = () => {
   const [msg, setMsg] = useState("");
   const navigate = useNavigate();
 
-  const [home, setHome] = useState([]);
 
   useEffect(() => {
-    getHome();
+
   }, []);
 
   // Fetch Home
   const getHome = async () => {
     try {
-      const res = await axios.get(URI); //  endpoint
-      setHome(res.data);
+      await axios.get(URI); //  endpoint
     } catch (error) {
       console.error("Error fetching Home:", error);
     }
@@ -63,7 +61,7 @@ const CompHome = () => {
         <div className="hero-container home-hero">
           <img
             className="hero-logo"
-            src="images/home/white-logo-buonavibra.png"
+            src="/images/home/white-logo-buonavibra.png"
             alt=""
           />
         </div>
