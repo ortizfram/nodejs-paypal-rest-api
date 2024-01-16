@@ -30,9 +30,7 @@ const JWT_SECRET = process.env.JWT_SECRET;
 
 //------------login-------------------------
 const getLogin = async (req, res) => {
-  const user = req.session.user || null; // Get the user from the session or set to null if not logged in
-  const message = req.query.message; // Retrieve success message from query params authcontroller
-  res.render("auth/login", { user, message });
+  console.log(`\n\n*** getLogin\n\n`);
 };
 
 const postLogin = async (req, res, next) => {
@@ -64,16 +62,15 @@ const postLogin = async (req, res, next) => {
 };
 //------------signup-------------------------
 const getSignup = async (req, res) => {
-  const user = req.session.user || null; // Get the user from the session or set to null if not logged in
   const message = req.query.message; // Retrieve success message from query params authcontroller
-  res.render("auth/signup", { user, message });
+  res.render("auth/signup", {  message });
 };
 
 const postSignup = async (req, res) => {
   console.log("\n\n*** postSignUp\n\n");
 
   let role = "user"; //default role: user
-  const user = req.session.user || null;
+  // const user = req.session.user || null;
 
   const { username, name, email, password } = req.body;
 
@@ -125,6 +122,7 @@ const postSignup = async (req, res) => {
     const [rows] = await pool.query(postSignupQuery, data);
     // get inserted user's id
     const id = String(rows.insertId);
+    console.log(`\n\n🧍UserCreated\nInserted userId = ${id}\n`);
 
     //signup user & singin
     req.session.user = { id, username, name, email, role };

@@ -1,15 +1,13 @@
 import axios from "axios";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Link } from "react-router-dom";
 
 // NodeJS endpoint reference
 const URI_signup = "http://localhost:3000/api/signup";
-const URI_login = "http://localhost:3000/api/login";
-const URI_logout = "http://localhost:3000/api/logout";
-const URI_forgotPassword = "http://localhost:3000/api/forgot-password";
 
 const CompSignup = () => {
+
+//   declare form fields
   const [username, setUsername] = useState("");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");

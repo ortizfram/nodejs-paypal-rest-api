@@ -31,8 +31,9 @@ const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:3000';
 // call express
 const app = express();
 
-// Connection
+app.use(express.json()); // Add this line to parse JSON bodies
 
+// Connection
 app.listen(PORT, HOST, () => {
     console.log(`Server is running on http://${HOST}:${PORT}`);
   });
