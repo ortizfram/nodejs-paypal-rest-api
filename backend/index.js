@@ -172,7 +172,7 @@ app.use(initSession);
 
 // middleware for login user
 export function is_loggedin_check (req, res, next) {
-  const user = req.session
+  const user = req.session.user
   if(!user) {
     // Redirect the user to the login page
     return res.status(403).redirect('/api/login');
@@ -183,7 +183,7 @@ export function is_loggedin_check (req, res, next) {
 
 // middleware for admin&staff
 export function admin_staff_check (req, res, next) {
-  const user = req.session || null;
+  const user = req.session.user || null;
   if(!user || (user.role !== 'staff' && user.role !== 'admin')){
     return res.status(403).send(`Forbidden`);
   }

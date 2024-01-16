@@ -10,7 +10,7 @@ const URI = "http://localhost:3000/"; // Update the base URL
 const URI_sendEmail = "http://localhost:3000/send-email"; // Update the base URL
 
 const CompHome = () => {
-  
+  let user = null;
 
   const me_about_img_style = {
     maxWidth: "300px",
@@ -55,7 +55,7 @@ const CompHome = () => {
 
   return (
     <>
-      <CompNavbar />
+      <CompNavbar user={user}/>
       <div className="home-page-container">
         {/* <!-- hero --> */}
         <div className="hero-container home-hero">

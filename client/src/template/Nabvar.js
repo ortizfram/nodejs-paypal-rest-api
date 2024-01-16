@@ -6,8 +6,8 @@ import { Link } from "react-router-dom";
 // NodeJS endpoint reference
 const URI = "http://localhost:3000/"; // Update the base URL
 
-const CompNavbar = (req) => {
-    let user = req.session;
+const CompNavbar = () => {
+    let user = null;
 
     return (
         <>
