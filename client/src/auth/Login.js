@@ -10,9 +10,8 @@ const CompLogin = () => {
     //   declare form fields
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [page, setPage] = useState([]);
   const navigate = useNavigate();
-
-  const [loginPage, setLoginPage] = useState([]);
 
   useEffect(() => {
     loginUser();
@@ -22,7 +21,7 @@ const CompLogin = () => {
   const loginUser = async (e) => {
     try {
       const res = await axios.get(URI); //  endpoint
-      setLoginPage(res.data);
+      setPage(res.data);
 
       //send form
       e.preventDefault();
@@ -32,7 +31,7 @@ const CompLogin = () => {
       });
       navigate("/");
     } catch (error) {
-      console.error("Error Signing up:", error);
+      console.error("Error loginin:", error);
     }
   };
 
