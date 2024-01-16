@@ -71,11 +71,6 @@ app.use(express.static(path.join(__dirname, "src","public")));
 // set up uploads [backend]
 app.use("/uploads", express.static(path.join(__dirname, "src","uploads")));
 
-// config templates layout and EJS
-app.use(expressEjsLayouts);
-app.set("layout",  path.join(__dirname, "../client/src/layouts/layout.ejs"));
-app.set("view engine", "ejs");
-app.set("views", [path.join(__dirname, "../client/src/views", "templates")]);
 
 // marked test route
 app.get('/markdown-to-html', (req, res) => {
@@ -95,7 +90,7 @@ app.use(morgan('dev'));
 // Use sessions
 app.use(
   session({
-    secret: process.env.SESSION_SECRET, // Change this to a secure secret key
+    secret: process.env.SESSION_SECRET || 'secret', // Change this to a secure secret key
     resave: false,
     saveUninitialized: true,
   })

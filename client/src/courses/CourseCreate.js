@@ -107,7 +107,7 @@ const CompCourseCreate = () => {
             <br />
             % <input type="number" id="discount" name="discount" value={discount} onChange={(e) => setDiscount(e.target.value)}/>
             <br />
-            <input type="hidden" name="author" value={req.session} />
+            <input type="hidden" name="author" value={user} />
             <button type="submit">Create Course</button>
             {/* Display error message */}
             {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}

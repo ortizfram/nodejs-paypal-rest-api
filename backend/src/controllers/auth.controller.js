@@ -31,6 +31,8 @@ const JWT_SECRET = process.env.JWT_SECRET;
 //------------login-------------------------
 const getLogin = async (req, res) => {
   console.log(`\n\n*** getLogin\n\n`);
+  res.render(`auth/login`)
+  
 };
 
 const postLogin = async (req, res, next) => {
@@ -63,7 +65,6 @@ const postLogin = async (req, res, next) => {
 //------------signup-------------------------
 const getSignup = async (req, res) => {
   const message = req.query.message; // Retrieve success message from query params authcontroller
-  res.render("auth/signup", {  message });
 };
 
 const postSignup = async (req, res) => {

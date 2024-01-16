@@ -14,6 +14,10 @@ const CompSignup = () => {
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
+  useEffect(() => {
+    register();
+  }, []);
+
   //procedimiento guardar -----------------------------------
   const register = async (e) => {
     try {

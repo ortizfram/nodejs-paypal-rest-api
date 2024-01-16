@@ -1,0 +1,35 @@
+#login-page-container {
+    background-image: url("../../../../public/images/auth/natural-background.jpg");
+    background-size: cover;
+    background-position: center;
+    /* Centers the background image */
+    height: 100%;
+    width: 100vw;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    /* Center-align text within the container */
+}
+
+#login-page-content{
+    margin: 6.2rem auto;
+}
+
+.links-container p {
+    margin: 5px 0;
+    /* Adjust margin for individual links */
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+    /* Adding shadow to the links */
+}
+
+.links-container {
+    margin-bottom: 20px;
+    margin-top: 10px;
+}
+
+.section-title h1 {
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+    /* Adding shadow to the h1 */
+}

@@ -26,7 +26,7 @@ const getCourseCreate = async (req, res) => {
   console.log("\n\n*** getCourseCreate\n\n");
 
   const message = req.query.message;
-  const user = req.session.user || null;
+  const user = req.session
   const userId = user.id || null;
   res.render(`courseCreate/courseCreate`, { message, user });
 };

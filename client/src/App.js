@@ -8,6 +8,9 @@ import CompBlogCreate from "./blog/BlogCreate.js";
 import CompBlogUpdate from "./blog/BlogUpdate.js";
 import CompHome from "./index/Home.js";
 import CompSignup from "./auth/Signup.js";
+import CompLogin from "./auth/Login.js";
+import CompCourses from "./courses/Courses";
+import CompCourseCreate from "./courses/CourseCreate";
 // import css
 import homeCSS from './public/css/home/home.css'
 import formCSS from './public/css/form.css'
@@ -23,8 +26,7 @@ import courseDetailCSS from './public/css/course/courseDetail.css'
 import courseEnrollCSS from './public/css/course/courseEnroll.css'
 import courseUpdateCSS from './public/css/course/courseUpdate.css'
 import coursesCSS from './public/css/course/courses.css'
-import CompCourses from "./courses/Courses";
-import CompCourseCreate from "./courses/CourseCreate";
+
 
 function App() {
   return (
@@ -36,7 +38,7 @@ function App() {
             
             {/* AUTH */}
             <Route path="/api/signup" element={ <CompSignup />}/>
-            <Route path="/api/login" element={ <CompSignup />}/>
+            <Route path="/api/login" element={ <CompLogin />}/>
             <Route path="/api/forgot-password" element={ <CompSignup />}/>
 
             {/* COURSES */}

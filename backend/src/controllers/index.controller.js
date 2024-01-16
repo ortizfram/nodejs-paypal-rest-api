@@ -12,10 +12,8 @@ const getPing = async (req, res) => {
 };
 
 const getHome = async (req, res) => {
-  const message = req.query.message; // Retrieve success message from query params authcontroller
-  const user =  req.session.user || null; // Get the user from the session or set to null if not logged in
-
-  res.render("home", { user, message });
+ console.log(`\n\n*** getHome\n\n`)
+ res.render('auth/home')
 };
 
 const sendEmail = async (req, res) => {
