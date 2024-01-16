@@ -23,6 +23,7 @@ import courseDetailCSS from './public/css/course/courseDetail.css'
 import courseEnrollCSS from './public/css/course/courseEnroll.css'
 import courseUpdateCSS from './public/css/course/courseUpdate.css'
 import coursesCSS from './public/css/course/courses.css'
+import CompCourses from "./courses/Courses";
 
 function App() {
   return (
@@ -36,6 +37,10 @@ function App() {
             <Route path="/api/signup" element={ <CompSignup />}/>
             <Route path="/api/login" element={ <CompSignup />}/>
             <Route path="/api/forgot-password" element={ <CompSignup />}/>
+
+            {/* COURSES */}
+            <Route path="/api/courses" element={ <CompCourses />}/>
+
 
             {/* BLOGS */}
             <Route path="/api/blog" element={ <CompBlogList />}/>

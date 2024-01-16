@@ -3,29 +3,27 @@
 // ----- Create, Update course Queries-----------------
 export const createCourseTableQuery = `
 CREATE TABLE IF NOT EXISTS courses (
-    id INT NOT NULL AUTO_INCREMENT,
-    title VARCHAR(255) NOT NULL,
-    slug VARCHAR(255) NOT NULL,
-    description VARCHAR(255) DEFAULT NULL,
-    text_content TEXT DEFAULT NULL,
-    ars_price DECIMAL(10, 2) NOT NULL,
-    usd_price DECIMAL(10, 2) NOT NULL,
-    discount DECIMAL(10, 2) DEFAULT NULL,
-    thumbnail VARCHAR(255) DEFAULT NULL,
-    video VARCHAR(255) DEFAULT NULL,  // Modified to include the video field
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    author_id INT NOT NULL,
+  id INT NOT NULL AUTO_INCREMENT,
+  title VARCHAR(255) NOT NULL,
+  slug VARCHAR(255) NOT NULL,
+  description VARCHAR(255) DEFAULT NULL,
+  text_content TEXT DEFAULT NULL,
+  ars_price DECIMAL(10, 2) NOT NULL,
+  usd_price DECIMAL(10, 2) NOT NULL,
+  discount DECIMAL(10, 2) DEFAULT NULL,
+  thumbnail VARCHAR(255) DEFAULT NULL,
+  video VARCHAR(255) DEFAULT NULL,  /* Modified to include the video field */
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  author_id INT NOT NULL,
 
-    PRIMARY KEY(id),
-    UNIQUE KEY(slug),
-    FOREIGN KEY (author_id) REFERENCES users(id)
-);
-
-ALTER TABLE courses
-ADD CONSTRAINT fk_author
-FOREIGN KEY (author_id) REFERENCES users(id);
-`;
+  PRIMARY KEY(id),
+  UNIQUE KEY(slug)
+  /* Add the foreign key constraint in the same query */
+  -- ALTER TABLE courses
+  -- ADD CONSTRAINT fk_author
+  -- FOREIGN KEY (author_id) REFERENCES users(id);
+);`;  
 
 const argentinaTimeZone =
   "CONVERT_TZ(NOW(), 'UTC', 'America/Argentina/Buenos_Aires')";

@@ -10,6 +10,8 @@ const URI = "http://localhost:3000/"; // Update the base URL
 const URI_sendEmail = "http://localhost:3000/send-email"; // Update the base URL
 
 const CompHome = () => {
+  
+
   const me_about_img_style = {
     maxWidth: "300px",
     height: "auto",

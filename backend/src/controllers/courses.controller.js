@@ -431,7 +431,7 @@ const coursesList = async (req, res) => {
 
   try {
     const message = req.query.message;
-    const user = req.session.user || null;
+    let user= req.session;
     const isAdmin = user && user.role === "admin";
 
     const page = parseInt(req.query.page) || 1;

@@ -8,7 +8,7 @@ export const createUserTableQuery = `
       password VARCHAR(255) NOT NULL,
       role ENUM('user', 'admin', 'staff') NOT NULL,
       resetToken VARCHAR(255) DEFAULT NULL,
-      avatar VARCHAR(255) DEFAULT NULL,
+      avatar VARCHAR(255) DEFAULT NULL
   );
     `;
 export const fetchUserByField = (fieldName) =>`
