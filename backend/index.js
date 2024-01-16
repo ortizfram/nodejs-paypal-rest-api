@@ -157,7 +157,7 @@ export function is_loggedin_check (req, res, next) {
 
 // middleware for admin&staff
 export function admin_staff_check (req, res, next) {
-  const user = req.session.user || null;
+  const user = req.session || null;
   if(!user || (user.role !== 'staff' && user.role !== 'admin')){
     return res.status(403).send(`Forbidden`);
   }

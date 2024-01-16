@@ -24,6 +24,7 @@ import courseEnrollCSS from './public/css/course/courseEnroll.css'
 import courseUpdateCSS from './public/css/course/courseUpdate.css'
 import coursesCSS from './public/css/course/courses.css'
 import CompCourses from "./courses/Courses";
+import CompCourseCreate from "./courses/CourseCreate";
 
 function App() {
   return (
@@ -40,6 +41,7 @@ function App() {
 
             {/* COURSES */}
             <Route path="/api/courses" element={ <CompCourses />}/>
+            <Route path="/api/course/create" element={ <CompCourseCreate />}/>
 
 
             {/* BLOGS */}
