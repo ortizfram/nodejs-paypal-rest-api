@@ -10,17 +10,30 @@ const URI = `http://localhost:3000/api/course/create`;
 
 const CompCourseCreate = () => {
   const [errorMessage, setErrorMessage] = useState(""); // Define errorMessage state
-  const navigate = useNavigate();
+   // course form data declaration
+   const [title, setTitle] = useState("");
+   const [description, setDescription] = useState("");
+   const [text_content, setTextContent] = useState("");
+   const [video, setVideo] = useState("");
+   const [thumbnail, setThumbnail] = useState("");
+   const [ars_price, setARSPrice] = useState("");
+   const [usd_price, setUSDPrice] = useState("");
+   const [discount, setDiscount] = useState("");
+   const navigate = useNavigate();
 
   // createCourse procedure ------------------------
   const handleFormSubmit = async (e) => {
     try {
       e.preventDefault();
       await axios.post(URI, {
-        username: username,
-        name: name,
-        email: email,
-        password: password,
+        title: title,
+        description: description,
+        text_content: text_content,
+        video: video,
+        thumbnail: thumbnail,
+        ars_price: ars_price,
+        usd_price: usd_price,
+        discount: discount,
       });
       navigate("/");
     } catch (error) {
@@ -94,7 +107,7 @@ const CompCourseCreate = () => {
             <br />
             % <input type="number" id="discount" name="discount" value={discount} onChange={(e) => setDiscount(e.target.value)}/>
             <br />
-            <input type="hidden" name="author" value={user} />
+            <input type="hidden" name="author" value={req.session} />
             <button type="submit">Create Course</button>
             {/* Display error message */}
             {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
