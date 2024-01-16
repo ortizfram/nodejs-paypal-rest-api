@@ -12,6 +12,17 @@ import CompSignup from "./auth/Signup.js";
 import homeCSS from './public/css/home/home.css'
 import formCSS from './public/css/form.css'
 import signupCSS from './public/css/auth/signup.css'
+import navbarCSS from './public/css/layout/navbar.css'
+import sectionTitleCSS from './public/css/sectionTitle.css'
+import paginationCSS from './public/css/pagination.css'
+import highlightTextCSS from './public/css/highlightText.css'
+import alertCSS from './public/css/alert.css'
+import courseCreateModuleCSS from './public/css/course/courseCreateModule.css'
+import courseCreateVideoCSS from './public/css/course/courseCreateVideo.css'
+import courseDetailCSS from './public/css/course/courseDetail.css'
+import courseEnrollCSS from './public/css/course/courseEnroll.css'
+import courseUpdateCSS from './public/css/course/courseUpdate.css'
+import coursesCSS from './public/css/course/courses.css'
 
 function App() {
   return (
