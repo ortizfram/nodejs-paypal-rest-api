@@ -50,7 +50,7 @@ const postLogin = async (req, res, next) => {
       req.session.user = user; // Store the user in the session
       const userId = user.id;
       console.log("\n\nuser: ", user);
-      res.json({ message: `Login successful, user: ${userId}`, user: req.session.user });
+      res.redirect(`/?message=Login successful, user:${userId}`);
       console.log("\n*** Logged in\n");
     } else {
       res.send("Wrong password or username");
