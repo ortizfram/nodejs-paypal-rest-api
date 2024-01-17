@@ -7,7 +7,9 @@ import { Link } from "react-router-dom";
 const URI = "http://localhost:3000/"; // Update the base URL
 
 const CompNavbar = () => {
-    let user = null;
+    let user = req.session.user ? req.session.user : null;
+    console.log('user', user);
+    
 
     return (
         <>

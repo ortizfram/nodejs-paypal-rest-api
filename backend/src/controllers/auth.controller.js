@@ -50,7 +50,7 @@ const postLogin = async (req, res, next) => {
       req.session.user = user; // Store the user in the session
       const userId = user.id;
       console.log("\n\nuser: ", user);
-      res.redirect(`/?message=Login successful, user:${userId}`);
+      res.json({ message: `Login successful, user: ${userId}`, user: req.session.user });
       console.log("\n*** Logged in\n");
     } else {
       res.send("Wrong password or username");
@@ -58,6 +58,12 @@ const postLogin = async (req, res, next) => {
   } catch (error) {
     res.send("An error occurred while logging in");
   }
+};
+
+// New endpoint to get user information
+const getUser = (req, res) => {
+  const user = req.session.user;
+  res.json(user);
 };
 //------------signup-------------------------
 const getSignup = async (req, res) => {
@@ -530,6 +536,7 @@ const postUserUpdate = async (req, res) => {
 };
 
 export default {
+  getUser,
   getLogin,
   postLogin,
   getSignup,

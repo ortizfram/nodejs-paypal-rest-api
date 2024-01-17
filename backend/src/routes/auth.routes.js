@@ -6,7 +6,8 @@
     //------------login-------------------------
     router.get("/login", controller.getLogin);
     router.post("/login", controller.postLogin);
-
+    
+    router.get("/get-user", controller.getUser);
     //------------signup-------------------------
     router.get("/signup", controller.getSignup);
     router.post("/signup", controller.postSignup);
