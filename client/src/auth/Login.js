@@ -6,28 +6,42 @@ import { useNavigate } from "react-router-dom";
 const URI = "http://localhost:3000/api/login";
 
 const CompLogin = () => {
-
-    //   declare form fields
+  // declare form fields
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
+  const [user, setUser] = useState(null);
 
-  useEffect(() => {
+  useEffect(() => {}, []);
 
-  }, []);
-
-  //procedimiento guardar -----------------------------------
-  const loginUser = async (e) => {
+    // login procedure -----------------------------------
+  const loginUser = async (username, password) => {
     try {
-      e.preventDefault();
-      await axios.post(URI, {
+      const response = await axios.post(URI, {
         username: username,
         password: password,
       });
-      navigate("/");
+
+      if (response.data.error) {
+        console.error("Error logging in:", response.data.error);
+      } else {
+        setUser(response.data.user);
+        console.log("Login successful:", response.data.message);
+        navigate("/");
+      }
     } catch (error) {
-      console.error("Error loginin:", error);
+      console.error("Error logging in:", error);
     }
+  };
+
+  // submit form -----------------------------------
+  const handleLoginSubmit = (e) => {
+    e.preventDefault();
+    // Get username and password from the form
+    const username = e.target.username.value;
+    const password = e.target.password.value;
+    // Call the login function
+    loginUser(username, password);
   };
 
 return (
@@ -38,7 +52,7 @@ return (
       <h1 class="text-white">Ingresa</h1>
     </div>
 
-    <form onSubmit={loginUser}  class="vertical-form">
+    <form onSubmit={handleLoginSubmit}  class="vertical-form">
       <input type="text" value={username} name="username" placeholder="Nombre de Usuario" onChange={(e) => setUsername(e.target.value)}/>
       <input type="password" value={password} name="password" placeholder="contraseña" onChange={(e) => setPassword(e.target.value)}/>
       <input type="submit" value="Login" />

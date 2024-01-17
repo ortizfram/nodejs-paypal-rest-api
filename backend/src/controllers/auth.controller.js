@@ -52,7 +52,6 @@ const postLogin = async (req, res, next) => {
       console.log("\n\nuser: ", user);
       res.redirect(`/?message=Login successful, user:${userId}`);
       console.log("\n*** Logged in\n");
-      next();
     } else {
       res.send("Wrong password or username");
     }
