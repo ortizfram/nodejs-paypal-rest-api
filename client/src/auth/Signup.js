@@ -6,35 +6,38 @@ import { useNavigate } from "react-router-dom";
 const URI_signup = "http://localhost:8081/api/signup";
 
 function CompSignup() {
-  //   declare form fields
+  // declare form fields
   const [values, setValues] = useState({
     username: "",
     name: "",
     email: "",
     password: "",
   });
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
-  //procedimiento guardar -----------------------------------
+  // procedimiento guardar -----------------------------------
   //....
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await axios.post(URI_signup, values)
-    .then(res => {
-      if(res.data.Status === "Success") {
-        navigate('/api/login')
-      } else {
-        alert("Error")
-      }
-    })
-    .then(err => console.log(err))
+    await axios
+      .post(URI_signup, values)
+      .then((res) => {
+        if (res.data.Status === "Success") {
+          navigate('/api/login');
+        } else {
+          alert("Error");
+        }
+      })
+      .catch((err) => console.log(err));
   };
+
+  const { username, name, email, password } = values; // Destructure values
 
   return (
     <div id="signup-page-container">
       <div id="signup-content-container">
-        <div class="section-title1">
-          <h1 class="text-white">Registrar</h1>
+        <div className="section-title1">
+          <h1 className="text-white">Registrar</h1>
         </div>
         {/* username, name, email, password */}
         <form onSubmit={handleSubmit}>
@@ -42,7 +45,9 @@ function CompSignup() {
           <label>Username</label>
           <input
             value={username}
-            onChange={(e) => setValues({ ...values, username: e.target.value })}
+            onChange={(e) =>
+              setValues({ ...values, username: e.target.value })
+            }
             type="text"
             className="form-control"
           />
@@ -64,7 +69,9 @@ function CompSignup() {
           <label>Contraseña</label>
           <input
             value={password}
-            onChange={(e) => setValues({ ...values, password: e.target.value })}
+            onChange={(e) =>
+              setValues({ ...values, password: e.target.value })
+            }
             type="password"
             className="form-control"
           />
@@ -78,3 +85,4 @@ function CompSignup() {
 }
 
 export default CompSignup;
+
