@@ -20,13 +20,14 @@ import { validationResult, body } from "express-validator";
 import { pool } from "./src/db.js";
 import { getUserEnrolledCoursesQuery } from "./db/queries/course.queries.js";
 import { Marked, marked } from "marked";
+import cookieParser from 'cookie-parser';
 
 config();
 
-const PORT = process.env.PORT || 3000; 
+const PORT = process.env.PORT || 8081; 
 const HOST = process.env.HOST || 'localhost'; 
-const FRONTEND_URL = process.env.FRONTEND_URL || 'http://127.0.0.1:5173'; 
-const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:3000'; 
+const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000'; 
+const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:8081'; 
 
 // shortcuts for files/dirs
 export const __filename = fileURLToPath(import.meta.url);
@@ -56,6 +57,9 @@ app.use(cors({
   origin: 'http://localhost:3000', 
   credentials: true,
 })); // frontend app can ask data
+
+app.use(cookieParser)
+
 
 // Use sessions
 app.use(

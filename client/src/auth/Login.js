@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 // NodeJS endpoint reference
-const URI = "http://localhost:3000/api/login";
+const URI = "http://localhost:8081/api/login";
 
 const CompLogin = () => {
   // declare form fields

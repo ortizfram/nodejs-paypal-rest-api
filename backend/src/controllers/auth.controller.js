@@ -1,4 +1,4 @@
-import bcrypt from "bcrypt";
+import bcrypt, { hash } from "bcrypt";
 import { pool } from "../db.js";
 import {
   postSignupQuery,
@@ -21,6 +21,7 @@ import { HOST } from "../config.js";
 import sendResetEmail from "../utils/sendEmail.js";
 import path from "path";
 import { __dirname } from "../../index.js";
+const salt = 10;
 
 // load .ENV
 config();
@@ -74,75 +75,33 @@ const getSignup = async (req, res) => {
 const postSignup = async (req, res) => {
   console.log("\n\n*** postSignUp\n\n");
 
-  let role = "user"; //default role: user
-  // const user = req.session.user || null;
+  // create table q
+  // CREATE TABLE `conn`.`login` (
+  //   `id` INT NOT NULL AUTO_INCREMENT,
+  //   `username` VARCHAR(45) NULL,
+  //   `name` VARCHAR(45) NULL,
+  //   `email` VARCHAR(45) NULL,
+  //   `password` VARCHAR(45) NULL,
+  //   PRIMARY KEY (`id`),
+  //   UNIQUE INDEX `email_UNIQUE` (`email` ASC) VISIBLE);
 
-  const { username, name, email, password } = req.body;
+  const sql =
+    "INSERT INTO login (`username`,`name`,`email`,`password`) VALUES (?)";
 
-  // Add validation for required fields
-  if (!username || !password || !email) {
-    return res.status(400).send("Username, password & email are required.");
-  }
-
-  try {
-    // Check if the email already exists in the database
-    const fetchUser_q = fetchUserByField("email");
-    const [existingEmail] = await pool.query(fetchUser_q, [email]);
-    const [existingUsername] = await pool.query(fetchUser_q, [username]);
-
-    // If the email already exists, handle the duplicate case
-    if (existingEmail.length > 0) {
-      return res.status(400).render("auth/signup", {
-        message: "This email is already registered.",
-      });
-    }
-    // If the username already exists, handle the duplicate case
-    if (existingUsername.length > 0) {
-      return res.status(400).render("auth/signup", {
-        message: "This username is already registered.",
-      });
-    }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    const data = [username, name, email, hashedPassword, role];
-
-    // table check
-    const checkTable_users = await createTableIfNotExists(
-      pool,
-      tableCheckQuery,
-      createUserTableQuery,
-      "users"
-    );
-    const checkTable_user_courses = await createTableIfNotExists(
-      pool,
-      tableCheckQuery,
-      createTableUserCourses,
-      "user_courses"
-    );
-
-    // insert to table: user
-    const [rows] = await pool.query(postSignupQuery, data);
-    // get inserted user's id
-    const id = String(rows.insertId);
-    console.log(`\n\n🧍UserCreated\nInserted userId = ${id}\n`);
-
-    //signup user & singin
-    req.session= { id, username, name, email, role };
-
-    //set up role
-    const emailCheck = req.session.email === process.env.ADMIN_EMAIL;
-    if (emailCheck) {
-      setUserRole("admin", req.session.email); // Use the retrieved ID here
-    }
-
-    //redirect
-    res.redirect("/?message=Signup successful. Logged in automatically.");
-    console.log("\n\n*** Signed up successfully\n\n");
-  } catch (error) {
-    console.error("Error while saving user:", error);
-    res.redirect("/?message=Error during signup or login");
-  }
+  bcrypt.hash(req.body.password.toString(), salt, (err, hash) => {
+    if (err) return res.json({ Error: "Error hasshing password" });
+    const values = [
+      req.body.username,
+      req.body.name,
+      req.body.email,
+      hash, // password
+    ];
+    pool.query(sql, [values], (err, result) => {
+      if (err)
+        return res.json({ Error: "Error inserting user data in server" });
+      return res.json({ Status: "Success" });
+    });
+  });
 };
 
 //------------logout-------------------------
@@ -173,8 +132,8 @@ const getForgotPassword = (req, res) => {
   const titles = ["Forgot Password"];
   const submitBtn = ["Submit"];
   const formAction = ["/api/forgot-password"];
-  const subtitle = ['Inset your current Email to receive reset instructions']
-  const labels = ['']
+  const subtitle = ["Inset your current Email to receive reset instructions"];
+  const labels = [""];
 
   const data = {
     fields,
@@ -230,7 +189,6 @@ const postForgotPassword = async (req, res) => {
     return res.render("auth/emailSent", {
       user,
       message: "Password reset email sent, verify your mailbox !",
-      
     });
   } catch (error) {
     console.error("Error sending Email for password reset:", error);
@@ -267,8 +225,8 @@ const getResetPassword = async (req, res) => {
   const titles = ["Reset Password"];
   const submitBtn = ["Change password"];
   const formAction = [`/api/reset-password/${id}/${token}`];
-  const labels = [''];
-  const subtitle = [''];
+  const labels = [""];
+  const subtitle = [""];
 
   const data = {
     fields,
@@ -329,7 +287,7 @@ const postResetPassword = async (req, res) => {
 };
 
 // -----------userUpdate-----------------------
-const getsendEmailToken = async (req, res) => { 
+const getsendEmailToken = async (req, res) => {
   console.log("\n\n*** getsendEmailToken\n\n");
   const message = req.query.message;
   const user = req.session.user || null;
@@ -340,8 +298,10 @@ const getsendEmailToken = async (req, res) => {
   const titles = ["Account update"];
   const submitBtn = ["Submit"];
   const formAction = [`/api/user-update/${userId}`];
-  const subtitle = ['Inset your current Email to receive Token for updating account']
-  const labels = ['']
+  const subtitle = [
+    "Inset your current Email to receive Token for updating account",
+  ];
+  const labels = [""];
 
   const data = {
     fields,
@@ -356,7 +316,7 @@ const getsendEmailToken = async (req, res) => {
   };
 
   renderDynamicForm(res, "auth/forgotPassword", data);
-}
+};
 
 const postsendEmailToken = async (req, res) => {
   console.log("\n\n*** postSendEmailToken\n\n");
@@ -526,7 +486,7 @@ const postUserUpdate = async (req, res) => {
       console.log("\n\nemail sent\n\n");
 
       console.log(`\n\n\→ Go to home`);
-      res.redirect(`/?message=${message}`, );
+      res.redirect(`/?message=${message}`);
     } else {
       const message = "no changes made to user";
       console.log(`\n\n\→ Go to user: ${message}`);

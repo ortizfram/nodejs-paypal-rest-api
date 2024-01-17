@@ -3,35 +3,31 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 // NodeJS endpoint reference
-const URI_signup = "http://localhost:3000/api/signup";
+const URI_signup = "http://localhost:8081/api/signup";
 
-const CompSignup = () => {
-
-//   declare form fields
-  const [username, setUsername] = useState("");
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    register();
-  }, []);
+function CompSignup() {
+  //   declare form fields
+  const [values, setValues] = useState({
+    username: "",
+    name: "",
+    email: "",
+    password: "",
+  });
+  const navigate = useNavigate()
 
   //procedimiento guardar -----------------------------------
-  const register = async (e) => {
-    try {
-      e.preventDefault();
-      await axios.post(URI_signup, {
-        username: username,
-        name: name,
-        email: email,
-        password: password,
-      });
-      navigate("/");
-    } catch (error) {
-      console.error("Error Signing up:", error);
-    }
+  //....
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    await axios.post(URI_signup, values)
+    .then(res => {
+      if(res.data.Status === "Success") {
+        navigate('/api/login')
+      } else {
+        alert("Error")
+      }
+    })
+    .then(err => console.log(err))
   };
 
   return (
@@ -41,12 +37,12 @@ const CompSignup = () => {
           <h1 class="text-white">Registrar</h1>
         </div>
         {/* username, name, email, password */}
-        <form onSubmit={register}>
+        <form onSubmit={handleSubmit}>
           <div className="mb-3"></div>
           <label>Username</label>
           <input
             value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            onChange={(e) => setValues({ ...values, username: e.target.value })}
             type="text"
             className="form-control"
           />
@@ -54,21 +50,21 @@ const CompSignup = () => {
           <label>Nombre</label>
           <input
             value={name}
-            onChange={(e) => setName(e.target.value)}
+            onChange={(e) => setValues({ ...values, name: e.target.value })}
             type="text"
             className="form-control"
           />
           <label>Email</label>
           <input
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) => setValues({ ...values, email: e.target.value })}
             type="text"
             className="form-control"
           />
           <label>Contraseña</label>
           <input
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={(e) => setValues({ ...values, password: e.target.value })}
             type="password"
             className="form-control"
           />
@@ -79,6 +75,6 @@ const CompSignup = () => {
       </div>
     </div>
   );
-};
+}
 
 export default CompSignup;
