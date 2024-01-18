@@ -39,10 +39,11 @@ const app = express();
 
 app.use(express.json()); // Add this line to parse JSON bodies
 // Use cors middleware to handle CORS headers
-app.use(cors({
-  origin: 'http://localhost:3000', 
-  credentials: true,
-})); // frontend app can ask data
+app.use(cors()); // frontend app can ask data
+// {
+//   origin: 'http://localhost:3000', 
+//   credentials: true,
+// }
 
 // Connection
 app.listen(PORT, HOST, () => {

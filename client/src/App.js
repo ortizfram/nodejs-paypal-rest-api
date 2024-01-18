@@ -30,14 +30,16 @@ import courseUpdateCSS from "./public/css/course/courseUpdate.css";
 import coursesCSS from "./public/css/course/courses.css";
 
 function App() {
-  const BASE_URL = "http://localhost:8081";
+  const BASE_URL = "http://localhost:3000";
 
+  useEffect(() => {
   // Use BASE_URL in your API requests
-  fetch(`${BASE_URL}/api/courses`)
+  fetch(`${BASE_URL}`)
     .then((response) => response.json())
     .then((data) => console.log(data))
     .then(console.log(`\n\n👨🏼‍💻⚛️ React & Express were connected\n\n`))
     .catch((error) => console.error(error));
+  }, []);
 
   return (
     <div className="App">

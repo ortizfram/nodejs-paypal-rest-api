@@ -18,7 +18,7 @@ const CompLogin = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     await axios
-      .post(URI, values)
+      .post(URI, values, { withCredentials: true })
       .then((res) => {
         if (res.data.Status === "Success") {
           setMessage(res.data.Message);
