@@ -58,10 +58,10 @@ const postLogin = async (req, res, next) => {
           return res.json({ Status: "Success" });
         } else {
           // Passwords do not match - Handle unsuccessful login
-          return res.json({ message: "Wrong email or password" });
+          return res.json({ Message: "Wrong email or password" });
         }
       } else {
-        return res.json({ message: "User not found" });
+        return res.json({ Message: "User not found" });
       }
     }
   });

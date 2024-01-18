@@ -14,6 +14,7 @@ function CompSignup() {
     password: "",
   });
   const navigate = useNavigate();
+  const [Message, setMessage] = useState("");
 
   // procedimiento guardar -----------------------------------
   //....
@@ -26,6 +27,7 @@ function CompSignup() {
           console.log("✨👨 =>> NEW USER Signed in");
           navigate('/api/login');
         } else {
+          setMessage(res.data.Error);
           alert("Error");
         }
       })
@@ -40,6 +42,7 @@ function CompSignup() {
         <div className="section-title1">
           <h1 className="text-white">Registrar</h1>
         </div>
+        <h1 style={{color:'red', fontSize:'15px', textAlign:'center',marginTop:'20px'}}>{Message}</h1>
         {/* username, name, email, password */}
         <form onSubmit={handleSubmit}>
           <div className="mb-3"></div>

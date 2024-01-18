@@ -12,6 +12,7 @@ const CompLogin = () => {
     password: "",
   });
   const navigate = useNavigate();
+  const [Message, setMessage] = useState("");
 
   // submit form -----------------------------------
   const handleSubmit = async (e) => {
@@ -20,9 +21,11 @@ const CompLogin = () => {
       .post(URI, values)
       .then((res) => {
         if (res.data.Status === "Success") {
+          setMessage(res.data.Message);
           console.log("👨 =>> Logged in");
           navigate("/");
         } else {
+          setMessage(res.data.message || res.data.Error || '');
           alert("Error");
         }
       })
@@ -38,6 +41,7 @@ const CompLogin = () => {
           <div class="section-title">
             <h1 class="text-white">Ingresa</h1>
           </div>
+          <h1 style={{color:'red', fontSize:'15px', textAlign:'center',marginTop:'20px'}}>{Message}</h1>
 
           <form onSubmit={handleSubmit} class="vertical-form">
             <input
