@@ -2,7 +2,7 @@ import { config } from "dotenv";
 
 config(); // Loads the .env file into process.env
 
-export const PORT = 3000;
+export const PORT = 8081;
 export const HOST = "http://localhost:" + PORT;
 
 export const PAYPAL_API_CLIENT = process.env.PAYPAL_API_CLIENT;
