@@ -38,6 +38,16 @@ export const __dirname = path.dirname(__filename);
 const app = express();
 
 app.use(express.json()); // Add this line to parse JSON bodies
+// Use cors middleware to handle CORS headers
+app.use(cors({
+  origin: 'http://localhost:3000', 
+  credentials: true,
+})); // frontend app can ask data
+
+// Connection
+app.listen(PORT, HOST, () => {
+  console.log(`Server is running on http://${HOST}:${PORT}`);
+});
 
 // Serve static files from React build directory
 app.use(express.static(path.join(__dirname, '../client/build')));
@@ -47,16 +57,6 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../client/build/index.html'));
 });
 
-// Connection
-app.listen(PORT, HOST, () => {
-    console.log(`Server is running on http://${HOST}:${PORT}`);
-  });
-
-// Use cors middleware to handle CORS headers
-app.use(cors({
-  origin: 'http://localhost:3000', 
-  credentials: true,
-})); // frontend app can ask data
 
 app.use(cookieParser)
 

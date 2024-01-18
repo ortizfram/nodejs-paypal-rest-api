@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 // NodeJS endpoint reference
-const URI_signup = "http://localhost:8081/api/signup";
+const URI = "http://localhost:8081/api/signup";
 
 function CompSignup() {
   // declare form fields
@@ -20,9 +20,10 @@ function CompSignup() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     await axios
-      .post(URI_signup, values)
+      .post(URI, values)
       .then((res) => {
         if (res.data.Status === "Success") {
+          console.log("✨👨 =>> NEW USER Signed in");
           navigate('/api/login');
         } else {
           alert("Error");
@@ -42,9 +43,9 @@ function CompSignup() {
         {/* username, name, email, password */}
         <form onSubmit={handleSubmit}>
           <div className="mb-3"></div>
-          <label>Username</label>
           <input
             value={username}
+            placeholder="Nombre de usuario"
             onChange={(e) =>
               setValues({ ...values, username: e.target.value })
             }
@@ -52,23 +53,23 @@ function CompSignup() {
             className="form-control"
           />
           <div className="mb-3"></div>
-          <label>Nombre</label>
           <input
             value={name}
+            placeholder="Nombre"
             onChange={(e) => setValues({ ...values, name: e.target.value })}
             type="text"
             className="form-control"
           />
-          <label>Email</label>
           <input
             value={email}
+            placeholder="Email"
             onChange={(e) => setValues({ ...values, email: e.target.value })}
             type="text"
             className="form-control"
-          />
-          <label>Contraseña</label>
+            />
           <input
             value={password}
+            placeholder="Contraseña"
             onChange={(e) =>
               setValues({ ...values, password: e.target.value })
             }

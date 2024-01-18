@@ -7,68 +7,73 @@ const URI = "http://localhost:8081/api/login";
 
 const CompLogin = () => {
   // declare form fields
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const [values, setValues] = useState({
+    email: "",
+    password: "",
+  });
   const navigate = useNavigate();
-  const [user, setUser] = useState(null);
-
-  useEffect(() => {}, []);
-
-    // login procedure -----------------------------------
-  const loginUser = async (username, password) => {
-    try {
-      const response = await axios.post(URI, {
-        username: username,
-        password: password,
-      });
-
-      if (response.data.error) {
-        console.error("Error logging in:", response.data.error);
-      } else {
-        setUser(response.data.user);
-        console.log("Login successful:", response.data.message);
-        navigate("/");
-      }
-    } catch (error) {
-      console.error("Error logging in:", error);
-    }
-  };
 
   // submit form -----------------------------------
-  const handleLoginSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Get username and password from the form
-    const username = e.target.username.value;
-    const password = e.target.password.value;
-    // Call the login function
-    loginUser(username, password);
+    await axios
+      .post(URI, values)
+      .then((res) => {
+        if (res.data.Status === "Success") {
+          console.log("👨 =>> Logged in");
+          navigate("/");
+        } else {
+          alert("Error");
+        }
+      })
+      .catch((err) => console.log(err));
   };
 
-return (
-<>
-<div id="login-page-container">
-  <div id="login-page-content">
-    <div class="section-title">
-      <h1 class="text-white">Ingresa</h1>
-    </div>
+  const { email, password } = values; // Destructure values
 
-    <form onSubmit={handleLoginSubmit}  class="vertical-form">
-      <input type="text" value={username} name="username" placeholder="Nombre de Usuario" onChange={(e) => setUsername(e.target.value)}/>
-      <input type="password" value={password} name="password" placeholder="contraseña" onChange={(e) => setPassword(e.target.value)}/>
-      <input type="submit" value="Login" />
-    </form>
-    <div class="links-container">
-      <p><a class="text-white" href="/api/signup">No tengo cuenta aún.</a></p>
-      <p>
-        <a class="text-white" href="/api/forgot-password"
-          >Olvidaste tu contraseña ?</a
-        >
-      </p>
-    </div>
-  </div>
-</div>
-</>
-)
-}
+  return (
+    <>
+      <div id="login-page-container">
+        <div id="login-page-content">
+          <div class="section-title">
+            <h1 class="text-white">Ingresa</h1>
+          </div>
+
+          <form onSubmit={handleSubmit} class="vertical-form">
+            <input
+              type="text"
+              value={email}
+              name="email"
+              placeholder="Email"
+              onChange={(e) => setValues({ ...values, email: e.target.value })}
+              className="form-control"
+              />
+            <input
+              type="password"
+              value={password}
+              name="password"
+              placeholder="Contraseña"
+              onChange={(e) => setValues({ ...values, password: e.target.value })}
+              className="form-control"
+            />
+            <input type="submit" value="Login" />
+          </form>
+          <div class="links-container">
+            <p>
+              <a class="text-white" href="/api/signup">
+                No tengo cuenta aún.
+              </a>
+            </p>
+            <p>
+              <a class="text-white" href="/api/forgot-password">
+                Olvidaste tu contraseña ?
+              </a>
+            </p>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+};
 
 export default CompLogin;

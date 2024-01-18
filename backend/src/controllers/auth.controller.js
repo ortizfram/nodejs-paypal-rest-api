@@ -35,31 +35,38 @@ const getLogin = async (req, res, next) => {
 };
 
 const postLogin = async (req, res, next) => {
-  //create users table if not exists
-  //...
-  createTableIfNotExists(pool, tableCheckQuery, createUserTableQuery, "users");
+  console.log("\n\n***PostLogin\n\n");
 
-  try {
-    const { username, password } = req.body;
+  const email = req.body.email;
+  const password = req.body.password;
 
-    // Find user in the database that matches the username from the login form
-    const [rows] = await pool.query(postLoginQuery, [username]);
-    const user = rows[0];
+  const sql = "SELECT * FROM register WHERE email = ?";
 
-    // If the user exists and the passwords match
-    if (user && (await bcrypt.compare(password, user.password))) {
-      req.session.user = user; // Store the user in the session
-      const userId = user.id;
-      console.log("\n\nuser: ", user);
-      res.redirect(`/?message=Login successful, user:${userId}`);
-      console.log("\n*** Logged in\n");
+  pool.query(sql, [email], async (err, result) => {
+    if (err) {
+      console.error(err);
+      return res.json({ Error: "Error getting user data from server" });
     } else {
-      res.send("Wrong password or username");
+      if (result.length > 0) {
+        const user = result[0];
+
+        // Compare the provided password with the hashed password from the database
+        const passwordMatch = await bcrypt.compare(password, user.password);
+
+        if (passwordMatch) {
+          // Passwords match - Perform login actions
+          return res.json({ Status: "Success" });
+        } else {
+          // Passwords do not match - Handle unsuccessful login
+          return res.json({ message: "Wrong email or password" });
+        }
+      } else {
+        return res.json({ message: "User not found" });
+      }
     }
-  } catch (error) {
-    res.send("An error occurred while logging in");
-  }
+  });
 };
+
 
 // New endpoint to get user information
 const getUser = (req, res) => {
@@ -74,19 +81,16 @@ const getSignup = async (req, res) => {
 
 const postSignup = async (req, res) => {
   console.log("\n\n*** postSignUp\n\n");
-
-  // create table q
-  // CREATE TABLE `conn`.`login` (
-  //   `id` INT NOT NULL AUTO_INCREMENT,
+  // CREATE TABLE `conn`.`register` (
+  //   `id` INT NOT NULL,
   //   `username` VARCHAR(45) NULL,
   //   `name` VARCHAR(45) NULL,
   //   `email` VARCHAR(45) NULL,
-  //   `password` VARCHAR(45) NULL,
   //   PRIMARY KEY (`id`),
   //   UNIQUE INDEX `email_UNIQUE` (`email` ASC) VISIBLE);
 
   const sql =
-    "INSERT INTO login (`username`,`name`,`email`,`password`) VALUES (?)";
+    "INSERT INTO register (`username`,`name`,`email`,`password`) VALUES (?)";
 
   bcrypt.hash(req.body.password.toString(), salt, (err, hash) => {
     if (err) return res.json({ Error: "Error hasshing password" });
