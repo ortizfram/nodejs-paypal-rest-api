@@ -19,14 +19,14 @@
         <h3>Add Videos</h3>
         <div id="videoFields">
             <% modules.forEach(module=> { %>
-                <div class="videoField">
+                <div className="videoField">
                     <div>
                         <!-- Display module titles as selectable input -->
                         <label for="moduleId">Module:</label><br>
                         <h4><%= module.title %></h4><br><br>
                     </div>
                     <label for="videoId">Video ID: (From Youtube)</label><br>
-                    <input type="text" class="videoId" name="videoId[]" required><br><br>
+                    <input type="text" className="videoId" name="videoId[]" required><br><br>
                     <input type="hidden" name="moduleId[]" value="<%= module.id %>">
                 </div>
                 <hr>

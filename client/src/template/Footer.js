@@ -9,12 +9,12 @@ const URI = "http://localhost:5000"; // Update the base URL
 const CompFooter = () => {
   return (
     <>
-      <footer class="bg-dark text-white py-5" id="footer">
+      <footer className="bg-dark text-white py-5" id="footer">
         <div>
-          <div class="row">
-            <div class="col-md-4">
+          <div className="row">
+            <div className="col-md-4">
               <img
-                class="footer-icon"
+                className="footer-icon"
                 src="/images/white-logo-buonavibra.png"
                 alt=""
               />
@@ -24,9 +24,9 @@ const CompFooter = () => {
                 juntos el camino del Kundalini Yoga.
               </p>
             </div>
-            <div class="col-md-4">
+            <div className="col-md-4">
               <h5>Links</h5>
-              <ul class="list-unstyled">
+              <ul className="list-unstyled">
                 <li>
                   <a href="/">Home</a>
                 </li>
@@ -44,7 +44,7 @@ const CompFooter = () => {
                 </li>
               </ul>
             </div>
-            <div class="col-md-4">
+            <div className="col-md-4">
               <h5>Contacto</h5>
               <p>
                 Email: buonavibraclub@gmail.com
@@ -53,8 +53,8 @@ const CompFooter = () => {
               </p>
             </div>
           </div>
-          <hr class="my-4" />
-          <p class="text-center">© 2024 buonavibra. All rights reserved.</p>
+          <hr className="my-4" />
+          <p className="text-center">© 2024 buonavibra. All rights reserved.</p>
         </div>
       </footer>
     </>

@@ -1,24 +1,24 @@
-<div class="page-container">
-  <div class="course-overview">
-    <div class="section-title2 mt-4 mb-4">
+<div className="page-container">
+  <div className="course-overview">
+    <div className="section-title2 mt-4 mb-4">
       <h1>Payment Details</h1>
     </div>
     <!-- Payment Details -->
     <img
-      class="mb-4"
+      className="mb-4"
       src="<%= course.thumbnail %>"
       alt="<%= course.title %> Image"
     />
     <h2><%= course.title %></h2>
     <p><%= course.description %></p>
     <div>
-      <div class="row align-items-center">
+      <div className="row align-items-center">
         instructor:
-        <div class="col-auto">
+        <div className="col-auto">
           <img
             src="<%= course.author.avatar %>"
             alt="User Avatar"
-            class="rounded-circle me-2"
+            className="rounded-circle me-2"
             style="width: 25px; height: 25px; object-fit: cover"
           />
           <span>
@@ -28,12 +28,12 @@
       </div>
     </div>
 
-    <p class="price-text">
+    <p className="price-text">
       USD<%= course.usd_price %> | ARS<%= course.ars_price %>
     </p>
   </div>
 
-  <div class="payment-options">
+  <div className="payment-options">
     <!--course enroll-->
     <!-- The form to trigger the payment -->
     <form

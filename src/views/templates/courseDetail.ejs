@@ -1,10 +1,10 @@
-<div class="bg-course-detail">
-  <div class="background-blur"></div>
-  <div class="container" style="margin: 6.2rem auto;">
-    <div class="row">
-      <div class="col-lg-12 text-center">
-        <div class="video-container mb-1">
-          <video id="course-video" controls class="img-fluid shadow-lg">
+<div className="bg-course-detail">
+  <div className="background-blur"></div>
+  <div className="container" style="margin: 6.2rem auto;">
+    <div className="row">
+      <div className="col-lg-12 text-center">
+        <div className="video-container mb-1">
+          <video id="course-video" controls className="img-fluid shadow-lg">
             <source src="<%= course.video %>" type="video/mp4" />
             <source src="<%= course.video %>" type="video/webm" />
             <source src="<%= course.video %>" type="video/ogg" />
@@ -14,36 +14,36 @@
       </div>
     </div>
 
-    <div class="row">
-      <div class="col-lg-12 text-center">
+    <div className="row">
+      <div className="col-lg-12 text-center">
         <div>
           <p>
             <%= course.updated_at %>
             <span
               ><img
-                class="avatar ms-4 me-2"
+                className="avatar ms-4 me-2"
                 src="<%= course.author.avatar %>"
                 alt="author_avatar"
             /></span>
-            <span class="fw-bold"> <%= course.author.username %> </span> •
+            <span className="fw-bold"> <%= course.author.username %> </span> •
             <span> <%= course.author.name %> </span>
             <% if (user.role==="admin" ) { %>
-            <span class="course-admin-options opacity-50">
-              <button class="btn">
+            <span className="course-admin-options opacity-50">
+              <button className="btn">
                 <p>
                   <a
-                    class="text-muted"
+                    className="text-muted"
                     href="/api/course/<%= course.id %>/update?courseId=<%= course.id %>"
-                    ><i class="fas fa-edit me-2 text-white"></i
+                    ><i className="fas fa-edit me-2 text-white"></i
                   ></a>
                 </p>
               </button>
-              <button class="btn">
+              <button className="btn">
                 <p>
                   <a
-                    class="text-muted"
+                    className="text-muted"
                     href="/api/course/<%= course.id %>/delete?courseId=<%= course.id %>"
-                    ><i class="fas fa-trash-alt me-2 text-white"></i
+                    ><i className="fas fa-trash-alt me-2 text-white"></i
                   ></a>
                 </p>
               </button>

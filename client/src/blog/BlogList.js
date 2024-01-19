@@ -43,10 +43,10 @@ const CompBlogList = () => {
   };
 
   return (
-    <div class="blogs-page-container">
-      <div class="blogs-container">
-        <div class="section-title1">
-          <h1 class="text-white">Blogs and Latest News</h1>
+    <div className="blogs-page-container">
+      <div className="blogs-container">
+        <div className="section-title1">
+          <h1 className="text-white">Blogs and Latest News</h1>
         </div>
 
         <Link to={`${URI}create`}>CrearBlog</Link>

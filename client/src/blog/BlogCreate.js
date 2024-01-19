@@ -26,8 +26,8 @@ const CompBlogCreate = () => {
 
   return (
     <div>
-        <div class="section-title1">
-          <h1 class="text-white">Crear Blog</h1>
+        <div className="section-title1">
+          <h1 className="text-white">Crear Blog</h1>
         </div>
         <form onSubmit={store}>
             <div className="mb-3"></div>

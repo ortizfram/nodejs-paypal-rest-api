@@ -1,23 +1,23 @@
-<header class="header shadow-lg">
-  <a href="/" class="logo"><img src="/images/white-logo-buonavibra.png" alt=""></a>
+<header className="header shadow-lg">
+  <a href="/" className="logo"><img src="/images/white-logo-buonavibra.png" alt=""></a>
 
   <input type="checkbox" id="check">
-  <label for="check" class="icons">
-    <i class='bx bx-menu' id="menu-icon"></i>
-    <i class='bx bx-x' id="close-icon"></i>
+  <label for="check" className="icons">
+    <i className='bx bx-menu' id="menu-icon"></i>
+    <i className='bx bx-x' id="close-icon"></i>
   </label>
 
-  <nav class="navbar">
+  <nav className="navbar">
     <!-- basic links -->
     <a href="/" style="--i:0;">Inicio</a>
     <a href="/#contact" style="--i:1;">Contacto</a>
     <a href="/#about1" style="--i:2;">Acerca</a>
     <!-- Dropdown for Courses and Blogs -->
-    <div class="dropdown">
-      <a href="#" class="dropdown-toggle" role="button">
+    <div className="dropdown">
+      <a href="#" className="dropdown-toggle" role="button">
         Cursos y Blogs
       </a>
-      <div class="dropdown-menu">
+      <div className="dropdown-menu">
         <a href="/api/courses?page=1&perPage=6" style="--i:3;">Cursos</a>
         <a href="/api/blog?page=1&perPage=6" style="--i:4;">Blogs</a>
       </div>
@@ -27,11 +27,11 @@
     <a href="/api/courses-owned?page=1&perPage=6" style="--i:5;">Mis Cursos</a>
     <!-- Admin Dropdown -->
     <% if (user.role==="admin" ) { %>
-    <div class="dropdown">
-      <a href="#" class="dropdown-toggle" role="button">
+    <div className="dropdown">
+      <a href="#" className="dropdown-toggle" role="button">
         Admin
       </a>
-      <div class="dropdown-menu">
+      <div className="dropdown-menu">
         <a href="/api/course/create" style="--i:6;">Crear curso</a>
         <a href="/api/blog/create" style="--i:7;">Crear Blog</a>
         <a href="/api/admin/users" style="--i:8;">Panel de Usuarios</a>
@@ -41,11 +41,11 @@
     <!-- Edit Profile and Logout -->
     <% if (user.avatar) { %>
     <a href="/api/user-update/<%= user.id %>/confirm" style="--i:9;">
-      <img src="<%= user.avatar %>" alt="User Avatar" class="avatar">Editar Perfil
+      <img src="<%= user.avatar %>" alt="User Avatar" className="avatar">Editar Perfil
     </a>
     <% } else { %>
     <a href="/api/user-update/<%= user.id %>/confirm" style="--i:10;">
-      <img src="/images/user.png" alt="Placeholder Avatar" class="avatar">Editar Perfil
+      <img src="/images/user.png" alt="Placeholder Avatar" className="avatar">Editar Perfil
     </a>
     <% } %>
     <a href="/api/logout" style="--i:11; border: 2px solid white; border-radius: 10%; padding: 8px;">Salir</a>

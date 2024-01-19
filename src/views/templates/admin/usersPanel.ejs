@@ -1,9 +1,9 @@
 <div id="users-panel-container">
   <div>
-    <h1 class="section-title">Admin Panel - Users</h1>
+    <h1 className="section-title">Admin Panel - Users</h1>
   </div>
 
-  <div class="searchbar">
+  <div className="searchbar">
     <!-- Add a search input field -->
     <form action="/api/admin/users" method="GET">
       <label for="search"></label>
@@ -11,14 +11,14 @@
       <button type="submit">Search</button>
     </form>
 
-    <div class="save-button">
+    <div className="save-button">
       <!-- Save button -->
-      <button onclick="saveAndReload()" class="bg-success">Save</button>
+      <button onclick="saveAndReload()" className="bg-success">Save</button>
     </div>
   </div>
 
-  <table class="users-table">
-    <thead class="table-headers">
+  <table className="users-table">
+    <thead className="table-headers">
       <tr>
         <th>Username</th>
         <th></th>
@@ -30,7 +30,7 @@
         <!-- Add more columns as needed -->
       </tr>
     </thead>
-    <tbody class="table-rows">
+    <tbody className="table-rows">
       <% users.forEach(user=> { %>
         <tr>
           <td>
@@ -48,7 +48,7 @@
           <!-- <td>
             <%= user.role %>
           </td> -->
-          <td class="change-role"> <!-- Modified this line -->
+          <td className="change-role"> <!-- Modified this line -->
             <!-- Button to change user role -->
             <form action="/api/admin/users/change-role" method="POST">
               <input type="hidden" name="userEmail" value="<%= user.email %>">

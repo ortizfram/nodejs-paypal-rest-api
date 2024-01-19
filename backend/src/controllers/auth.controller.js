@@ -2,20 +2,17 @@ import bcrypt from "bcrypt";
 import { pool } from "../db.js";
 import {
   postSignupQuery,
-  postLoginQuery,
   createTableUserCourses,
   createUserTableQuery,
   fetchUserByField,
-  setResetToken,
   updatePassword_q,
   updateUserQuery,
+  findUserByEmail,
 } from "../../db/queries/auth.queries.js";
 import { tableCheckQuery } from "../../db/queries/course.queries.js";
 import createTableIfNotExists from "../public/js/createTable.js";
 import { config } from "dotenv";
 import setUserRole from "../public/js/setUserRole.js";
-import crypto from "crypto";
-import generateResetToken from "../utils/generateToken.js";
 import jwt from "jsonwebtoken";
 import sendResetEmail from "../utils/sendEmail.js";
 import path from "path";
@@ -33,15 +30,16 @@ const getLogin = async (req, res, next) => {
 };
 
 const postLogin = async (req, res, next) => {
-  //create users table if not exists
-  //...
+  // Create users table if not exists
+  // ...
+
   createTableIfNotExists(pool, tableCheckQuery, createUserTableQuery, "users");
 
   try {
-    const { username, password } = req.body;
+    const { email, password } = req.body;
 
-    // Find user in the database that matches the username from the login form
-    const [rows] = await pool.query(postLoginQuery, [username]);
+    // Find user in the database that matches the email from the login form
+    const [rows] = await pool.query(findUserByEmail, [email]);
     const user = rows[0];
 
     // If the user exists and the passwords match
@@ -52,10 +50,11 @@ const postLogin = async (req, res, next) => {
       res.json({ message: `Login successful, user: ${userId}`, user: req.session.user });
       console.log("\n*** Logged in\n");
     } else {
-      res.send("Wrong password or username");
+      res.status(401).json({ error: "Wrong password or email" });
     }
   } catch (error) {
-    res.send("An error occurred while logging in");
+    console.error("Error logging in:", error);
+    res.status(500).json({ error: "An error occurred while logging in" });
   }
 };
 
@@ -71,10 +70,7 @@ const getSignup = async (req, res) => {
 };
 
 const postSignup = async (req, res) => {
-  console.log("\n\n*** postSignUp\n\n");
-
-  let role = "user"; //default role: user
-  // const user = req.session.user || null;
+  console.log("\n\n*** postSignup\n\n");
 
   const { username, name, email, password } = req.body;
 
@@ -85,57 +81,35 @@ const postSignup = async (req, res) => {
 
   try {
     // Check if the email already exists in the database
-    const fetchUser_q = fetchUserByField("email");
-    const [existingEmail] = await pool.query(fetchUser_q, [email]);
-    const [existingUsername] = await pool.query(fetchUser_q, [username]);
+    const [existingEmail] = await pool.query(fetchUserByField("email"), [email]);
 
     // If the email already exists, handle the duplicate case
     if (existingEmail.length > 0) {
-      return res.status(400).render("auth/signup", {
-        message: "This email is already registered.",
-      });
+      return res.status(400).json({ error: "This email is already registered." });
     }
+
     // If the username already exists, handle the duplicate case
     if (existingUsername.length > 0) {
-      return res.status(400).render("auth/signup", {
-        message: "This username is already registered.",
-      });
+      return res.status(400).json({ error: "This username is already registered." });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const data = [username, name, email, hashedPassword, role];
+    const data = [username, name, email, hashedPassword, "user"];
 
-    // table check
-    const checkTable_users = await createTableIfNotExists(
-      pool,
-      tableCheckQuery,
-      createUserTableQuery,
-      "users"
-    );
-    const checkTable_user_courses = await createTableIfNotExists(
-      pool,
-      tableCheckQuery,
-      createTableUserCourses,
-      "user_courses"
-    );
+    // Check and create tables if not exists
+    await createTableIfNotExists(pool, tableCheckQuery, createUserTableQuery, "users");
+    await createTableIfNotExists(pool, tableCheckQuery, createTableUserCourses, "user_courses");
 
-    // insert to table: user
+    // Insert data into the users table
     const [rows] = await pool.query(postSignupQuery, data);
-    // get inserted user's id
-    const id = String(rows.insertId);
-    console.log(`\n\n🧍UserCreated\nInserted userId = ${id}\n`);
 
-    //signup user & singin
-    req.session= { id, username, name, email, role };
+    const userId = String(rows.insertId);
 
-    //set up role
-    const emailCheck = req.session.email === process.env.ADMIN_EMAIL;
-    if (emailCheck) {
-      setUserRole("admin", req.session.email); // Use the retrieved ID here
-    }
+    // Set session data for the newly signed-up user
+    req.session.user = { id: userId, username, name, email, role: "user" };
 
-    //redirect
+    // Redirect or respond as needed
     res.redirect("/?message=Signup successful. Logged in automatically.");
     console.log("\n\n*** Signed up successfully\n\n");
   } catch (error) {
@@ -143,6 +117,7 @@ const postSignup = async (req, res) => {
     res.redirect("/?message=Error during signup or login");
   }
 };
+
 
 //------------logout-------------------------
 const logout = (req, res) => {
@@ -158,10 +133,6 @@ const logout = (req, res) => {
 };
 
 // -----------forgotPassword-----------------------
-const renderDynamicForm = (res, template, data) => {
-  res.render(template, data);
-};
-
 const getForgotPassword = (req, res) => {
   console.log("\n\n*** getForgotPassword\n\n");
   const message = req.query.message;
@@ -187,7 +158,7 @@ const getForgotPassword = (req, res) => {
     user,
   };
 
-  renderDynamicForm(res, "auth/forgotPassword", data);
+  // renderDynamicForm(res, "auth/forgotPassword", data);
 };
 
 const postForgotPassword = async (req, res) => {
