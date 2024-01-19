@@ -88,11 +88,6 @@ const postSignup = async (req, res) => {
       return res.status(400).json({ error: "This email is already registered." });
     }
 
-    // If the username already exists, handle the duplicate case
-    if (existingUsername.length > 0) {
-      return res.status(400).json({ error: "This username is already registered." });
-    }
-
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const data = [username, name, email, hashedPassword, "user"];
@@ -110,7 +105,7 @@ const postSignup = async (req, res) => {
     req.session.user = { id: userId, username, name, email, role: "user" };
 
     // Redirect or respond as needed
-    res.redirect("/?message=Signup successful. Logged in automatically.");
+    res.redirect("/api/login?message=Signup successful. Now go Login.");
     console.log("\n\n*** Signed up successfully\n\n");
   } catch (error) {
     console.error("Error while saving user:", error);
