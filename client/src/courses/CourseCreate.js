@@ -6,7 +6,7 @@ import CompNavbar from "../template/Nabvar";
 import CompFooter from "../template/Footer";
 
 // NodeJS endpoint reference
-const URI = `http://localhost:3000/api/course/create`;
+const URI = `http://localhost:5000/api/course/create`;
 
 const CompCourseCreate = () => {
   const [errorMessage, setErrorMessage] = useState(""); // Define errorMessage state

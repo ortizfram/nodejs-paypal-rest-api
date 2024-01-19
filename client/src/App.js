@@ -1,5 +1,3 @@
-import logo from "./logo.svg";
-import "./App.css";
 //import router
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 //a
@@ -30,7 +28,7 @@ import courseUpdateCSS from "./public/css/course/courseUpdate.css";
 import coursesCSS from "./public/css/course/courses.css";
 
 function App() {
-  const BASE_URL = "http://localhost:3000";
+  const BASE_URL = "http://localhost:5000";
 
   // Use BASE_URL in your API requests
   fetch(`${BASE_URL}/courses`)

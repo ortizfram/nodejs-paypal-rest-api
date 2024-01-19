@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 // NodeJS endpoint reference
-const URI_signup = "http://localhost:3000/api/signup";
+const URI_signup = "http://localhost:5000/api/signup";
 
 const CompSignup = () => {
 

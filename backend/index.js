@@ -1,7 +1,6 @@
 import cors from 'cors'
 import { config } from 'dotenv';
 import express from 'express';
-import expressEjsLayouts from "express-ejs-layouts";
 import session from "express-session";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -15,18 +14,16 @@ import indexRoutes from "./src/routes/index.routes.js";
 import morgan from "morgan";
 import methodOverride from "method-override";
 import fileUpload from "express-fileupload";
-import jwt from "jsonwebtoken";
-import { validationResult, body } from "express-validator";
 import { pool } from "./src/db.js";
 import { getUserEnrolledCoursesQuery } from "./db/queries/course.queries.js";
 import { Marked, marked } from "marked";
 
 config();
 
-const PORT = process.env.PORT || 3000; 
-const HOST = process.env.HOST || 'localhost'; 
-const FRONTEND_URL = process.env.FRONTEND_URL || 'http://127.0.0.1:5173'; 
-const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:3000'; 
+const PORT = process.env.PORT; 
+const HOST = process.env.HOST; 
+const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000'; 
+const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:5000'; 
 
 // shortcuts for files/dirs
 export const __filename = fileURLToPath(import.meta.url);
@@ -35,8 +32,8 @@ export const __dirname = path.dirname(__filename);
 
 // call express **********************************************************
 const app = express();
-
 app.use(express.json()); // Add this line to parse JSON bodies
+app.use(cors()); // frontend app can ask data
 
 // Serve static files from React build directory
 app.use(express.static(path.join(__dirname, '../client/build')));
@@ -48,14 +45,8 @@ app.get('*', (req, res) => {
 
 // Connection
 app.listen(PORT, HOST, () => {
-    console.log(`Server is running on http://${HOST}:${PORT}`);
+    console.log(`Server is running on ${BACKEND_URL}`);
   });
-
-// Use cors middleware to handle CORS headers
-app.use(cors({
-  origin: 'http://localhost:3000', 
-  credentials: true,
-})); // frontend app can ask data
 
 // Use sessions
 app.use(

@@ -1,6 +1,5 @@
   //src/controllers/payment.controller.js
   import {
-    HOST,
     PAYPAL_API,
     PAYPAL_API_CLIENT,
     PAYPAL_API_SECRET,
@@ -15,7 +14,7 @@
   import { pool } from "../db.js";
   import { createTableUserCourses, createUserTableQuery } from "../../db/queries/auth.queries.js";
   import mercadopago from "mercadopago";
-  import { config } from "dotenv";
+  import { config, configDotenv } from "dotenv";
 import createTableIfNotExists from "../public/js/createTable.js";
 
   config(); // load .ENV
@@ -49,8 +48,8 @@ import createTableIfNotExists from "../public/js/createTable.js";
           brand_name: "Mi tienda",
           landing_page: "NO_PREFERENCE",
           user_action: "PAY_NOW",
-          return_url: `${HOST}/api/capture-order-paypal?courseId=${courseId}`, // Include course slug in the return URL
-          cancel_url: `${HOST}/api/cancel-order-paypal`,
+          return_url: `${pro}/api/capture-order-paypal?courseId=${courseId}`, // Include course slug in the return URL
+          cancel_url: `${process.env.BACKEND_URL}/api/cancel-order-paypal`,
         },
       };
 
@@ -176,9 +175,9 @@ import createTableIfNotExists from "../public/js/createTable.js";
         },
       ],
       back_urls: {
-        success: `http://localhost:3000/api/course/${courseId}/`,
-        failure: "http://localhost:3000/api/failure-mp",
-        pending: "http://localhost:3000/api/pending-mp",
+        success: `${process.env.BACKEND_URL}/api/course/${courseId}/`,
+        failure: `${process.env.BACKEND_URL}/api/failure-mp`,
+        pending: `${process.env.BACKEND_URL}/api/pending-mp`,
       },
       //here we use NGROK till it's deployed
       notification_url: `${process.env.MP_NOTIFICATION_URL}/api/webhook-mp?courseId=${courseId}&userId=${userId}`,

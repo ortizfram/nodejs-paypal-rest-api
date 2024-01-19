@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 
 // NodeJS endpoint reference
-const URI = "http://localhost:3000/api/blog/";
+const URI = "http://localhost:5000/api/blog/";
 
 const CompBlogList = () => {
 // 

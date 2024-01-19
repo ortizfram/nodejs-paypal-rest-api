@@ -17,7 +17,6 @@ import setUserRole from "../public/js/setUserRole.js";
 import crypto from "crypto";
 import generateResetToken from "../utils/generateToken.js";
 import jwt from "jsonwebtoken";
-import { HOST } from "../config.js";
 import sendResetEmail from "../utils/sendEmail.js";
 import path from "path";
 import { __dirname } from "../../index.js";
