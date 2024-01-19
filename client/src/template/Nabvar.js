@@ -8,10 +8,6 @@ const URI = "http://localhost:5000"; // Update the base URL
 
 const CompNavbar = () => {
     let user = null;
-<<<<<<< HEAD
-    console.log('user', user);
-=======
->>>>>>> 094cac01424438eb5104ea98b92bd6b5ce917f48
     
 
     return (

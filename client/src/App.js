@@ -31,7 +31,7 @@ function App() {
   const BASE_URL = "http://localhost:5000";
 
   // Use BASE_URL in your API requests
-  fetch(`${BASE_URL}/courses`)
+  fetch(`${BASE_URL}`)
     .then((response) => response.json())
     .then((data) => console.log(data))
     .then(console.log(`\n\n👨🏼‍💻⚛️ React & Express were connected\n\n`))

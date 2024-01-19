@@ -20,7 +20,7 @@ import { Marked, marked } from "marked";
 
 config();
 
-const PORT = process.env.PORT; 
+const port = 5000; 
 const HOST = process.env.HOST; 
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000'; 
 const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:5000'; 
@@ -44,7 +44,7 @@ app.get('*', (req, res) => {
 });
 
 // Connection
-app.listen(PORT, HOST, () => {
+app.listen(port, () => {
     console.log(`Server is running on ${BACKEND_URL}`);
   });
 
@@ -59,7 +59,7 @@ app.use(
 
 
 // Use routes app
-app.use(indexRoutes);
+app.use("/", indexRoutes);
 app.use("/api", authRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api", paymentRoutes);
