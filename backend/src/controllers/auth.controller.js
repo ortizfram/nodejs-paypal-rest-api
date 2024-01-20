@@ -498,7 +498,6 @@ const postUserUpdate = async (req, res) => {
 };
 
 export default {
-  getUser,
   getLogin,
   postLogin,
   getSignup,

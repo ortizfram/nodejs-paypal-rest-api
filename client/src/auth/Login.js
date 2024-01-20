@@ -47,13 +47,15 @@ const CompLogin = () => {
       <div id="login-page-container">
         <div id="login-page-content">
 
-        {backendMessage && <p>{backendMessage}</p>}
         
           <div className="section-title">
             <h1 className="text-white">Ingresa</h1>
           </div>
 
           <form onSubmit={handleLoginSubmit} className="vertical-form">
+
+        {backendMessage && <p>{backendMessage}</p>}
+        
             <input
               type="text"
               value={email}
