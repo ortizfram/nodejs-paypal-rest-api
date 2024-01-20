@@ -2,19 +2,14 @@ import axios from "axios";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
-// NodeJS endpoint reference
 const URI = "http://localhost:5000/api/login";
 
 const CompLogin = () => {
-  // declare form fields
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
-  const [user, setUser] = useState(null);
+  const [backendMessage, setBackendMessage] = useState("");
 
-  useEffect(() => {}, []);
-
-  // login procedure -----------------------------------
   const loginUser = async (email, password) => {
     try {
       const response = await axios.post(URI, {
@@ -23,33 +18,37 @@ const CompLogin = () => {
       });
 
       if (response.data.error) {
+        setBackendMessage(response.data.error);
         console.error("Error logging in:", response.data.error);
       } else if (response.data.user) {
-        setUser(response.data.user);
+        setBackendMessage(response.data.message);
         console.log("Login successful:", response.data.message);
         navigate("/");
       } else {
+        setBackendMessage("Unexpected response format. Please try again.");
         console.error("Unexpected response format:", response.data);
       }
     } catch (error) {
+      setBackendMessage("An error occurred while logging in. Please try again.");
       console.error("Error logging in:", error);
     }
   };
 
-  // submit form -----------------------------------
   const handleLoginSubmit = (e) => {
     e.preventDefault();
-    // Get username and password from the form
     const email = e.target.email.value;
     const password = e.target.password.value;
-    // Call the login function
     loginUser(email, password);
   };
+
 
   return (
     <>
       <div id="login-page-container">
         <div id="login-page-content">
+
+        {backendMessage && <p>{backendMessage}</p>}
+        
           <div className="section-title">
             <h1 className="text-white">Ingresa</h1>
           </div>

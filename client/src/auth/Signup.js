@@ -9,21 +9,26 @@ const CompSignup = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [backendMessage, setBackendMessage] = useState("");
   const navigate = useNavigate();
 
   const handleSignupSubmit = async (e) => {
     e.preventDefault();
 
     try {
-      await axios.post(URI_signup, {
+      const response = await axios.post(URI_signup, {
         username,
         name,
         email,
         password,
       });
+      setBackendMessage(response.data.message); // Set backend message
       navigate("/");
     } catch (error) {
       console.error("Error Signing up:", error);
+      setBackendMessage(
+        error.response.data.error || "Error during signup. Please try again."
+      ); // Set backend message
     }
   };
 
@@ -35,6 +40,8 @@ const CompSignup = () => {
         </div>
 
         <form onSubmit={handleSignupSubmit}>
+          {/* Render backend message */}
+          {backendMessage && <p>{backendMessage}</p>}{" "}
           <div className="mb-3">
             <label>Username</label>
             <input
@@ -44,7 +51,6 @@ const CompSignup = () => {
               className="form-control"
             />
           </div>
-
           <div className="mb-3">
             <label>Nombre</label>
             <input
@@ -54,7 +60,6 @@ const CompSignup = () => {
               className="form-control"
             />
           </div>
-
           <div className="mb-3">
             <label>Email</label>
             <input
@@ -64,7 +69,6 @@ const CompSignup = () => {
               className="form-control"
             />
           </div>
-
           <div className="mb-3">
             <label>Contraseña</label>
             <input
@@ -74,7 +78,6 @@ const CompSignup = () => {
               className="form-control"
             />
           </div>
-
           <button type="submit" className="btn btn-primary">
             Registrar
           </button>

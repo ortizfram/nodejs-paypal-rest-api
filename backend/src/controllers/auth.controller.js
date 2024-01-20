@@ -47,7 +47,7 @@ const postLogin = async (req, res, next) => {
       req.session.user = user; // Store the user in the session
       const userId = user.id;
       console.log("\n\nuser: ", user);
-      res.json({ message: `Login successful, user: ${userId}`, user: req.session.user });
+      res.status(200).json({ message: `Login successful, user: ${userId}`, user: req.session.user });
       console.log("\n*** Logged in\n");
     } else {
       res.status(401).json({ error: "Wrong password or email" });
@@ -58,11 +58,7 @@ const postLogin = async (req, res, next) => {
   }
 };
 
-// New endpoint to get user information
-const getUser = (req, res) => {
-  const user = req.session.user;
-  res.json(user);
-};
+
 //------------signup-------------------------
 const getSignup = async (req, res) => {
   const message = req.query.message; // Retrieve success message from query params authcontroller
@@ -76,7 +72,7 @@ const postSignup = async (req, res) => {
 
   // Add validation for required fields
   if (!username || !password || !email) {
-    return res.status(400).send("Username, password & email are required.");
+    return res.status(400).json({ error: "Username, password & email are required." });
   }
 
   try {
@@ -104,14 +100,15 @@ const postSignup = async (req, res) => {
     // Set session data for the newly signed-up user
     req.session.user = { id: userId, username, name, email, role: "user" };
 
-    // Redirect or respond as needed
-    res.redirect("/api/login?message=Signup successful. Now go Login.");
+    // Respond with success message
+    res.status(200).json({ message: "Signup successful. Now go Login.", user: req.session.user });
     console.log("\n\n*** Signed up successfully\n\n");
   } catch (error) {
     console.error("Error while saving user:", error);
-    res.redirect("/?message=Error during signup or login");
+    res.status(500).json({ error: "Error during signup or login" });
   }
 };
+
 
 
 //------------logout-------------------------
