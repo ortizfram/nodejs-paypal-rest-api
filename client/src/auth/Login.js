@@ -16,7 +16,7 @@ const CompLogin = () => {
         email: email,
         password: password,
       });
-
+  
       if (response.data.error) {
         setBackendMessage(response.data.error);
         console.error("Error logging in:", response.data.error);
@@ -33,6 +33,7 @@ const CompLogin = () => {
       console.error("Error logging in:", error);
     }
   };
+  
 
   const handleLoginSubmit = (e) => {
     e.preventDefault();
@@ -54,7 +55,8 @@ const CompLogin = () => {
 
           <form onSubmit={handleLoginSubmit} className="vertical-form">
 
-        {backendMessage && <p>{backendMessage}</p>}
+          {backendMessage && <p className="error-message">{backendMessage}</p>}
+
         
             <input
               type="text"

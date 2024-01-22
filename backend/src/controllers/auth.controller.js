@@ -127,31 +127,10 @@ const logout = (req, res) => {
 // -----------forgotPassword-----------------------
 const getForgotPassword = (req, res) => {
   console.log("\n\n*** getForgotPassword\n\n");
-  const message = req.query.message;
-  const user = req.session.user || null;
 
-  const fields = ["email"];
-  const values = [];
-  const titles = ["Forgot Password"];
-  const submitBtn = ["Submit"];
-  const formAction = ["/api/forgot-password"];
-  const subtitle = ['Inset your current Email to receive reset instructions']
-  const labels = ['']
-
-  const data = {
-    fields,
-    values,
-    titles,
-    subtitle,
-    labels,
-    submitBtn,
-    formAction,
-    message,
-    user,
   };
 
   // renderDynamicForm(res, "auth/forgotPassword", data);
-};
 
 const postForgotPassword = async (req, res) => {
   // ♦ send token to email for password changing
@@ -189,11 +168,11 @@ const postForgotPassword = async (req, res) => {
       `<button><a href="${link}">Go to Reset Password</a></button>`
     );
 
-    return res.render("auth/emailSent", {
-      user,
-      message: "Password reset email sent, verify your mailbox !",
+    // return res.render("auth/emailSent", {
+    //   user,
+    //   message: "Password reset email sent, verify your mailbox !",
       
-    });
+    // });
   } catch (error) {
     console.error("Error sending Email for password reset:", error);
     //   return res.render("auth/forgotPassword", { message: "Error sending reset email" });
@@ -202,50 +181,6 @@ const postForgotPassword = async (req, res) => {
 
 const getResetPassword = async (req, res) => {
   console.log("\n\n*** getResetPassword\n\n");
-
-  const { id, token } = req.params;
-
-  // check user existence ID in db
-  const [existingUser] = await pool.query(fetchUserByField("id"), [id]);
-  console.log("\n\nuser fetcher from id", existingUser[0]["id"], "\n\n");
-
-  if (!existingUser || existingUser.length === 0) {
-    return res.render("auth/forgot-password", { message: "user id not found" });
-  }
-
-  // We have valid id and valid user with this id
-  const secret = JWT_SECRET + existingUser[0]["password"];
-  const user = existingUser[0];
-  try {
-    const payload = jwt.verify(token, secret);
-    //
-  } catch (error) {
-    console.log(error.message);
-  }
-
-  // template data
-  const message = req.query.message;
-  const fields = ["password", "repeat_password"];
-  const titles = ["Reset Password"];
-  const submitBtn = ["Change password"];
-  const formAction = [`/api/reset-password/${id}/${token}`];
-  const labels = [''];
-  const subtitle = [''];
-
-  const data = {
-    fields,
-    values,
-    titles,
-    submitBtn,
-    formAction,
-    message,
-    user,
-    labels,
-    subtitle,
-  };
-
-  // render reset password
-  renderDynamicForm(res, "auth/forgotPassword", data);
 };
 
 const postResetPassword = async (req, res) => {
@@ -293,31 +228,7 @@ const postResetPassword = async (req, res) => {
 // -----------userUpdate-----------------------
 const getsendEmailToken = async (req, res) => { 
   console.log("\n\n*** getsendEmailToken\n\n");
-  const message = req.query.message;
-  const user = req.session.user || null;
-  const userId = req.session.user.id || null;
-
-  const fields = ["email"];
-  const values = [];
-  const titles = ["Account update"];
-  const submitBtn = ["Submit"];
-  const formAction = [`/api/user-update/${userId}`];
-  const subtitle = ['Inset your current Email to receive Token for updating account']
-  const labels = ['']
-
-  const data = {
-    fields,
-    values,
-    titles,
-    subtitle,
-    labels,
-    submitBtn,
-    formAction,
-    message,
-    user,
-  };
-
-  renderDynamicForm(res, "auth/forgotPassword", data);
+  
 }
 
 const postsendEmailToken = async (req, res) => {

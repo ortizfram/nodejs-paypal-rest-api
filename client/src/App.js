@@ -26,6 +26,8 @@ import courseDetailCSS from "./public/css/course/courseDetail.css";
 import courseEnrollCSS from "./public/css/course/courseEnroll.css";
 import courseUpdateCSS from "./public/css/course/courseUpdate.css";
 import coursesCSS from "./public/css/course/courses.css";
+import ForgotPassword from "./auth/ForgotPass.js";
+import EmailSentMessage from "./auth/EmailSent.js";
 
 function App() {
   const BASE_URL = "http://localhost:5000";
@@ -44,19 +46,57 @@ function App() {
           {/* INDEX */}
           <Route path="/" element={<CompHome />} />
 
+
+          {/* AADMIN */}
+          {/* router.post("/users/change-role", admin_staff_check, controller.changeUserRole); */}
+          {/* router.post("/users", admin_staff_check,controller.getUsers); */}
+
+
           {/* AUTH */}
           <Route path="/api/signup" element={<CompSignup />} />
           <Route path="/api/login" element={<CompLogin />} />
-          <Route path="/api/forgot-password" element={<CompSignup />} />
+          <Route path="/api/forgot-password" element={<ForgotPassword />} />
+          <Route path="/api/email-sent" element={<EmailSentMessage />} />
+          {/* // ------------userUpdate-------------------------
+          router.post("/user-update/:id", controller.postsendEmailToken)
+          router.post("/user-update/:id/:token", controller.postUserUpdate) */}
+
 
           {/* COURSES */}
           <Route path="/api/courses" element={<CompCourses />} />
           <Route path="/api/course/create" element={<CompCourseCreate />} />
+          {/* router.post('/course/create',  admin_staff_check, controllers.postCourseCreate);//post
+          router.post('/course/:id/update',  admin_staff_check, controllers.postCourseUpdate);// post update
+          router.post('/course/:id/delete',  admin_staff_check, controllers.postCourseDelete);// post del
+          //------------courseDetail  -------------------------
+          router.post("/course/:id/overview", is_loggedin_check, controllers.courseOverview);
+          router.post("/course/:id/enroll", is_loggedin_check, controllers.courseEnroll);
+          router.post("/course/:id/", is_loggedin_check, admin_staff_clicking_course, controllers.courseDetail); // This route should fetch course detail
+          //------------coursesList-------------------------
+          router.post("/courses", controllers.coursesList);
+          router.post("/courses-owned", is_loggedin_check, controllers.coursesListOwned);  */}
+
 
           {/* BLOGS */}
           <Route path="/api/blog" element={<CompBlogList />} />
           <Route path="/api/blog/create" element={<CompBlogCreate />} />
           <Route path="/api/blog/:id/update" element={<CompBlogUpdate />} />
+          {/* //------------detail-------------------------
+          router.get("/blog/:id", controller.getBlogDetail);
+          router.post("/blog/:id/delete", admin_staff_check, controller.postBlogDelete); */}
+
+
+          {/* PAYMENT PAYPAL */}
+          {/* router.post("/create-order-paypal", createOrderPaypal);
+          router.post("/capture-order-paypal", captureOrderPaypal); */}
+
+
+          {/* PAYMENT MERCADO */}
+          {/* router.post("/create-order-mp", createOrderMP)
+          router.get("/success-mp", successMP)
+          router.get("/pending-mp", (req, res)=>res.send("pending"))
+          router.get("/failure-mp", (req, res)=>res.send("failure"))
+          router.post("/webhook-mp", webhookMP */}
         </Routes>
       </BrowserRouter>
     </div>
