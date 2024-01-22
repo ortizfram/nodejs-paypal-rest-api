@@ -58,7 +58,7 @@ function App() {
           <Route path="/api/login" element={<CompLogin />} />
           <Route path="/api/forgot-password" element={<ForgotPassword />} />
           <Route path="/api/email-sent" element={<EmailSentMessage />} />
-          <Route path="/reset-password/:id/:token" element={<ResetPassword />} />
+          <Route path="/reset-password/:id/:token" element={<ResetPassword />} /> {/* correct errors missing creds*/}
           {/* // ------------userUpdate-------------------------
           router.post("/user-update/:id", controller.postsendEmailToken)
           router.post("/user-update/:id/:token", controller.postUserUpdate) */}

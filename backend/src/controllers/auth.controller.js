@@ -243,7 +243,7 @@ const postsendEmailToken = async (req, res) => {
       id: userId,
     };
     const token = jwt.sign(payload, secret, { expiresIn: "1y" });
-    const link = `${HOST}/api/user-update/${userId}?token=${token}`;
+    const link = `${process.env.BACKEND_URL}/api/user-update/${userId}?token=${token}`;
 
     // 3. SEND TOKEN BACK TO THE USER EMAIL.
     const emailInfo = await sendResetEmail(

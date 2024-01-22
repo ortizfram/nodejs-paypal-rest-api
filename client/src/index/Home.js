@@ -187,9 +187,9 @@ const CompHome = () => {
                     </label>
                     <textarea
                       className="form-control"
-                      id="message"
+                      id="msg"
                       rows="3"
-                      value={email}
+                      value={msg}
                       onChange={(e) => setMsg(e.target.value)}
                     ></textarea>
                   </div>
