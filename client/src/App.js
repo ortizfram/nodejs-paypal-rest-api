@@ -28,6 +28,7 @@ import courseUpdateCSS from "./public/css/course/courseUpdate.css";
 import coursesCSS from "./public/css/course/courses.css";
 import ForgotPassword from "./auth/ForgotPass.js";
 import EmailSentMessage from "./auth/EmailSent.js";
+import ResetPassword from "./auth/ResetPass.js";
 
 function App() {
   const BASE_URL = "http://localhost:5000";
@@ -57,6 +58,7 @@ function App() {
           <Route path="/api/login" element={<CompLogin />} />
           <Route path="/api/forgot-password" element={<ForgotPassword />} />
           <Route path="/api/email-sent" element={<EmailSentMessage />} />
+          <Route path="/reset-password/:id/:token" element={<ResetPassword />} />
           {/* // ------------userUpdate-------------------------
           router.post("/user-update/:id", controller.postsendEmailToken)
           router.post("/user-update/:id/:token", controller.postUserUpdate) */}

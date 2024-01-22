@@ -132,52 +132,39 @@ const getForgotPassword = (req, res) => {
 
   // renderDynamicForm(res, "auth/forgotPassword", data);
 
-const postForgotPassword = async (req, res) => {
-  // ♦ send token to email for password changing
-  console.log("\n\n*** postForgotPassword\n\n");
-  const { email } = req.body;
-  const user = req.session.user || null;
-
-  try {
-    // 1. GET USER BASED ON POSTED EMAIL
-    const [existingUser] = await pool.query(fetchUserByField("email"), [email]);
-    console.log("\n\nuser fetcher from email", existingUser[0]["id"]);
-
-    if (!existingUser || existingUser.length === 0) {
-      return res.render("auth/forgot-password", { message: "Email not found" });
+  const postForgotPassword = async (req, res) => {
+    const { email } = req.body;
+  
+    try {
+      const [existingUser] = await pool.query(fetchUserByField("email"), [email]);
+  
+      if (!existingUser || existingUser.length === 0) {
+        return res.status(404).json({ error: "Email not found" });
+      }
+  
+      const secret = JWT_SECRET + existingUser[0]["password"];
+      const userId = existingUser[0]["id"];
+      const payload = {
+        email: existingUser[0]["email"],
+        id: existingUser[0]["id"],
+      };
+      const token = jwt.sign(payload, secret, { expiresIn: "1y" });
+      const link = `${process.env.BACKEND_URL}/api/reset-password/${userId}/${token}`;
+  
+      await sendResetEmail(
+        email,
+        "Password Reset",
+        "Sending Reset password Token using Node JS & Nodemailer",
+        `<button><a href="${link}">Go to Reset Password</a></button>`
+      );
+  
+      res.status(200).json({ message: "Password reset email sent, check your mailbox." });
+    } catch (error) {
+      console.error("Error sending Email for password reset:", error);
+      res.status(500).json({ error: "Error sending reset email" });
     }
-
-    // ♦ Create a one time link valid for 15min
-
-    // 2. GENERATE RANDOM TOKEN : JWT secret
-    const secret = JWT_SECRET + existingUser[0]["password"]; // unique each time
-    const userId = existingUser[0]["id"];
-    const payload = {
-      email: existingUser[0]["email"],
-      id: existingUser[0]["id"],
-    };
-    const token = jwt.sign(payload, secret, { expiresIn: "1y" });
-    const link = `${HOST}/api/reset-password/${userId}/${token}`;
-    //console.log("\n\n", link, "\n\n");
-
-    // 3. SEND TOKEN BACK TO THE USER EMAIL.
-    const emailInfo = await sendResetEmail(
-      email,
-      "Password Reset",
-      "Sending Reset password Token using Node JS & Nodemailer",
-      `<button><a href="${link}">Go to Reset Password</a></button>`
-    );
-
-    // return res.render("auth/emailSent", {
-    //   user,
-    //   message: "Password reset email sent, verify your mailbox !",
-      
-    // });
-  } catch (error) {
-    console.error("Error sending Email for password reset:", error);
-    //   return res.render("auth/forgotPassword", { message: "Error sending reset email" });
-  }
-};
+  };
+  
 
 const getResetPassword = async (req, res) => {
   console.log("\n\n*** getResetPassword\n\n");
