@@ -12,7 +12,8 @@
     router.post("/signup", controller.postSignup);
 
     //------------logout-------------------------
-    router.get("/logout", controller.logout);
+    router.get("/logout", controller.getLogout);
+    router.post("/logout", controller.logout);
 
     // ------------forgotPassword-------------------------
     router.get("/forgot-password", controller.getForgotPassword)

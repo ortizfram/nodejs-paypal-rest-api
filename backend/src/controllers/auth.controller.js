@@ -107,10 +107,21 @@ const postSignup = async (req, res) => {
 
 
 //------------logout-------------------------
+const getLogout = (req, res) => {
+  console.log("\n*** Logout\n");
+}
 const logout = (req, res) => {
-    console.log("\n*** Logout\n");
-    res.status(204).json({ message: "Logged out successfully", redirectUrl:'/' });
-  };
+  req.session.destroy((err) => {
+      if (err) {
+          console.error("Error destroying session:", err);
+          res.status(500).json({ error: "An error occurred during logout" });
+      } else {
+          console.log("\n*** Logout successful\n");
+          res.status(204).json({ message: "Logged out successfully", redirectUrl:'/' });
+      }
+  });
+};
+
 
 
 // -----------forgotPassword-----------------------
@@ -389,6 +400,7 @@ export default {
   postLogin,
   getSignup,
   postSignup,
+  getLogout,
   logout,
   getForgotPassword,
   postForgotPassword,
