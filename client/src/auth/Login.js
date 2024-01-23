@@ -9,6 +9,7 @@ const CompLogin = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [backendMessage, setBackendMessage] = useState("");
   const { setUserData } = useUserContext();
 
 
@@ -20,6 +21,9 @@ const CompLogin = () => {
         email,
         password
       });
+      
+      // fetch backenMessage
+      setBackendMessage(response.data.message || response.data.error);
 
       // Assuming your server responds with user data upon successful login
       const userData = response.data.user;
@@ -43,6 +47,8 @@ const CompLogin = () => {
   return (
     <div>
       <form>
+        {/* Render backend message */}
+        {backendMessage && <p>{backendMessage}</p>}{" "}
         <label>Email</label>
         <input type="text" onChange={(e) => setEmail(e.target.value)} />
         <label>Password</label>

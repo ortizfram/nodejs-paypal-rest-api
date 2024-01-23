@@ -96,7 +96,7 @@ const postSignup = async (req, res) => {
     req.session.user = { id: userId, username, name, email, role: "user" };
 
     // Respond with success message
-    res.status(200).json({ message: "Signup successful. Now go Login.", user: req.session.user });
+    res.status(200).json({ message: "Signup successful. Now go Login.", user: req.session.user, redirectUrl:'/api/login' });
     console.log("\n\n*** Signed up successfully\n\n");
   } catch (error) {
     console.error("Error while saving user:", error);

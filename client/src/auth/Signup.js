@@ -22,8 +22,11 @@ const CompSignup = () => {
         email,
         password,
       });
+      console.log("\nSign-up successful:", response.data);
       setBackendMessage(response.data.message); // Set backend message
-      navigate("/");
+      const next = response.data.redirectUrl
+      console.log(next)
+      navigate(next);
     } catch (error) {
       console.error("Error Signing up:", error);
       setBackendMessage(
