@@ -30,11 +30,6 @@ const getLogin = async (req, res, next) => {
 };
 
 const postLogin = async (req, res, next) => {
-  // Create users table if not exists
-  // ...
-
-  createTableIfNotExists(pool, tableCheckQuery, createUserTableQuery, "users");
-
   try {
     const { email, password } = req.body;
 
