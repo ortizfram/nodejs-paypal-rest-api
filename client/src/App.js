@@ -11,6 +11,9 @@ import CompSignup from "./auth/Signup.js";
 import CompLogin from "./auth/Login.js";
 import CompCourses from "./courses/Courses";
 import CompCourseCreate from "./courses/CourseCreate";
+import ForgotPassword from "./auth/ForgotPass.js";
+import EmailSentMessage from "./auth/EmailSent.js";
+import ResetPassword from "./auth/ResetPass.js";
 // import css
 import homeCSS from "./public/css/home/home.css";
 import formCSS from "./public/css/form.css";
@@ -26,9 +29,9 @@ import courseDetailCSS from "./public/css/course/courseDetail.css";
 import courseEnrollCSS from "./public/css/course/courseEnroll.css";
 import courseUpdateCSS from "./public/css/course/courseUpdate.css";
 import coursesCSS from "./public/css/course/courses.css";
-import ForgotPassword from "./auth/ForgotPass.js";
-import EmailSentMessage from "./auth/EmailSent.js";
-import ResetPassword from "./auth/ResetPass.js";
+// import Hooks
+import { UserContextProvider } from "./hooks/UserContext.js";
+
 
 function App() {
   const BASE_URL = "http://localhost:5000";
@@ -43,6 +46,7 @@ function App() {
   return (
     <div className="App">
       <BrowserRouter>
+      <UserContextProvider>
         <Routes>
           {/* INDEX */}
           <Route path="/" element={<CompHome />} />
@@ -100,6 +104,7 @@ function App() {
           router.get("/failure-mp", (req, res)=>res.send("failure"))
           router.post("/webhook-mp", webhookMP */}
         </Routes>
+        </UserContextProvider>
       </BrowserRouter>
     </div>
   );
