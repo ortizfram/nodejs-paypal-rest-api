@@ -108,16 +108,10 @@ const postSignup = async (req, res) => {
 
 //------------logout-------------------------
 const logout = (req, res) => {
-  // Clear the user session by destroying it
-  req.session.destroy((err) => {
-    if (err) {
-      console.error("Error destroying session:", err);
-    }
-    // Redirect the user to the home page after logout
-    res.redirect("/?message=Logged out successfully");
-    console.log("\n*** Logged out\n");
-  });
-};
+    console.log("\n*** Logout\n");
+    res.status(204).json({ message: "Logged out successfully", redirectUrl:'/' });
+  };
+
 
 // -----------forgotPassword-----------------------
 const getForgotPassword = (req, res) => {

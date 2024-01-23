@@ -28,6 +28,8 @@ const CompLogin = () => {
 
       // Set the user data in the context
       setUserData(userData);
+      // Set user data in localStorage
+      localStorage.setItem('userData', JSON.stringify(userData));
 
       // Do something with the user data (e.g., redirect to Home)
       console.log('Login successful:', userData);

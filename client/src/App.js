@@ -31,6 +31,7 @@ import courseUpdateCSS from "./public/css/course/courseUpdate.css";
 import coursesCSS from "./public/css/course/courses.css";
 // import Hooks
 import { UserContextProvider } from "./hooks/UserContext.js";
+import CompLogout from "./auth/Logout.js";
 
 
 function App() {
@@ -60,6 +61,7 @@ function App() {
           {/* AUTH */}
           <Route path="/api/signup" element={<CompSignup />} />
           <Route path="/api/login" element={<CompLogin />} />
+          <Route path="/api/logout" element={<CompLogout />} />
           <Route path="/api/forgot-password" element={<ForgotPassword />} />
           <Route path="/api/email-sent" element={<EmailSentMessage />} />
           <Route path="/reset-password/:id/:token" element={<ResetPassword />} /> {/* correct errors missing creds*/}

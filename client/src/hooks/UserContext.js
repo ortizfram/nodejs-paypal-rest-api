@@ -6,7 +6,11 @@ const UserContext = createContext({
 });
 
 export const UserContextProvider = ({ children }) => {
-  const [userData, setUserData] = useState(null);
+  const [userData, setUserData] = useState(() => {
+    // Check for existing user data in localStorage
+    const storedUserData = localStorage.getItem('userData');
+    return storedUserData ? JSON.parse(storedUserData) : null;
+  });
 
   return (
     <UserContext.Provider value={{ userData, setUserData }}>
