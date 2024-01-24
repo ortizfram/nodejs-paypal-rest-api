@@ -46,7 +46,7 @@ const postCourseCreate = async (req, res) => {
 
     // Files upload check
     if (!req.files || !req.files.thumbnail || !req.files.video) {
-      return res.status(400).send("No thumbnail or video file uploaded");
+      return res.status(400).json({message:"No thumbnail or video file uploaded"});
     }
 
     // Extract necessary data from request body
@@ -90,7 +90,7 @@ const postCourseCreate = async (req, res) => {
       async (err) => {
         if (err) {
           console.error(err);
-          return res.status(500).send("Error uploading the file");
+          return res.status(500).json({message:"Error uploading the file"});
         }
 
         // video file upload handling
@@ -99,7 +99,7 @@ const postCourseCreate = async (req, res) => {
           async (err) => {
             if (err) {
               console.error(err);
-              return res.status(500).send("Error uploading the video file");
+              return res.status(500).json({message:"Error uploading the video file"});
             }
 
             try {

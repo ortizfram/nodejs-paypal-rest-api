@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 import CompNavbar from "../template/Nabvar";
 import CompFooter from "../template/Footer";
+// import css
+import '../public/css/course/courseCreate.css'
 
 // NodeJS endpoint reference
 const URI = `http://localhost:5000/api/course/create`;
@@ -25,7 +27,7 @@ const CompCourseCreate = () => {
   const handleFormSubmit = async (e) => {
     try {
       e.preventDefault();
-      await axios.post(URI, {
+      const response = await axios.post(URI, {
         title: title,
         description: description,
         text_content: text_content,
@@ -35,9 +37,18 @@ const CompCourseCreate = () => {
         usd_price: usd_price,
         discount: discount,
       });
+      // Handle successful response
+      console.log(response.data);
+      setErrorMessage(""); // Reset error message
       navigate("/");
     } catch (error) {
-      console.error("Error Signing up:", error);
+      console.error("Error creating course:", error);
+
+      // Handle different types of errors
+      setErrorMessage(
+        error.response.data ||
+          "An unexpected error occurred while creating the course."
+      );
     }
   };
 
@@ -45,6 +56,7 @@ const CompCourseCreate = () => {
   return (
     <>
       <CompNavbar />
+      <div id="create-course-container-page">
       <div id="create-course-container">
         <h1 className="section-title">Create New Course</h1>
         <div>
@@ -54,9 +66,11 @@ const CompCourseCreate = () => {
             method="POST"
             encType="multipart/form-data"
             onSubmit={handleFormSubmit}
-          >
+            >
             {/* Form action should match the route for creating a course */}
             <h3>Course description</h3>
+            {/* Display error message */}
+  {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
             <label htmlFor="title">titulo:</label>
             <br />
             <input 
@@ -113,6 +127,7 @@ const CompCourseCreate = () => {
             {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
           </form>
         </div>
+      </div>
       </div>
       <CompFooter />
     </>
