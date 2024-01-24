@@ -46,7 +46,7 @@ const postCourseCreate = async (req, res) => {
 
     // Files upload check
     if (!req.files || !req.files.thumbnail || !req.files.video) {
-      return res.status(400).json({message:"No thumbnail or video file uploaded"});
+      return res.status(400).json({message:"video y miniatura no pueden estar vacios"});
     }
 
     // Extract necessary data from request body
