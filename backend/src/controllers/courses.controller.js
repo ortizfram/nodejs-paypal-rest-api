@@ -59,6 +59,16 @@ const postCourseCreate = async (req, res) => {
       discount,
     } = req.body;
 
+     // Array de campos para validar
+     const camposRequeridos = ['title', 'description', 'text_content', 'ars_price', 'usd_price'];
+
+     // Validar campos no pueden estar vacíos
+     for (const campo of camposRequeridos) {
+       if (!req.body[campo]) {
+         return res.status(400).json({ message: `El campo ${campo} es obligatorio` });
+       }
+     }
+
     // Ensure title is a string
     if (typeof title !== "string") {
       title = String(title);
@@ -166,7 +176,7 @@ const postCourseCreate = async (req, res) => {
               );
               
               // Redirect after creating the course
-              res.redirect(`/api/course/${courseId}`);
+              return res.status(201).json({message:'course Created successfully', redirectUrl:`/api/course/${courseId}`})
 
             } catch (error) {
               console.error("Error creating the course:", error);

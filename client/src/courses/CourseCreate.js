@@ -40,7 +40,8 @@ const CompCourseCreate = () => {
       // Handle successful response
       console.log(response.data);
       setErrorMessage(""); // Reset error message
-      navigate("/");
+      const next = response.data.redirectUrl
+      navigate(next);
     } catch (error) {
       console.error("Error creating course:", error);
 
@@ -57,7 +58,7 @@ const CompCourseCreate = () => {
     <>
       <CompNavbar />
       <div id="create-course-container-page">
-      <div id="create-course-container">
+      <div id="create-course-container" className="mt-8">
         <h1 className="section-title">Create New Course</h1>
         <div>
           <form
