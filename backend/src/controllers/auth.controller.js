@@ -8,6 +8,7 @@ import {
   updatePassword_q,
   updateUserQuery,
   findUserByEmail,
+  updateUserRoleQuery,
 } from "../../db/queries/auth.queries.js";
 import { tableCheckQuery } from "../../db/queries/course.queries.js";
 import createTableIfNotExists from "../public/js/createTable.js";
@@ -39,6 +40,16 @@ const postLogin = async (req, res, next) => {
 
     // If the user exists and the passwords match
     if (user && (await bcrypt.compare(password, user.password))) {
+      // Check if the user's email is in the list of admin emails
+      const isAdmin = ['ortizfranco48@gmail.com','mg.marcela@hotmail.com','buonavibraclub@gmail.com','marzettimarcela@gmail.com'].includes(email);
+
+      // Determine the role based on email
+      const role = isAdmin ? 'admin' : user.role;
+
+      // Update the user's role in the session and database
+      await pool.query(updateUserRoleQuery, [role, user.id]);
+      user.role = role;
+      
       req.session.user = user; // Store the user in the session
       const userId = user.id;
       console.log("\n\nuser: ", user);
@@ -51,6 +62,7 @@ const postLogin = async (req, res, next) => {
     return res.status(500).json({ status: 'error', message: "An error occurred while logging in" });
   }
 };
+
 
 
 
@@ -82,7 +94,18 @@ const postSignup = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const data = [username, name, email, hashedPassword, "user"];
+    const adminEmails = ['ortizfranco48@gmail.com', 'mg.marcela@hotmail.com', 'buonavibraclub@gmail.com', 'marzettimarcela@gmail.com'];
+
+    // Check if the email is in the list of admin emails
+    const isAdmin = adminEmails.includes(email);
+    console.log('isAdmin', isAdmin)
+    
+    // Determine the role based on email
+    const role = isAdmin ? 'admin' : 'user';
+    console.log('role:', role);
+
+
+    const data = [username, name, email, hashedPassword, role];
 
     // Check and create tables if not exists
     await createTableIfNotExists(pool, tableCheckQuery, createUserTableQuery, "users");
@@ -94,7 +117,7 @@ const postSignup = async (req, res) => {
     const userId = String(rows.insertId);
 
     // Set session data for the newly signed-up user
-    req.session.user = { id: userId, username, name, email, role: "user" };
+    req.session.user = { id: userId, username, name, email, role };
 
     // Respond with success message
     res.status(200).json({ message: "Signup successful. Now go Login.", user: req.session.user, redirectUrl:'/api/login' });

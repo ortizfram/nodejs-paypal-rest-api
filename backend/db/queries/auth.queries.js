@@ -15,6 +15,10 @@ export const fetchUserByField = (fieldName) =>`
   SELECT * FROM users WHERE ${fieldName} = ?
 `;
 
+export const updateUserRoleQuery = `
+  UPDATE users SET role = ? WHERE id = ?
+`;
+
 export const setResetToken = `
   UPDATE users SET resetToken = ? WHERE email = ?
 `;
