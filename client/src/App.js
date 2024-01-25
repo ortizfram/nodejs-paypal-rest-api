@@ -37,9 +37,11 @@ function App() {
 
   // Use BASE_URL in your API requests
   fetch(`${BASE_URL}`)
-    .then((response) => response.json())
-    .then((data) => console.log(data))
-    .then(console.log(`\n\n👨🏼‍💻⚛️ React & Express were connected\n\n`))
+    .then((response) => response.text())
+    .then((data) => {
+      console.log(data);
+      console.log(`\n\n👨🏼‍💻⚛️ React & Express were connected\n\n`)
+    })
     .catch((error) => console.error(error));
 
   return (

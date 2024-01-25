@@ -6,11 +6,20 @@ import CompNavbar from "../template/Nabvar";
 import CompFooter from "../template/Footer";
 // import css
 import '../public/css/course/courseCreate.css'
+// import context
+import { useUserContext } from "../hooks/UserContext";
+
 
 // NodeJS endpoint reference
 const URI = `http://localhost:5000/api/course/create`;
 
+
 const CompCourseCreate = () => {
+  
+  // pass context user
+  const { userData } = useUserContext();
+  let user = userData;
+
   const [errorMessage, setErrorMessage] = useState(""); // Define errorMessage state
    // course form data declaration
    const [title, setTitle] = useState("");
@@ -122,7 +131,7 @@ const CompCourseCreate = () => {
             <br />
             % <input type="number" id="discount" name="discount" value={discount} onChange={(e) => setDiscount(e.target.value)}/>
             <br />
-            <input type="hidden" name="author" />
+            <input type="hidden" name="user" value={user}/>
             <button type="submit">Create Course</button>
             {/* Display error message */}
             {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
