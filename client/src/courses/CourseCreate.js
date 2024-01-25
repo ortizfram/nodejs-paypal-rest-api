@@ -50,8 +50,19 @@ const CompCourseCreate = () => {
      if (response.ok) {
       alert("File uploaded!!")
      } else {
-      console.error("some error ocurred on uploading")
+      console.error("Error uploading file. Server response:", response);
+
+      // Parse the error response if it's JSON
+    try {
+      const errorData = await response.json();
+      console.error("Error data:", errorData);
+    } catch (error) {
+      console.error("Error parsing error response:", error.message);
+    }
+    alert("Some error occurred on uploading");
+
      }
+     
       setErrorMessage(""); // Reset error message
       const next = response.data.redirectUrl;
       navigate(next);
@@ -60,7 +71,7 @@ const CompCourseCreate = () => {
 
       // Handle different types of errors
       setErrorMessage(
-        error.response.data ||
+        error.response?.data ||
           "An unexpected error occurred while creating the course."
       );
     }
