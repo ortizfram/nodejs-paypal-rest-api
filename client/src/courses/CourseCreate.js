@@ -29,6 +29,7 @@ const CompCourseCreate = () => {
   const [discount, setDiscount] = useState("");
   const navigate = useNavigate();
   const fileInput = createRef()
+  const fileInputThumbnail = createRef()
 
   // createCourse procedure ------------------------
   const handleFormSubmit = async (e) => {
@@ -37,7 +38,7 @@ const CompCourseCreate = () => {
     formData.append("description", description);
     formData.append("text_content", text_content);
     formData.append("thumbnail", fileInput.current.files[0]);
-    formData.append("video", video);
+    formData.append("video", fileInputThumbnail.current.files[0]);
     formData.append("ars_price", ars_price);
     formData.append("usd_price", usd_price);
     formData.append("discount", discount);
@@ -123,6 +124,7 @@ const CompCourseCreate = () => {
                 name="video"
                 value={video}
                 accept="video/*"
+                ref={fileInputThumbnail}
                 onChange={(e) => setVideo(e.target.value)}
               />
               <br />
