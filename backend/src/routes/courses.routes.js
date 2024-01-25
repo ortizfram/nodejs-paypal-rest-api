@@ -6,8 +6,13 @@ const router = Router();
 
 
 //------------courseCreate/Update-------------------------
+<<<<<<< Updated upstream
 router.get("/course/create",  controllers.getCourseCreate);//get
 router.post('/course/create',   controllers.postCourseCreate2);//post
+=======
+router.get("/course/create", admin_staff_check, controllers.getCourseCreate);//get
+router.post('/course/create', controllers.postCourseCreate);//post
+>>>>>>> Stashed changes
 router.get('/course/:id/update', admin_staff_check, controllers.getCourseUpdate);//get update
 router.post('/course/:id/update',  admin_staff_check, controllers.postCourseUpdate);// post update
 router.get('/course/:id/delete',  admin_staff_check, controllers.getCourseDelete);// get del

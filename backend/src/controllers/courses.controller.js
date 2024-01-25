@@ -2,6 +2,7 @@
 import slugify from "slugify";
 import { pool } from "../db.js";
 import path from "path";
+import moveFile from "../utils/moveFile.js";
 import {
   courseFieldsPlusAuthor_q,
   createCourseQuery,
@@ -95,6 +96,7 @@ const postCourseCreate = async (req, res) => {
     const videoPath = "/uploads/videos/" + uniqueVideoFilename;
 
     // Move uploaded thumbnail to the server
+<<<<<<< Updated upstream
     req.files.thumbnail.mv(
       path.join(__dirname, "uploads", "imgs", uniqueFilename),
       async (err) => {
@@ -192,7 +194,91 @@ const postCourseCreate = async (req, res) => {
           }
         ); // Closing bracket for video file upload
       }
+=======
+    await moveFile(
+      req.files.thumbnail,
+      path.join(__dirname, "uploads", uniqueFilename)
+>>>>>>> Stashed changes
     );
+
+    // video file upload handling
+    await moveFile(
+      videoFile,
+      path.join(__dirname, "uploads/videos", uniqueVideoFilename)
+    );
+
+    try {
+      // Get current timestamp
+      const currentDate = new Date();
+      const currentTimestamp = `${currentDate
+        .getDate()
+        .toString()
+        .padStart(2, "0")}-${(currentDate.getMonth() + 1)
+        .toString()
+        .padStart(2, "0")}-${currentDate.getFullYear().toString()} ${currentDate
+        .getHours()
+        .toString()
+        .padStart(2, "0")}:${currentDate
+        .getMinutes()
+        .toString()
+        .padStart(2, "0")}:${currentDate
+        .getSeconds()
+        .toString()
+        .padStart(2, "0")}`;
+
+      // Prepare course data
+      const courseData = [
+        title,
+        courseSlug,
+        description,
+        text_content,
+        ars_price,
+        usd_price,
+        discountValue,
+        relativePath,
+        videoPath,
+        authorId,
+      ];
+
+      console.log("\n\ncourseData: ", courseData);
+
+      // Create the new course using the SQL query
+      const [courseRow] = await pool.query(createCourseQuery, courseData);
+
+      // Fetch the created course & JOIN with user as author
+      const [fetchedCourse] = await pool.query(
+        getCourseFromSlugQuery,
+        courseSlug
+      );
+      const course = fetchedCourse[0];
+      const courseId = course.id;
+
+      console.log("\n\n◘ Creating course...");
+      console.log("\n\ncourse :", course);
+
+      // Set MIME type for the uploaded video
+      setCustomMimeTypes(
+        {
+          path: `/uploads/videos/${uniqueVideoFilename}`,
+        },
+        res,
+        () => {} // Empty callback as it's not required in this context
+      );
+
+      // Redirect after creating the course
+      return res
+        .status(201)
+        .json({
+          message: "course Created successfully",
+          redirectUrl: `/api/courses`,
+        });
+    } catch (error) {
+      console.error("Error creating the course:", error);
+      return res.status(500).json({
+        message: "Error creating the course",
+        error: error.message,
+      });
+    }
   } catch (error) {
     console.error("General error:", error);
     res
