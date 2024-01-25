@@ -211,7 +211,7 @@ const postCourseCreate2 = async (req, res) => {
         .json({ message: "User ID not found in the session" });
     }
 
-    const authorId = req.body.user.id;
+    const authorId = req.session.user.id;
     console.log("session user id: ", authorId);
 
     // Files upload check
