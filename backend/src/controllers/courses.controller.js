@@ -24,11 +24,6 @@ import { fetchUserByField } from "../../db/queries/auth.queries.js";
 // ===========================================================
 const getCourseCreate = async (req, res) => {
   console.log("\n\n*** getCourseCreate\n\n");
-
-  const message = req.query.message;
-  const user = req.session
-  const userId = user.id || null;
-  res.render(`courseCreate/courseCreate`, { message, user });
 };
 
 const postCourseCreate = async (req, res) => {
@@ -43,31 +38,36 @@ const postCourseCreate = async (req, res) => {
     }
 
     const authorId = req.session.user.id;
+    console.log("session user id: ", authorId);
 
     // Files upload check
     if (!req.files || !req.files.thumbnail || !req.files.video) {
-      return res.status(400).json({message:"video y miniatura no pueden estar vacios"});
+      return res
+        .status(400)
+        .json({ message: "video y miniatura no pueden estar vacios" });
     }
 
     // Extract necessary data from request body
-    let {
-      title,
-      description,
-      text_content,
-      ars_price,
-      usd_price,
-      discount,
-    } = req.body;
+    let { title, description, text_content, ars_price, usd_price, discount } =
+      req.body;
 
-     // Array de campos para validar
-     const camposRequeridos = ['title', 'description', 'text_content', 'ars_price', 'usd_price'];
+    // Array de campos para validar
+    const camposRequeridos = [
+      "title",
+      "description",
+      "text_content",
+      "ars_price",
+      "usd_price",
+    ];
 
-     // Validar campos no pueden estar vacíos
-     for (const campo of camposRequeridos) {
-       if (!req.body[campo]) {
-         return res.status(400).json({ message: `El campo ${campo} es obligatorio` });
-       }
-     }
+    // Validar campos no pueden estar vacíos
+    for (const campo of camposRequeridos) {
+      if (!req.body[campo]) {
+        return res
+          .status(400)
+          .json({ message: `El campo ${campo} es obligatorio` });
+      }
+    }
 
     // Ensure title is a string
     if (typeof title !== "string") {
@@ -88,7 +88,7 @@ const postCourseCreate = async (req, res) => {
 
     // Generate unique filename for video
     const videoFile = req.files.video;
-    const videoFilename = videoFile.name.split(' ')[0];
+    const videoFilename = videoFile.name.split(" ")[0];
     const uniqueVideoFilename = encodeURIComponent(
       `${timestamp}_${videoFilename}`
     );
@@ -96,20 +96,22 @@ const postCourseCreate = async (req, res) => {
 
     // Move uploaded thumbnail to the server
     req.files.thumbnail.mv(
-      path.join(__dirname, "uploads", uniqueFilename),
+      path.join(__dirname, "uploads", "imgs", uniqueFilename),
       async (err) => {
         if (err) {
           console.error(err);
-          return res.status(500).json({message:"Error uploading the file"});
+          return res.status(500).json({ message: "Error uploading the file" });
         }
 
         // video file upload handling
         videoFile.mv(
-          path.join(__dirname, "uploads/videos", uniqueVideoFilename),
+          path.join(__dirname, "uploads", "videos", uniqueVideoFilename),
           async (err) => {
             if (err) {
               console.error(err);
-              return res.status(500).json({message:"Error uploading the video file"});
+              return res
+                .status(500)
+                .json({ message: "Error uploading the video file" });
             }
 
             try {
@@ -174,10 +176,12 @@ const postCourseCreate = async (req, res) => {
                 res,
                 () => {} // Empty callback as it's not required in this context
               );
-              
-              // Redirect after creating the course
-              return res.status(201).json({message:'course Created successfully', redirectUrl:`/api/course/${courseId}`})
 
+              // Redirect after creating the course
+              return res.status(201).json({
+                message: "course Created successfully",
+                redirectUrl: `/api/course/${courseId}`,
+              });
             } catch (error) {
               console.error("Error creating the course:", error);
               return res.status(500).json({
@@ -194,6 +198,176 @@ const postCourseCreate = async (req, res) => {
     res
       .status(500)
       .json({ message: "Error creating the course", error: error.message });
+  }
+};
+
+const postCourseCreate2 = async (req, res) => {
+  console.log(`\n\n*** postCourseCreate2\n\n`);
+
+  try {
+    if (!req.session || !req.session.user || !req.session.user.id) {
+      return res
+        .status(401)
+        .json({ message: "User ID not found in the session" });
+    }
+
+    const authorId = req.session.user.id;
+    console.log("session user id: ", authorId);
+
+    // Files upload check
+    if (!req.files || !req.files.thumbnail || !req.files.video) {
+      return res
+        .status(400)
+        .json({ message: "video y miniatura no pueden estar vacios" });
+    }
+
+    // Extract necessary data from request body
+    let { title, description, text_content, ars_price, usd_price, discount } =
+      req.body;
+    // Log the extracted data to the console
+    console.log("Extracted data from request body:", {
+      title,
+      description,
+      text_content,
+      ars_price,
+      usd_price,
+      discount,
+    });
+
+    // Array de campos para validar
+    const camposRequeridos = [
+      "title",
+      "description",
+      "text_content",
+      "ars_price",
+      "usd_price",
+    ];
+
+    // Validar campos no pueden estar vacíos
+    for (const campo of camposRequeridos) {
+      if (!req.body[campo]) {
+        return res
+          .status(400)
+          .json({ message: `El campo ${campo} es obligatorio` });
+      }
+    }
+
+    // Ensure title is a string
+    if (typeof title !== "string") {
+      title = String(title);
+    }
+
+    // Generate course slug
+    const courseSlug = slugify(title, { lower: true, strict: true });
+
+    // Manage discount value
+    const discountValue = discount !== "" ? discount : null;
+
+    // Generate unique filename for thumbnail
+    const timestamp = Date.now();
+    const filename = req.files.thumbnail.name;
+    const uniqueFilename = encodeURIComponent(`${timestamp}_${filename}`);
+    const relativePath = "/uploads/" + uniqueFilename;
+
+    // Generate unique filename for video
+    const videoFile = req.files.video;
+    const videoFilename = videoFile.name.split(" ")[0];
+    const uniqueVideoFilename = encodeURIComponent(
+      `${timestamp}_${videoFilename}`
+    );
+    const videoPath = "/uploads/videos/" + uniqueVideoFilename;
+
+    // Move uploaded thumbnail to the server
+    req.files.thumbnail.mv(
+      path.join(__dirname, "uploads", "imgs", uniqueFilename),
+      async (err) => {
+        if (err) {
+          console.error(err);
+          return res.status(500).json({ message: "Error uploading the file" });
+        }
+      }
+    );
+
+    // video file upload handling
+    videoFile.mv(
+      path.join(__dirname, "uploads", "videos", uniqueVideoFilename),
+      async (err) => {
+        if (err) {
+          console.error(err);
+          return res
+            .status(500)
+            .json({ message: "Error uploading the video file" });
+        }
+      }
+    );
+
+    // Get current timestamp
+    const currentDate = new Date();
+    const currentTimestamp = `${currentDate
+      .getDate()
+      .toString()
+      .padStart(2, "0")}-${(currentDate.getMonth() + 1)
+      .toString()
+      .padStart(2, "0")}-${currentDate.getFullYear().toString()} ${currentDate
+      .getHours()
+      .toString()
+      .padStart(2, "0")}:${currentDate
+      .getMinutes()
+      .toString()
+      .padStart(2, "0")}:${currentDate
+      .getSeconds()
+      .toString()
+      .padStart(2, "0")}`;
+
+    // Set MIME type for the uploaded video
+    setCustomMimeTypes(
+      {
+        path: `/uploads/videos/${uniqueVideoFilename}`,
+      },
+      res,
+      () => {} // Empty callback as it's not required in this context
+    );
+
+    // Prepare course data
+    const courseData = [
+      title,
+      courseSlug,
+      description,
+      text_content,
+      ars_price,
+      usd_price,
+      discountValue,
+      relativePath,
+      videoPath,
+      authorId,
+    ];
+    console.log("\n\ncourseData: ", courseData);
+
+    // Create the new course using the SQL query
+    const [courseRow] = await pool.query(createCourseQuery, courseData);
+
+    // Fetch the created course & JOIN with user as author
+    const [fetchedCourse] = await pool.query(
+      getCourseFromSlugQuery,
+      courseSlug
+    );
+    const course = fetchedCourse[0];
+    const courseId = course.id;
+
+    console.log("\n\n◘ Creating course...");
+    console.log("\n\ncourse :", course);
+
+    // Redirect after creating the course
+    return res.status(201).json({
+      message: "course Created successfully",
+      redirectUrl: `/api/courses`,
+    });
+  } catch (error) {
+    console.error("Error creating the course:", error);
+    return res.status(500).json({
+      message: "Error creating the course",
+      error: error.message,
+    });
   }
 };
 
@@ -265,7 +439,7 @@ const postCourseUpdate = async (req, res) => {
 
   // Generate unique filename for video
   const videoFile = req.files.video;
-  const videoFilename = videoFile.name.split(' ')[0];
+  const videoFilename = videoFile.name.split(" ")[0];
   const uniqueVideoFilename = encodeURIComponent(
     `${timestamp}_${videoFilename}`
   );
@@ -281,7 +455,6 @@ const postCourseUpdate = async (req, res) => {
       }
     }
   );
-
 
   try {
     // req fields
@@ -309,7 +482,6 @@ const postCourseUpdate = async (req, res) => {
       .slice(0, 19)
       .replace("T", " ");
 
-    
     const updateParams = [
       title,
       courseSlug,
@@ -344,7 +516,7 @@ const postCourseUpdate = async (req, res) => {
       if (affectedRows > 0) {
         const message = "course updated correctly";
         console.log(`\n\n\→ Go to courseModules: ${message}`);
-        
+
         // Set MIME type for the uploaded video
         setCustomMimeTypes(
           {
@@ -354,11 +526,7 @@ const postCourseUpdate = async (req, res) => {
           () => {} // Empty callback as it's not required in this context
         );
 
-        res.redirect(
-          `/api/course/${courseId}`
-        );
-
-        
+        res.redirect(`/api/course/${courseId}`);
       } else {
         const message = "no changes made to course";
         console.log(`\n\n\→ Go to courseModules: ${message}`);
@@ -441,7 +609,7 @@ const coursesList = async (req, res) => {
 
   try {
     const message = req.query.message;
-    let user= req.session;
+    let user = req.session;
     const isAdmin = user && user.role === "admin";
 
     const page = parseInt(req.query.page) || 1;
@@ -557,7 +725,9 @@ const coursesListOwned = async (req, res) => {
 
       // If the user has not enrolled in any courses, redirect to '/api/courses'
       if (enrolledCourseIds.length === 0) {
-        res.redirect('/api/courses?page=1&perPage=6&message=No courses joined yet');
+        res.redirect(
+          "/api/courses?page=1&perPage=6&message=No courses joined yet"
+        );
         return;
       }
     }
@@ -574,7 +744,6 @@ const coursesListOwned = async (req, res) => {
       [enrolledCourseIds]
     );
     const totalItems = totalEnrolledCourses[0].count;
-    
 
     // Fetch enrolled courses for the user with pagination
     const [coursesRows] = await pool.query(
@@ -629,9 +798,7 @@ const coursesListOwned = async (req, res) => {
       courses: enrolledCourses,
       totalItems,
       user,
-      message: user
-        ? message
-        : "Not courses joined yet",
+      message: user ? message : "Not courses joined yet",
       isAdmin,
       perPage,
       page,
@@ -814,6 +981,7 @@ const courseDetail = async (req, res) => {
 
 export default {
   coursesList,
+  postCourseCreate2,
   coursesListOwned,
   courseOverview,
   courseEnroll,

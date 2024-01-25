@@ -33,7 +33,7 @@ export const __dirname = path.dirname(__filename);
 // call express **********************************************************
 const app = express();
 app.use(express.json()); // Add this line to parse JSON bodies
-app.use(cors()); // frontend app can ask data
+app.use(cors({ origin: 'http://localhost:3000', credentials: true })); // frontend app can ask data
 
 // Serve static files from React build directory
 app.use(express.static(path.join(__dirname, '../client/build')));
@@ -175,7 +175,7 @@ export function is_loggedin_check (req, res, next) {
 // middleware for admin&staff
 export function admin_staff_check (req, res, next) {
   const user = req.session.user || null;
-  if(!user || (user.role !== 'staff' && user.role !== 'admin')){
+  if(!user || (user.role !== 'staff' || user.role !== 'admin')){
     return res.status(403).send(`Forbidden`);
   }
   next();
