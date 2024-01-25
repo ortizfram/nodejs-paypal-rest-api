@@ -279,7 +279,7 @@ const postCourseCreate2 = async (req, res) => {
 
     // Move uploaded thumbnail to the server
     req.files.thumbnail.mv(
-      path.join(__dirname, "uploads", "imgs", uniqueFilename),
+      path.join(__dirname, "src","uploads", "imgs", uniqueFilename),
       async (err) => {
         if (err) {
           console.error(err);
@@ -290,7 +290,7 @@ const postCourseCreate2 = async (req, res) => {
 
     // video file upload handling
     videoFile.mv(
-      path.join(__dirname, "uploads", "videos", uniqueVideoFilename),
+      path.join(__dirname, "src","uploads", "videos", uniqueVideoFilename),
       async (err) => {
         if (err) {
           console.error(err);

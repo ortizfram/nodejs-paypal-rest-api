@@ -17,6 +17,7 @@ import fileUpload from "express-fileupload";
 import { pool } from "./src/db.js";
 import { getUserEnrolledCoursesQuery } from "./db/queries/course.queries.js";
 import { Marked, marked } from "marked";
+import bodyParser from 'body-parser';
 
 config();
 
@@ -28,11 +29,13 @@ const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:5000';
 // shortcuts for files/dirs
 export const __filename = fileURLToPath(import.meta.url);
 export const __dirname = path.dirname(__filename);
+console.log({'__filename':__filename, '__dirname':__dirname})
 
 
 // call express **********************************************************
 const app = express();
-app.use(express.json()); // Add this line to parse JSON bodies
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors({ origin: 'http://localhost:3000', credentials: true })); // frontend app can ask data
 
 // Serve static files from React build directory
