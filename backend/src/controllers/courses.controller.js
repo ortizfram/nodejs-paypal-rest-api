@@ -267,15 +267,15 @@ const postCourseCreate2 = async (req, res) => {
     const timestamp = Date.now();
     const filename = req.files.thumbnail.name;
     const uniqueFilename = encodeURIComponent(`${timestamp}_${filename}`);
-    const relativePath = "/uploads/" + uniqueFilename;
+    const relativePath = "/src/uploads/imgs/" + uniqueFilename;
 
     // Generate unique filename for video
     const videoFile = req.files.video;
-    const videoFilename = videoFile.name.split(" ")[0];
+    const videoFilename = videoFile.name;
     const uniqueVideoFilename = encodeURIComponent(
       `${timestamp}_${videoFilename}`
     );
-    const videoPath = "/uploads/videos/" + uniqueVideoFilename;
+    const videoPath = "/src/uploads/videos/" + uniqueVideoFilename;
 
     // Move uploaded thumbnail to the server
     req.files.thumbnail.mv(
@@ -322,7 +322,7 @@ const postCourseCreate2 = async (req, res) => {
     // Set MIME type for the uploaded video
     setCustomMimeTypes(
       {
-        path: `/uploads/videos/${uniqueVideoFilename}`,
+        path: `/src/uploads/videos/${uniqueVideoFilename}`,
       },
       res,
       () => {} // Empty callback as it's not required in this context
