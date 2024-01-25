@@ -5,21 +5,14 @@ import { Link } from "react-router-dom";
 import CompNavbar from "../template/Nabvar";
 import CompFooter from "../template/Footer";
 // import css
-<<<<<<< Updated upstream
-import '../public/css/course/courseCreate.css'
-// import context
-import { useUserContext } from "../hooks/UserContext";
-
-=======
 import "../public/css/course/courseCreate.css";
->>>>>>> Stashed changes
+import { useUserContext } from "../hooks/UserContext";
+import { createRef } from "react";
 
 // NodeJS endpoint reference
-const URI = `http://localhost:5000/api/course/create`;
-
+const URI = `/api/course/create`;
 
 const CompCourseCreate = () => {
-  
   // pass context user
   const { userData } = useUserContext();
   let user = userData;
@@ -35,28 +28,34 @@ const CompCourseCreate = () => {
   const [usd_price, setUSDPrice] = useState("");
   const [discount, setDiscount] = useState("");
   const navigate = useNavigate();
+  const fileInput = createRef()
 
   // createCourse procedure ------------------------
   const handleFormSubmit = async (e) => {
+    const formData = new FormData();
+    formData.append("title", title);
+    formData.append("description", description);
+    formData.append("text_content", text_content);
+    formData.append("thumbnail", fileInput.current.files[0]);
+    formData.append("video", video);
+    formData.append("ars_price", ars_price);
+    formData.append("usd_price", usd_price);
+    formData.append("discount", discount);
     try {
       e.preventDefault();
-      const response = await axios.post(URI, {
-        title: title,
-        description: description,
-        text_content: text_content,
-        video: video,
-        thumbnail: thumbnail,
-        ars_price: ars_price,
-        usd_price: usd_price,
-        discount: discount,
-      });
+      const response = await fetch(URI, {method:"POST", body: formData});
       // Handle successful response
-      console.log(response.data);
+     const parsedRes = await response.json();
+     if (response.ok) {
+      alert("File uploaded!!")
+     } else {
+      console.error("some error ocurred on uploading")
+     }
       setErrorMessage(""); // Reset error message
       const next = response.data.redirectUrl;
       navigate(next);
     } catch (error) {
-      console.error("Error creating course:", error);
+      console.error("Error creating course:", error.message);
 
       // Handle different types of errors
       setErrorMessage(
@@ -78,67 +77,6 @@ const CompCourseCreate = () => {
               encType="multipart/form-data"
               onSubmit={handleFormSubmit}
             >
-<<<<<<< Updated upstream
-            {/* Form action should match the route for creating a course */}
-            <h3>Course description</h3>
-            {/* Display error message */}
-  {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
-            <label htmlFor="title">titulo:</label>
-            <br />
-            <input 
-            value = {title}
-            name="title"
-            onChange={(e) => setTitle(e.target.value)}
-            type="text"
-            className="form-control" />
-            <br />
-            <label htmlFor="description">Descripcion:</label>
-            <br />
-            <input 
-            value = {description}
-            name="description"
-            onChange={(e) => setDescription(e.target.value)}
-            type="text"
-            className="form-control" />
-            <br />
-            <label htmlFor="text_content">contenido texto:</label>
-            <br />
-            <textarea 
-            value = {text_content}
-            onChange={(e) => setTextContent(e.target.value)}
-            type="text"
-            className="form-control"></textarea>
-            <br />
-            <label htmlFor="video">subir video:</label>
-            <br />
-            <input type="file" name="video" value = {video} accept="video/*"  onChange={(e) => setVideo(e.target.value)}/>
-            <br />
-            <hr />
-            <label htmlFor="thumbnail">subir miniatura:</label>
-            <br />
-            <input type="file" name="thumbnail" value={thumbnail} accept="image/*" onChange={(e) => setThumbnail(e.target.value)}/>
-            <br />
-            <hr />
-            <h3>Configurar precio</h3>
-            <label htmlFor="ars_price">ARS Price:</label>
-            <br />
-            <input type="number" id="ars_price" value={ars_price} name="ars_price" onChange={(e) => setARSPrice(e.target.value)}/>
-            <br />
-            <label htmlFor="usd_price">USD Price:</label>
-            <br />
-            <input type="number" id="usd_price" value={usd_price} name="usd_price" onChange={(e) => setUSDPrice(e.target.value)}/>
-            <br />
-            <h3>Aditional configs</h3>
-            <label htmlFor="discount">descuento:</label>
-            <br />
-            % <input type="number" id="discount" name="discount" value={discount} onChange={(e) => setDiscount(e.target.value)}/>
-            <br />
-            <input type="hidden" name="user" value={user}/>
-            <button type="submit">Create Course</button>
-            {/* Display error message */}
-            {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
-          </form>
-=======
               {/* Form action should match the route for creating a course */}
               <h3>Course description</h3>
               {/* Display error message */}
@@ -196,6 +134,7 @@ const CompCourseCreate = () => {
                 name="thumbnail"
                 value={thumbnail}
                 accept="image/*"
+                ref={fileInput}
                 onChange={(e) => setThumbnail(e.target.value)}
               />
               <br />
@@ -223,8 +162,7 @@ const CompCourseCreate = () => {
               <br />
               <h3>Aditional configs</h3>
               <label htmlFor="discount">descuento:</label>
-              <br />
-              %{" "}
+              <br />%{" "}
               <input
                 type="number"
                 id="discount"
@@ -239,7 +177,6 @@ const CompCourseCreate = () => {
               {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
             </form>
           </div>
->>>>>>> Stashed changes
         </div>
       </div>
       <CompFooter />

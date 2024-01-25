@@ -18,6 +18,7 @@ import { pool } from "./src/db.js";
 import { getUserEnrolledCoursesQuery } from "./db/queries/course.queries.js";
 import { Marked, marked } from "marked";
 import bodyParser from 'body-parser';
+import multer from 'multer';
 
 config();
 
@@ -36,6 +37,10 @@ console.log({'__filename':__filename, '__dirname':__dirname})
 const app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+
+
+
+
 app.use(cors({ origin: 'http://localhost:3000', credentials: true })); // frontend app can ask data
 
 // Serve static files from React build directory
@@ -84,8 +89,11 @@ app.use(fileUpload());
 //Set up serving static files in Express: [backend]
 app.use(express.static(path.join(__dirname, "src","public")));
 
-// set up uploads [backend]
+// set up uploads Endpoint express
 app.use("/uploads", express.static(path.join(__dirname, "src","uploads")));
+
+
+
 
 
 // marked test route
@@ -163,6 +171,18 @@ const initSession = (req, res, next) => {
   next();
 };
 app.use(initSession);
+
+//File Upload Middleware:
+const storage = multer.diskStorage({
+  destination: function(req, file, cb) {
+    return cb(null, "./src/uploads")
+  },
+  filename: function (req, file, cb){
+    return cb(nuill, `${Date.now()}_${file.originalname}`)
+  }
+})
+
+export const upload = multer({storage})
 
 // middleware for login user
 export function is_loggedin_check (req, res, next) {
