@@ -28,8 +28,8 @@ const CompCourseCreate = () => {
   const [usd_price, setUSDPrice] = useState("");
   const [discount, setDiscount] = useState("");
   const navigate = useNavigate();
-  const fileInput = createRef()
-  const fileInputThumbnail = createRef()
+  const fileInput = createRef();
+  const fileInputThumbnail = createRef();
 
   // createCourse procedure ------------------------
   const handleFormSubmit = async (e) => {
@@ -42,30 +42,32 @@ const CompCourseCreate = () => {
     formData.append("ars_price", ars_price);
     formData.append("usd_price", usd_price);
     formData.append("discount", discount);
+
     try {
       e.preventDefault();
-      const response = await fetch(URI, {method:"POST", body: formData});
+      const response = await fetch(URI, { method: "POST", body: formData });
       // Handle successful response
-     const parsedRes = await response.json();
-     if (response.ok) {
-      alert("File uploaded!!")
-     } else {
-      console.error("Error uploading file. Server response:", response);
+      const parsedRes = await response.json();
 
-      // Parse the error response if it's JSON
-    try {
-      const errorData = await response.json();
-      console.error("Error data:", errorData);
-    } catch (error) {
-      console.error("Error parsing error response:", error.message);
-    }
-    alert("Some error occurred on uploading");
+      if (response.status === 200) {
+        alert("File uploaded!!");
+      } else {
+        console.error("Error uploading file. Server response:", response);
 
-     }
-     
-      setErrorMessage(""); // Reset error message
-      const next = response.data.redirectUrl;
-      navigate(next);
+        // Parse the error response if it's JSON
+        try {
+          const errorData = await response.json();
+          console.error("Error data:", errorData);
+
+          alert("Some error occurred on uploading");
+        } catch (error) {
+          console.error("Error parsing error response:", error.message);
+        }
+
+        setErrorMessage(""); // Reset error message
+        const next = parsedRes.redirectUrl;
+        navigate(next);
+      }
     } catch (error) {
       console.error("Error creating course:", error.message);
 
@@ -184,7 +186,7 @@ const CompCourseCreate = () => {
                 onChange={(e) => setDiscount(e.target.value)}
               />
               <br />
-              <input type="hidden" name="author" value={user}/>
+              <input type="hidden" name="author" value={user} />
               <button type="submit">Create Course</button>
               {/* Display error message */}
               {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}

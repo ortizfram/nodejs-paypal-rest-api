@@ -85,7 +85,7 @@ const postCourseCreate = async (req, res) => {
     const timestamp = Date.now();
     const filename = req.files.thumbnail.name;
     const uniqueFilename = encodeURIComponent(`${timestamp}_${filename}`);
-    const relativePath = "/uploads/" + uniqueFilename;
+    const relativePath = "/src/uploads/imgs/" + uniqueFilename;
 
     // Generate unique filename for video
     const videoFile = req.files.video;
@@ -93,18 +93,18 @@ const postCourseCreate = async (req, res) => {
     const uniqueVideoFilename = encodeURIComponent(
       `${timestamp}_${videoFilename}`
     );
-    const videoPath = "/uploads/videos/" + uniqueVideoFilename;
+    const videoPath = "/src/uploads/videos/" + uniqueVideoFilename;
 
     // Move uploaded thumbnail to the server
     await moveFile(
       req.files.thumbnail,
-      path.join(__dirname, "uploads", uniqueFilename)
+      path.join(__dirname, "src","uploads","imgs", uniqueFilename)
     );
 
     // video file upload handling
     await moveFile(
       videoFile,
-      path.join(__dirname, "uploads/videos", uniqueVideoFilename)
+      path.join(__dirname, "src", "uploads", "videos", uniqueVideoFilename)
     );
 
     try {

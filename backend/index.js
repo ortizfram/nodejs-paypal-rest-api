@@ -37,7 +37,7 @@ console.log({'__filename':__filename, '__dirname':__dirname})
 const app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-
+app.use(fileUpload());
 
 
 
@@ -83,8 +83,7 @@ app.use(methodOverride('_method'));
 Intl.DateTimeFormat = Intl.DateTimeFormat(undefined, { timeZone: 'America/Argentina/Buenos_Aires' });
 
 
-//default option
-app.use(fileUpload());
+
 
 //Set up serving static files in Express: [backend]
 app.use(express.static(path.join(__dirname, "src","public")));
