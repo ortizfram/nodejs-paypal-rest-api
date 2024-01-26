@@ -19,7 +19,8 @@ router.get("/course/:id/overview", is_loggedin_check, controllers.courseOverview
 router.get("/course/:id/enroll", is_loggedin_check, controllers.courseEnroll);
 router.get("/course/:id/", is_loggedin_check, admin_staff_clicking_course, controllers.courseDetail); // This route should fetch course detail
 //------------coursesList-------------------------
-router.get("/courses", controllers.coursesList);
+router.get("/courses", controllers.getCoursesList);
+router.post("/courses", controllers.coursesList);
 router.get("/courses-owned", is_loggedin_check, controllers.coursesListOwned);
 
 export default router;

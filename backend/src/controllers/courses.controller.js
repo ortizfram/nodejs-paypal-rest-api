@@ -170,7 +170,7 @@ const postCourseCreate = async (req, res) => {
         .status(201)
         .json({
           message: "course Created successfully",
-          redirectUrl: `/api/courses`,
+          redirectUrl: `/api/courses?page=1&perPage=6`,
         });
     } catch (error) {
       console.error("Error creating the course:", error);
@@ -589,13 +589,16 @@ const postCourseDelete = async (req, res) => {
 // --- COURSE LIST , ENROLL, & DETAILS
 // ===========================================================
 
-const coursesList = async (req, res) => {
+const getCoursesList = async (req, res) => {
   console.log("\n*** coursesList\n");
+}
+const coursesList = async (req, res) => {
   const route = "courses";
 
   try {
+    
     const message = req.query.message;
-    let user = req.session;
+    let user = req.session.user;
     const isAdmin = user && user.role === "admin";
 
     const page = parseInt(req.query.page) || 1;
@@ -606,12 +609,14 @@ const coursesList = async (req, res) => {
       "SELECT COUNT(*) AS count FROM courses"
     );
     const totalItems = totalCourses[0].count;
+    console.log('totalItems:', totalItems)
 
     // fetch all courses
     const [coursesRows] = await pool.query(courseFieldsPlusAuthor_q, [
       0,
       totalItems,
     ]);
+    console.log('coursesRows: ', coursesRows)
 
     // map courses
     let courses = coursesRows.map((course) => {
@@ -634,6 +639,7 @@ const coursesList = async (req, res) => {
         next: `/api/course/${course.id}/`, // Dynamic course link
       };
     });
+    console.log('map courses:', courses)
 
     let enrolledCourseIds = [];
 
@@ -662,13 +668,8 @@ const coursesList = async (req, res) => {
     const offset = (page - 1) * perPage;
     const coursesForPage = courses.slice(offset, offset + perPage);
 
-    // redirect to the previous page if last it's empty
-    if (page === totalPages && coursesForPage.length === 0) {
-      res.redirect(`/api/${route}?page=${page - 1}&perPage=${perPage}`);
-      return;
-    }
-
-    res.render("courses", {
+    // JSON response
+    res.status(200).json({
       route,
       title: "Cursos",
       courses: coursesForPage,
@@ -684,9 +685,10 @@ const coursesList = async (req, res) => {
     });
   } catch (error) {
     console.log("Error fetching courses:", error);
-    res.redirect("/api/courses?message=Error fetching courses");
+    res.status(500).json({ error: "Internal Server Error" });
   }
 };
+
 
 const coursesListOwned = async (req, res) => {
   console.log("\n*** courseListOwned\n");
@@ -966,6 +968,7 @@ const courseDetail = async (req, res) => {
 };
 
 export default {
+  getCoursesList,
   coursesList,
   postCourseCreate2,
   coursesListOwned,

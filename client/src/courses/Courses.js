@@ -6,7 +6,7 @@ import CompNavbar from "../template/Nabvar";
 import CompFooter from "../template/Footer";
 
 // NodeJS endpoint reference
-const URI = `http://localhost:5000/api/courses`;
+const URI = `http://localhost:5000/api/courses?page=1&perPage=6`;
 
 const CompCourses = () => {
   // fetch courses procedure -------------------------
@@ -28,27 +28,41 @@ const CompCourses = () => {
   // Fetch Courses
   const getCoursesList = async () => {
     try {
-      const res = await axios.get(URI); // endpoint
-      const { title, page, route, perPage, currentPage, totalPages } = res.data; // Destructure response data
-      setTitle(title);
-      setPage(page);
-      setRoute(route);
-      setPerPage(perPage);
-      setCurrentPage(currentPage);
-      setTotalPages(totalPages);
+      const res = await axios.post(URI, {
+        data: {},
+      });
+      console.log("Axios Response Data:", res.data);
 
-      // Assuming limitedDescription comes from course data
-      // Check if 'courses' is an array before setting state
-      if (Array.isArray(res.data.courses)) {
-        setCourses(
-          res.data.courses.map((course) => ({
+
+      if (res.status === 200) {
+        const { title, page, route, perPage, currentPage, totalPages } =
+          res.data; // Destructure response data
+        console.log("Response Data:", res.data);
+
+        setTitle(title);
+        setPage(page);
+        setRoute(route);
+        setPerPage(perPage);
+        setCurrentPage(currentPage);
+        setTotalPages(totalPages);
+
+        if (Array.isArray(res.data.courses)) {
+          const mappedCourses = res.data.courses.map((course) => ({
             ...course,
-            limitedDescription: course.description.split(" ").slice(0, 50).join(" "),
-          }))
-        );
+            limitedDescription: course.description
+              .split(" ")
+              .slice(0, 50)
+              .join(" "),
+          }));
+          console.log("Mapped Courses:", mappedCourses);
+
+          setCourses(mappedCourses);
+        }
+      } else {
+        console.error(res)
       }
     } catch (error) {
-      console.error("Error fetching courses:", error);
+      console.error("Error fetching courses:", error.message);
     }
   };
 
@@ -64,21 +78,26 @@ const CompCourses = () => {
           {/* <!-- pagination top --> */}
           <div className="pagination">
             {page && page > 1 && (
-              <a href={`/api/${route}?page=${page - 1}&perPage=${perPage}`}>Previous</a>
+              <a href={`/api/${route}?page=${page - 1}&perPage=${perPage}`}>
+                Previous
+              </a>
             )}
-            {[...Array(totalPages)].map((_, i) => (
-              !(i === totalPages - 1 && courses.length === 0) && (
-                <a
-                  key={i}
-                  href={`/api/${route}?page=${i + 1}&perPage=${perPage}`}
-                  className={currentPage === i + 1 ? "active" : ""}
-                >
-                  {i + 1}
-                </a>
-              )
-            ))}
+            {[...Array(totalPages)].map(
+              (_, i) =>
+                !(i === totalPages - 1 && courses.length === 0) && (
+                  <a
+                    key={i}
+                    href={`/api/${route}?page=${i + 1}&perPage=${perPage}`}
+                    className={currentPage === i + 1 ? "active" : ""}
+                  >
+                    {i + 1}
+                  </a>
+                )
+            )}
             {page && page < totalPages && (
-              <a href={`/api/${route}?page=${page + 1}&perPage=${perPage}`}>Next</a>
+              <a href={`/api/${route}?page=${page + 1}&perPage=${perPage}`}>
+                Next
+              </a>
             )}
           </div>
 
@@ -87,14 +106,25 @@ const CompCourses = () => {
             {courses &&
               courses.length > 0 &&
               courses.map((course, index) => (
-                <div key={index} className="course-item backdrop-filter shadow-lg">
+                <div
+                  key={index}
+                  className="course-item backdrop-filter shadow-lg"
+                >
                   <a href={course.next}>
-                    <img src={course.thumbnail} alt={`thumbnail-${course.slug}`} />
+                    <img
+                      src={course.thumbnail}
+                      alt={`thumbnail-${course.slug}`}
+                    />
                     <p className="timestamp text-white">{course.updated_at}</p>
                     <div className="author">
-                      <img src={course.author.avatar} alt="User Avatar" className="avatar" />
+                      <img
+                        src={course.author.avatar}
+                        alt="User Avatar"
+                        className="avatar"
+                      />
                       <p className="author-info text-white">
-                        <strong>{course.author.username}</strong> • {course.author.name}
+                        <strong>{course.author.username}</strong> •{" "}
+                        {course.author.name}
                       </p>
                     </div>
                     <h2 className="text-white">{course.title}</h2>
@@ -104,15 +134,24 @@ const CompCourses = () => {
                       </p>
                     ) : null}
                     {/* <!-- limit description 50 words --> */}
-                    {course.description && <p className="text-white">{course.limitedDescription}</p>}
+                    {course.description && (
+                      <p className="text-white">{course.limitedDescription}</p>
+                    )}
                   </a>
                   {isAdmin && (
                     <div className="course-actions">
                       <p className="text-white">
-                        <a className="text-muted" href={`/api/course/${course.id}/update`}>
+                        <a
+                          className="text-muted"
+                          href={`/api/course/${course.id}/update`}
+                        >
                           <i className="fas fa-edit me-2"></i>
                         </a>
-                        <input type="hidden" name="author" value={course.author} />
+                        <input
+                          type="hidden"
+                          name="author"
+                          value={course.author}
+                        />
                       </p>
                       <p>
                         <a
