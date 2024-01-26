@@ -256,10 +256,9 @@ const postCourseCreate2 = async (req, res) => {
     const relativePath = "/src/uploads/imgs/" + uniqueFilename;
 
     // Generate unique filename for video
-    const videoFile = req.files.video;
-    const videoFilename = videoFile.name;
+    const videoFile = req.files.video.name;
     const uniqueVideoFilename = encodeURIComponent(
-      `${timestamp}_${videoFilename}`
+      `${timestamp}_${videoFile}`
     );
     const videoPath = "/src/uploads/videos/" + uniqueVideoFilename;
 

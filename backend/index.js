@@ -33,25 +33,37 @@ export const __dirname = path.dirname(__filename);
 console.log({'__filename':__filename, '__dirname':__dirname})
 
 
-// call express **********************************************************
 const app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(fileUpload());
-
-
-
 app.use(cors({ origin: 'http://localhost:3000', credentials: true })); // frontend app can ask data
 
-// Serve static files from React build directory
-app.use(express.static(path.join(__dirname, '../client/build')));
-
-// Catch-all route to serve the React app
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../client/build/index.html'));
+// MULTER : file uploading config *******************************************************************************
+// Multer storage configuration for images
+const imageStorage = multer.diskStorage({
+  destination: path.join(__dirname, 'src', 'uploads', 'imgs'),
+  filename: function (req, file, cb) {
+    cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
+  }
 });
 
-// Connection
+// Multer storage configuration for videos
+const videoStorage = multer.diskStorage({
+  destination: path.join(__dirname, 'src', 'uploads', 'videos'),
+  filename: function (req, file, cb) {
+    cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
+  }
+});
+
+// Multer upload instances
+const uploadImage = multer({ storage: imageStorage });
+const uploadVideo = multer({ storage: videoStorage });
+
+
+
+
+// CONNECTION ********************************************************************************************************************
 app.listen(port, () => {
     console.log(`Server is running on ${BACKEND_URL}`);
   });
@@ -66,7 +78,7 @@ app.use(
 );
 
 
-// Use routes app
+// Use ROUTES app ==========================================================
 app.use("/", indexRoutes);
 app.use("/api", authRoutes);
 app.use("/api/admin", adminRoutes);
@@ -75,25 +87,23 @@ app.use("/api", coursesRoutes);
 app.use("/api", employeeRoutes);
 app.use("/api", blogRoutes);
 
+// Handling thumbnail upload route
+app.post('/upload/image', uploadImage.single('thumbnail'), (req, res) => {
+  if (!req.file) {
+    return res.status(400).send('No thumbnail uploaded.');
+  }
+  const imageUrl = `/imgs/${req.file.filename}`;
+  res.status(200).json({ imageUrl: imageUrl });
+});
 
-// configure methodOverride
-app.use(methodOverride('_method'));
-
-// Set default time zone
-Intl.DateTimeFormat = Intl.DateTimeFormat(undefined, { timeZone: 'America/Argentina/Buenos_Aires' });
-
-
-
-
-//Set up serving static files in Express: [backend]
-app.use(express.static(path.join(__dirname, "src","public")));
-
-// set up uploads Endpoint express
-app.use("/uploads", express.static(path.join(__dirname, "src","uploads")));
-
-
-
-
+// Handling video upload route
+app.post('/upload/video', uploadVideo.single('video'), (req, res) => {
+  if (!req.file) {
+    return res.status(400).send('No video uploaded.');
+  }
+  const videoUrl = `/videos/${req.file.filename}`;
+  res.status(200).json({ videoUrl: videoUrl });
+});
 
 // marked test route
 app.get('/markdown-to-html', (req, res) => {
@@ -103,14 +113,33 @@ app.get('/markdown-to-html', (req, res) => {
   res.send(htmlContent);
 });
 
-// db use JSON
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// SERVE FILES *******************************************************************************
+// Serve static files from React build directory
+app.use(express.static(path.join(__dirname, '../client/build')));
+
+// Catch-all route to serve the React app
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../client/build/index.html'));
+});
+
+// Serve files from 'public' directory
+app.use(express.static(path.join(__dirname, "src","public")));
+
+// Serve static files from the 'uploads' directory
+app.use('/imgs', express.static(path.join(__dirname, 'src', 'uploads', 'imgs')));
+app.use('/videos', express.static(path.join(__dirname, 'src', 'uploads', 'videos')));
+// ===============================================================================
+
+// configure methodOverride
+app.use(methodOverride('_method'));
+
+// Set default time zone
+Intl.DateTimeFormat = Intl.DateTimeFormat(undefined, { timeZone: 'America/Argentina/Buenos_Aires' });
 
 // Use morgan to see requests in console
 app.use(morgan('dev'));
 
-// Use sessions
+// Use sessions =================================================================================
 app.use(
   session({
     secret: process.env.SESSION_SECRET || 'secret', // Change this to a secure secret key
@@ -119,7 +148,7 @@ app.use(
   })
 );
 
-
+// MIDDLEWARE ===============================================================================================
 // Define a function to set MIME types based on file extensions
 export const setCustomMimeTypes = (req, res, next) => {
   const extension = req.path.split('.').pop();
@@ -153,8 +182,7 @@ export const setCustomMimeTypes = (req, res, next) => {
 app.use('/uploads/videos', setCustomMimeTypes, express.static(path.join(__dirname, 'uploads/videos')));
 
 
-// MIDDLEWARE
-// =============================================================
+
 // middleware for 404
 app.use((req, res) => {
   res.status(404).json({
@@ -171,17 +199,6 @@ const initSession = (req, res, next) => {
 };
 app.use(initSession);
 
-//File Upload Middleware:
-const storage = multer.diskStorage({
-  destination: function(req, file, cb) {
-    return cb(null, "./src/uploads")
-  },
-  filename: function (req, file, cb){
-    return cb(nuill, `${Date.now()}_${file.originalname}`)
-  }
-})
-
-export const upload = multer({storage})
 
 // middleware for login user
 export function is_loggedin_check (req, res, next) {
