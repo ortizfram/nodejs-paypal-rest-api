@@ -635,7 +635,7 @@ const coursesList = async (req, res) => {
           username: course.author_username,
           avatar: course.author_avatar,
         },
-        next: `/api/course/${course.id}/`, // Dynamic course link
+        next: `/api/course/${course.id}`, // Dynamic course link
       };
     });
     console.log('map courses:', courses)
@@ -899,7 +899,6 @@ const getCourseDetail = async (req, res) => {
 
 }
 const courseDetail = async (req, res) => {
-  console.log("\n*** courseDetail\n");
   res.send('course detail')
 
   // let courseId = req.params.id;

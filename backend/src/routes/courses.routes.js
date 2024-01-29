@@ -17,7 +17,6 @@ router.post('/course/:id/delete',  admin_staff_check, controllers.postCourseDele
 //------------courseDetail  -------------------------
 router.get("/course/:id/overview", is_loggedin_check, controllers.courseOverview);
 router.get("/course/:id/enroll", is_loggedin_check, controllers.courseEnroll);
-router.get("/course/:id/", controllers.getCourseDetail);
 router.post("/course/:id/", controllers.courseDetail); 
 router.get("/courses", controllers.getCoursesList);
 router.post("/courses", controllers.coursesList);
