@@ -1,0 +1,17 @@
+{
+  "files": {
+    "main.css": "/static/css/main.47622471.css",
+    "main.js": "/static/js/main.07dace58.js",
+    "static/media/buonavibra-marce-frio.png": "/static/media/buonavibra-marce-frio.50900710d8e92decb03c.png",
+    "static/media/jay-castor-7AcMUSYRZpU-unsplash.jpg": "/static/media/jay-castor-7AcMUSYRZpU-unsplash.450ad671256336edd230.jpg",
+    "static/media/hero-image.jpg": "/static/media/hero-image.45876ebdf8005220b8d3.jpg",
+    "static/media/lotus-flower.jpg": "/static/media/lotus-flower.bcb85f60313a2df5eb15.jpg",
+    "index.html": "/index.html",
+    "main.47622471.css.map": "/static/css/main.47622471.css.map",
+    "main.07dace58.js.map": "/static/js/main.07dace58.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.47622471.css",
+    "static/js/main.07dace58.js"
+  ]
+}
