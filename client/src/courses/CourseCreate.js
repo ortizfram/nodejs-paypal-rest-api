@@ -15,30 +15,28 @@ const URI = `/api/course/create`;
 const CompCourseCreate = () => {
   // pass context user
   const { userData } = useUserContext();
+  const navigate = useNavigate();
   let user = userData;
 
-  const [errorMessage, setErrorMessage] = useState(""); // Define errorMessage state
-  // course form data declaration
+  // form data declaration
+  const [video, setVideo] = useState("");
+  const [thumbnail, setThumbnail] = useState("");
+  const [videoUrl, setVideoUrl] = useState("");
+  const [thumbnailUrl, setThumbnailUrl] = useState("");
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [text_content, setTextContent] = useState("");
-  const [video, setVideo] = useState("");
-  const [thumbnail, setThumbnail] = useState("");
   const [ars_price, setARSPrice] = useState("");
   const [usd_price, setUSDPrice] = useState("");
   const [discount, setDiscount] = useState("");
-  const navigate = useNavigate();
-  const fileInput = createRef();
-  const fileInputThumbnail = createRef();
+  const [errorMessage, setErrorMessage] = useState(""); // Define errorMessage state
 
-  // createCourse procedure ------------------------
+  // createCourse procedure ------------------------------------------------
   const handleFormSubmit = async (e) => {
     const formData = new FormData();
     formData.append("title", title);
     formData.append("description", description);
     formData.append("text_content", text_content);
-    formData.append("thumbnail", fileInput.current.files[0]);
-    formData.append("video", fileInputThumbnail.current.files[0]);
     formData.append("ars_price", ars_price);
     formData.append("usd_price", usd_price);
     formData.append("discount", discount);
@@ -76,6 +74,64 @@ const CompCourseCreate = () => {
         error.response?.data ||
           "An unexpected error occurred while creating the course."
       );
+    }
+  };
+
+  // hadle video and thumbnail onChange ------------------------------------
+  const handleThumbnailChange = (e) => {
+    setThumbnail(e.target.files[0]);
+    setThumbnailUrl(null); // Clear previous image when a new file is selected
+  };
+
+  const handleVideoChange = (e) => {
+    setVideo(e.target.files[0]);
+    setVideoUrl(null); // Clear previous video when a new file is selected
+  };
+
+  // hadle video and thumbnail Upload -------------------------------------
+  const handleThumbnailUpload = async () => {
+    try {
+      const formData = new FormData();
+      formData.append("thumbnail", thumbnail);
+
+      const response = await axios.post(
+        "http://localhost:5000/upload/image",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      setThumbnailUrl(response.data.imageUrl);
+      alert("Image uploaded successfully.");
+    } catch (error) {
+      console.error("Error uploading image:", error.message);
+      alert("Error uploading image.");
+    }
+  };
+
+  const handleVideoUpload = async () => {
+    try {
+      const formData = new FormData();
+      formData.append("video", video);
+
+      const response = await axios.post(
+        "http://localhost:5000/upload/video",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      setVideoUrl(response.data.videoUrl);
+      alert("Video uploaded successfully.");
+    } catch (error) {
+      console.error("Error uploading video:", error.message);
+      alert("Error uploading video.");
     }
   };
 
@@ -137,9 +193,9 @@ const CompCourseCreate = () => {
                 name="video"
                 value={video}
                 accept="video/*"
-                ref={fileInputThumbnail}
-                onChange={(e) => setVideo(e.target.value)}
+                onChange={handleVideoChange}
               />
+              <button onClick={handleVideoUpload}>Guardar Video</button>
               <br />
               <hr />
               <label htmlFor="thumbnail">subir miniatura:</label>
@@ -149,9 +205,9 @@ const CompCourseCreate = () => {
                 name="thumbnail"
                 value={thumbnail}
                 accept="image/*"
-                ref={fileInput}
-                onChange={(e) => setThumbnail(e.target.value)}
+                onChange={handleThumbnailChange}
               />
+              <button onClick={handleThumbnailUpload}>Guardar Miniatura</button>
               <br />
               <hr />
               <h3>Configurar precio</h3>
