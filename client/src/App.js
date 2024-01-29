@@ -30,6 +30,7 @@ import coursesCSS from "./public/css/course/courses.css";
 // import Hooks
 import { UserContextProvider } from "./hooks/UserContext.js";
 import CompLogout from "./auth/Logout.js";
+import CourseDetailComponent from "./courses/CourseDetail.js";
 
 
 function App() {
@@ -73,13 +74,14 @@ function App() {
           {/* COURSES */}
           <Route path="/api/courses" element={<CompCourses />} />
           <Route path="/api/course/create" element={<CompCourseCreate />} />
+          <Route path="/api/course/:id" element={<CourseDetailComponent />} />
           {/* router.post('/course/create',  admin_staff_check, controllers.postCourseCreate);//post
+          router.post("/course/:id/", is_loggedin_check, admin_staff_clicking_course, controllers.courseDetail); // This route should fetch course detail
           router.post('/course/:id/update',  admin_staff_check, controllers.postCourseUpdate);// post update
           router.post('/course/:id/delete',  admin_staff_check, controllers.postCourseDelete);// post del
           //------------courseDetail  -------------------------
           router.post("/course/:id/overview", is_loggedin_check, controllers.courseOverview);
           router.post("/course/:id/enroll", is_loggedin_check, controllers.courseEnroll);
-          router.post("/course/:id/", is_loggedin_check, admin_staff_clicking_course, controllers.courseDetail); // This route should fetch course detail
           //------------coursesList-------------------------
           router.post("/courses", controllers.coursesList);
           router.post("/courses-owned", is_loggedin_check, controllers.coursesListOwned);  */}

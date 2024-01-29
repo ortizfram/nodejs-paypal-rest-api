@@ -895,81 +895,88 @@ const courseEnroll = async (req, res) => {
   }
 };
 
-const courseDetail = async (req, res) => {
+const getCourseDetail = async (req, res) => {
   console.log("\n*** courseDetail\n");
 
-  let courseId = req.params.id;
-  const user = req.session.user || null;
-  const message = req.query.message;
+}
+const courseDetail = async (req, res) => {
+  console.log("\n*** courseDetail\n");
+  res.send('course detail')
 
-  try {
-    console.log("\nCourseId:", courseId);
-    const [courseRows] = await pool.query(getCourseFromIdQuery, courseId);
+  // let courseId = req.params.id;
+  // const user = req.session.user || null;
+  // const message = req.query.message;
 
-    if (!courseRows || courseRows.length === 0) {
-      return res.status(404).send("Course not found");
-    }
+  // try {
+  //   console.log("\nCourseId:", courseId);
+  //   const [courseRows] = await pool.query(getCourseFromIdQuery, courseId);
 
-    const course = courseRows[0];
-    console.log(course);
-    console.log("\n\ncourse.video", course.video);
-    courseId = course.id;
+  //   if (!courseRows || courseRows.length === 0) {
+  //     return res.status(404).json({ error: "Course not found" });
+  //   }
 
-    // Format course timestamps and video_link
-    const formattedCourse = {
-      ...course,
-      created_at: new Date(course.created_at).toLocaleString(),
-      updated_at: new Date(course.updated_at).toLocaleString(),
-    };
+  //   const course = courseRows[0];
+  //   console.log(course);
+  //   console.log("\n\ncourse.video", course.video);
+  //   courseId = course.id;
 
-    if (!course) {
-      return res.status(404).send("Course not found");
-    }
+  //   // Format course timestamps and video_link
+  //   const formattedCourse = {
+  //     ...course,
+  //     created_at: new Date(course.created_at).toLocaleString(),
+  //     updated_at: new Date(course.updated_at).toLocaleString(),
+  //   };
 
-    // Fetching author details
-    const [authorRows] = await pool.query(getCourseAuthorQuery, [
-      course.author_id,
-    ]);
-    const author = authorRows[0];
-    console.log(author);
+  //   if (!course) {
+  //     return res.status(404).json({ error: "Course not found" });
+  //   }
 
-    if (!author) {
-      return res.status(404).send("Author details not found");
-    }
+  //   // Fetching author details
+  //   const [authorRows] = await pool.query(getCourseAuthorQuery, [
+  //     course.author_id,
+  //   ]);
+  //   const author = authorRows[0];
+  //   console.log(author);
 
-    // Extend formattedCourse with author details
-    formattedCourse.author = {
-      name: author.author_name,
-      username: author.author_username,
-      avatar: author.author_avatar,
-    };
-    console.log(formattedCourse.author);
+  //   if (!author) {
+  //     return res.status(404).json({ error: "Author details not found" });
+  //   }
 
-    // Fill array with query result
-    let enrolledCourses = [];
-    if (user) {
-      const [enrolledRows] = await pool.query(getUserEnrolledCoursesQuery, [
-        user.id,
-      ]);
-      enrolledCourses = enrolledRows[0]?.enrolled_courses || [];
-    }
+  //   // Extend formattedCourse with author details
+  //   formattedCourse.author = {
+  //     name: author.author_name,
+  //     username: author.author_username,
+  //     avatar: author.author_avatar,
+  //   };
+  //   console.log(formattedCourse.author);
 
-    // Render the courseDetail view with the fetched data
-    res.render("courseDetail", {
-      course: formattedCourse,
-      message,
-      user,
-      enrolledCourses,
-    });
-  } catch (error) {
-    console.error("Error fetching the course:", error);
-    res.status(500).send("Error fetching the course");
-  }
+  //   // Fill array with query result
+  //   let enrolledCourses = [];
+  //   if (user) {
+  //     const [enrolledRows] = await pool.query(getUserEnrolledCoursesQuery, [
+  //       user.id,
+  //     ]);
+  //     enrolledCourses = enrolledRows[0]?.enrolled_courses || [];
+  //   }
+
+  //   // Send JSON response with the fetched data
+  //   res.json({
+  //     course: formattedCourse,
+  //     message,
+  //     user,
+  //     enrolledCourses,
+  //   });
+  // } catch (error) {
+  //   console.error("Error fetching the course:", error);
+  //   res.status(500).json({ error: "Error fetching the course" });
+  // }
 };
+
 
 export default {
   getCoursesList,
   coursesList,
+  getCourseDetail,
   postCourseCreate2,
   coursesListOwned,
   courseOverview,
