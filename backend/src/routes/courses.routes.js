@@ -1,6 +1,6 @@
 import { Router } from "express";
 import controllers from "../controllers/courses.controller.js";
-import { admin_staff_check, admin_staff_clicking_course, checkCourseEnrollment, is_loggedin_check, upload } from "../../index.js";
+import { admin_staff_check, admin_staff_clicking_course, checkCourseEnrollment, is_loggedin_check } from "../../index.js";
 
 
 const router = Router();

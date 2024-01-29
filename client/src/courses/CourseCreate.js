@@ -104,7 +104,7 @@ const CompCourseCreate = () => {
         }
       );
 
-      setImageUrl(response.data.imageUrl);
+      setThumbnailUrl(response.data.imageUrl);
       alert("Image uploaded successfully.");
     } catch (error) {
       console.error("Error uploading image:", error.message);
@@ -115,7 +115,7 @@ const CompCourseCreate = () => {
   const handleVideoUpload = async () => {
     try {
       const formData = new FormData();
-      formData.append("video", videoFile);
+      formData.append("video", video);
 
       const response = await axios.post(
         "http://localhost:5000/upload/video",
