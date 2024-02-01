@@ -30,7 +30,6 @@ const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:5000';
 // shortcuts for files/dirs
 export const __filename = fileURLToPath(import.meta.url);
 export const __dirname = path.dirname(__filename);
-console.log({'__filename':__filename, '__dirname':__dirname})
 
 
 const app = express();
@@ -65,7 +64,7 @@ const uploadVideo = multer({ storage: videoStorage });
 
 // CONNECTION ********************************************************************************************************************
 app.listen(port, () => {
-    console.log(`Server is running on ${BACKEND_URL}`);
+    console.log(`Listening ${BACKEND_URL}`);
   });
 
 // Use sessions

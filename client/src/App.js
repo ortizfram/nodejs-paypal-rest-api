@@ -3,9 +3,9 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 //a
 import { useEffect, useState } from "react";
 //import components
-import CompBlogList from "./elements/blog/BlogList.js";
-import CompBlogCreate from "./elements/blog/BlogCreate.js";
-import CompBlogUpdate from "./elements/blog/BlogUpdate.js";
+import CompBlogList from "./blog/BlogList.js";
+import CompBlogCreate from "./blog/BlogCreate.js";
+import CompBlogUpdate from "./blog/BlogUpdate.js";
 import CompHome from "./index/Home.js";
 import CompSignup from "./auth/Signup.js";
 import CompLogin from "./auth/Login.js";
