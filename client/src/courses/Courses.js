@@ -11,7 +11,14 @@ const URI = `http://localhost:5000/api/courses?page=1&perPage=6`;
 const CompCourses = () => {
   // fetch courses procedure -------------------------
   const [courses, setCourses] = useState([]);
+  const [title, setTitle] = useState(""); // Add title state
+  const [page, setPage] = useState(1); // Add page state
   const [route, setRoute] = useState("courses"); // Add route state
+  const [perPage, setPerPage] = useState(1); // Add perPage state
+  const [currentPage, setCurrentPage] = useState(1); // Add currentPage state
+  const [totalPages, setTotalPages] = useState(1); // Add totalPages state
+  const navigate = useNavigate();
+  const [limitedDescription, setLimitedDescription] = useState("");
   const [isAdmin, setIsAdmin] = useState(false); // Define isAdmin state
 
   useEffect(() => {

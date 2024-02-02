@@ -1,14 +1,46 @@
 import React, { useEffect, useState } from "react";
+import {useNavigate} from "react-router-dom"
 import axios from "axios";
+
+import "../public/css/course/courses.css";
 
 function Courses() {
   const [data, setData] = useState([]);
+  const [title, setTitle] = useState(""); // Add title state
+  const [page, setPage] = useState(1); // Add page state
+  const [perPage, setPerPage] = useState(1); // Add perPage state
+  const [route, setRoute] = useState("courses"); // Add route state
+  const [currentPage, setCurrentPage] = useState(1); // Add currentPage state
+  const [totalPages, setTotalPages] = useState(1); // Add totalPages state
+  const [limitedDescription, setLimitedDescription] = useState("");
+  const [isAdmin, setIsAdmin] = useState(false); // Define isAdmin state
+  const navigate = useNavigate();
 
   useEffect(() => {
     axios
-      .get("/courses")
+      .get("/api/courses")
       .then((res) => {
-        setData(res.data);
+        const { title, page, route, perPage, currentPage, totalPages, courses  } =
+          res.data; // Destructure response data
+
+        setTitle(title);
+        setPage(page);
+        setPerPage(perPage);
+        setCurrentPage(currentPage);
+        setTotalPages(totalPages);
+
+        if (Array.isArray(courses)) {
+          const mappedCourses = courses.map((course) => ({
+            ...course,
+            limitedDescription: course.description
+              .split(" ")
+              .slice(0, 50)
+              .join(" "),
+          }));
+          console.log("Mapped Courses:", mappedCourses);
+
+          setData(mappedCourses);
+        }
       })
       .catch((err) => console.log(err));
   }, []);
@@ -21,7 +53,7 @@ function Courses() {
         </div>
 
         {/* <!-- pagination top --> */}
-        {/* <div className="pagination">
+        <div className="pagination">
           {page && page > 1 && (
             <a href={`/api/${route}?page=${page - 1}&perPage=${perPage}`}>
               Previous
@@ -29,7 +61,7 @@ function Courses() {
           )}
           {[...Array(totalPages)].map(
             (_, i) =>
-              !(i === totalPages - 1 && courses.length === 0) && (
+              !(i === totalPages - 1 && data.length === 0) && (
                 <a
                   key={i}
                   href={`/api/${route}?page=${i + 1}&perPage=${perPage}`}
@@ -44,46 +76,55 @@ function Courses() {
               Next
             </a>
           )}
-        </div> */}
+        </div>
 
         {/*<!-- courses --> */}
         <div className="courses-grid">
           {data &&
-            data.length > 0 &&
-            data.map((course, index) => (
-              <div
-                key={index}
-                className="course-item backdrop-filter shadow-lg"
-              >
-                <a href={course.next}>
-                  <img
-                    src={course.thumbnail}
-                    alt={`thumbnail-${course.slug}`}
-                  />
-                  <p className="timestamp text-white">{course.updated_at}</p>
-                  <div className="author">
+            Array.isArray(data) &&
+            data.map((course, index) => {
+              return (
+                <div
+                  key={index}
+                  className="course-item backdrop-filter shadow-lg"
+                >
+                  <a href={course.next}>
                     <img
-                      src={course.author.avatar}
-                      alt="User Avatar"
-                      className="avatar"
+                      src={course.thumbnail}
+                      alt={`thumbnail-${course.slug}`}
                     />
-                    <p className="author-info text-white">
-                      <strong>{course.author.username}</strong> •{" "}
-                      {course.author.name}
-                    </p>
-                  </div>
-                  <h2 className="text-white">{course.title}</h2>
-                  {course.usd_price || course.usd_price ? (
-                    <p className="text-white">
-                      USD {course.usd_price} | ARS {course.ars_price}
-                    </p>
-                  ) : null}
-                  {/* <!-- limit description 50 words --> */}
-                  {course.description && (
-                    <p className="text-white">{course.limitedDescription}</p>
-                  )}
-                </a>
-                {/* {isAdmin && (
+                    <p className="timestamp text-white">{course.updated_at}</p>
+                    <div className="author">
+                      {course.author && course.author.avatar && (
+                        <img
+                          src={course.author.avatar}
+                          alt="User Avatar"
+                          className="avatar"
+                        />
+                      )}
+                      {course.author && (
+                        <p className="author-info text-white">
+                          <strong>{course.author.username}</strong> •{" "}
+                          {course.author.name}
+                        </p>
+                      )}
+                      <p className="author-info text-white">
+                        <strong>{course.author.username}</strong> •{" "}
+                        {course.author.name}
+                      </p>
+                    </div>
+                    <h2 className="text-white">{course.title}</h2>
+                    {course.usd_price || course.usd_price ? (
+                      <p className="text-white">
+                        USD {course.usd_price} | ARS {course.ars_price}
+                      </p>
+                    ) : null}
+                    {/* <!-- limit description 50 words --> */}
+                    {course.description && (
+                      <p className="text-white">{course.limitedDescription}</p>
+                    )}
+                  </a>
+                  {isAdmin && (
                   <div className="course-actions">
                     <p className="text-white">
                       <a
@@ -107,9 +148,10 @@ function Courses() {
                       </a>
                     </p>
                   </div>
-                )} */}
-              </div>
-            ))}
+                )}
+                </div>
+              );
+            })}
         </div>
       </div>
     </div>

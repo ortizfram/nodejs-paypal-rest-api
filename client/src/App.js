@@ -9,7 +9,7 @@ import CompBlogUpdate from "./blog/BlogUpdate.js";
 import CompHome from "./index/Home.js";
 import CompSignup from "./auth/Signup.js";
 import CompLogin from "./auth/Login.js";
-import Courses from "./elements/Courses.jsx";
+import Courses from "./elements/Courses";
 import CompCourseCreate from "./courses/CourseCreate";
 import ForgotPassword from "./auth/ForgotPass.js";
 import EmailSentMessage from "./auth/EmailSent.js";
