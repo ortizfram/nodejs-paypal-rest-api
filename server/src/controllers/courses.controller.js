@@ -1,6 +1,6 @@
 //src/controllers/courses.controller.js
 import slugify from "slugify";
-import { pool } from "../db.js";
+import { db } from "../db.js";
 import path from "path";
 import moveFile from "../utils/moveFile.js";
 import {
@@ -143,10 +143,10 @@ const postCourseCreate = async (req, res) => {
       console.log("\n\ncourseData: ", courseData);
 
       // Create the new course using the SQL query
-      const [courseRow] = await pool.query(createCourseQuery, courseData);
+      const [courseRow] = await db.promise().execute(createCourseQuery, courseData);
 
       // Fetch the created course & JOIN with user as author
-      const [fetchedCourse] = await pool.query(
+      const [fetchedCourse] = await db.promise().execute(
         getCourseFromSlugQuery,
         courseSlug
       );
@@ -329,10 +329,10 @@ const postCourseCreate2 = async (req, res) => {
     console.log("\n\ncourseData: ", courseData);
 
     // Create the new course using the SQL query
-    const [courseRow] = await pool.query(createCourseQuery, courseData);
+    const [courseRow] = await db.promise().execute(createCourseQuery, courseData);
 
     // Fetch the created course & JOIN with user as author
-    const [fetchedCourse] = await pool.query(
+    const [fetchedCourse] = await db.promise().execute(
       getCourseFromSlugQuery,
       courseSlug
     );
@@ -365,7 +365,7 @@ const getCourseUpdate = async (req, res) => {
 
   try {
     console.log("\nCourse Id:", courseId);
-    const [courseRows] = await pool.query(getCourseFromIdQuery, courseId);
+    const [courseRows] = await db.promise().execute(getCourseFromIdQuery, courseId);
     const course = courseRows[0];
     console.log("\n---Fetched course:", course);
 
@@ -385,7 +385,7 @@ const postCourseUpdate = async (req, res) => {
 
   // get courseId
   let courseId = req.params.id; // Assuming the ID is coming from the request body
-  const [courseRows] = await pool.query(getCourseFromIdQuery, [courseId]);
+  const [courseRows] = await db.promise().execute(getCourseFromIdQuery, [courseId]);
   const course = courseRows[0];
   courseId = course.id;
   console.log(`\n--- courseId: ${courseId}\n`);
@@ -484,7 +484,7 @@ const postCourseUpdate = async (req, res) => {
     console.log("\n\n---Update Parameters:", updateParams); // Log the update parameters
 
     // Execute update query
-    const result = await pool.query(updateCourseQuery, updateParams);
+    const result = await db.promise().execute(updateCourseQuery, updateParams);
 
     //msg of query & result of query
     console.log("\n\n---Update Query:", updateCourseQuery);
@@ -535,7 +535,7 @@ const getCourseDelete = async (req, res) => {
   try {
     // course from id
     const courseId = req.query.courseId;
-    const [courseRows] = await pool.query(getCourseFromIdQuery, [courseId]);
+    const [courseRows] = await db.promise().execute(getCourseFromIdQuery, [courseId]);
     const course = courseRows[0];
     const action = `/api/course/${courseId}/delete`;
 
@@ -561,7 +561,7 @@ const postCourseDelete = async (req, res) => {
   try {
     // get course
     let courseId = req.params.id;
-    const [courseRows] = await pool.query(getCourseFromIdQuery, [courseId]);
+    const [courseRows] = await db.promise().execute(getCourseFromIdQuery, [courseId]);
     const course = courseRows[0];
     courseId = course.id;
 
@@ -569,8 +569,8 @@ const postCourseDelete = async (req, res) => {
     console.log(`\n\n${course.title}\n\n`);
 
     // Perform deletion query
-    await pool.query(deleteUserCourseQuery, [courseId]);
-    await pool.query(deleteCourseQuery, [courseId]);
+    await db.promise().execute(deleteUserCourseQuery, [courseId]);
+    await db.promise().execute(deleteCourseQuery, [courseId]);
 
     //msgs
     const message = `course deleted successfully`;
@@ -604,14 +604,14 @@ const coursesList = async (req, res) => {
     let perPage = parseInt(req.query.perPage) || 1;
 
     // count courses
-    const [totalCourses] = await pool.query(
+    const [totalCourses] = await db.promise().execute(
       "SELECT COUNT(*) AS count FROM courses"
     );
     const totalItems = totalCourses[0].count;
     console.log('totalItems:', totalItems)
 
     // fetch all courses
-    const [coursesRows] = await pool.query(courseFieldsPlusAuthor_q, [
+    const [coursesRows] = await db.promise().execute(courseFieldsPlusAuthor_q, [
       0,
       totalItems,
     ]);
@@ -643,7 +643,7 @@ const coursesList = async (req, res) => {
     let enrolledCourseIds = [];
 
     if (user) {
-      const [enrolledCoursesRows] = await pool.query(
+      const [enrolledCoursesRows] = await db.promise().execute(
         getUserEnrolledCoursesQuery,
         [user.id]
       );
@@ -702,7 +702,7 @@ const coursesListOwned = async (req, res) => {
 
     // Fetch enrolled courses for the user if logged in
     if (user) {
-      const [enrolledCoursesRows] = await pool.query(
+      const [enrolledCoursesRows] = await db.promise().execute(
         getUserEnrolledCoursesQuery,
         [user.id]
       );
@@ -726,14 +726,14 @@ const coursesListOwned = async (req, res) => {
     const offset = (page - 1) * perPage; // where to start the fetch depending on the page
 
     // Fetch total enrolled courses count for the user
-    const [totalEnrolledCourses] = await pool.query(
+    const [totalEnrolledCourses] = await db.promise().execute(
       "SELECT COUNT(*) AS count FROM courses WHERE id IN (?)",
       [enrolledCourseIds]
     );
     const totalItems = totalEnrolledCourses[0].count;
 
     // Fetch enrolled courses for the user with pagination
-    const [coursesRows] = await pool.query(
+    const [coursesRows] = await db.promise().execute(
       "SELECT * FROM courses WHERE id IN (?) LIMIT ? OFFSET ?",
       [enrolledCourseIds, perPage, offset]
     );
@@ -809,7 +809,7 @@ const courseOverview = async (req, res) => {
     const courseId = req.params.id;
 
     // Fetch the course using the query
-    const [rows] = await pool.query(getCourseFromIdQuery, courseId);
+    const [rows] = await db.promise().execute(getCourseFromIdQuery, courseId);
 
     // Check if the course exists
     const course = rows[0];
@@ -863,7 +863,7 @@ const courseEnroll = async (req, res) => {
   const userId = req.session.user.id;
 
   try {
-    const [rows] = await pool.query(getCourseFromIdQuery, courseId);
+    const [rows] = await db.promise().execute(getCourseFromIdQuery, courseId);
     const course = rows[0];
 
     if (course) {
@@ -907,7 +907,7 @@ const courseDetail = async (req, res) => {
 
   // try {
   //   console.log("\nCourseId:", courseId);
-  //   const [courseRows] = await pool.query(getCourseFromIdQuery, courseId);
+  //   const [courseRows] = await db.promise().execute(getCourseFromIdQuery, courseId);
 
   //   if (!courseRows || courseRows.length === 0) {
   //     return res.status(404).json({ error: "Course not found" });
@@ -930,7 +930,7 @@ const courseDetail = async (req, res) => {
   //   }
 
   //   // Fetching author details
-  //   const [authorRows] = await pool.query(getCourseAuthorQuery, [
+  //   const [authorRows] = await db.promise().execute(getCourseAuthorQuery, [
   //     course.author_id,
   //   ]);
   //   const author = authorRows[0];
@@ -951,7 +951,7 @@ const courseDetail = async (req, res) => {
   //   // Fill array with query result
   //   let enrolledCourses = [];
   //   if (user) {
-  //     const [enrolledRows] = await pool.query(getUserEnrolledCoursesQuery, [
+  //     const [enrolledRows] = await db.promise().execute(getUserEnrolledCoursesQuery, [
   //       user.id,
   //     ]);
   //     enrolledCourses = enrolledRows[0]?.enrolled_courses || [];

@@ -1,11 +1,11 @@
 // makeUserAdmin.js
 import { getUserByEmail_q, setUserRole_q } from "../../../db/queries/admin.queries.js";
-import { pool } from "../../db.js";
+import { db } from "../../db.js";
 
 const getUserByEmail = async (email) => {
   try {
     // Query to fetch user by email
-    const [userRows] = await pool.query(getUserByEmail_q, [email]);
+    const [userRows] = await db.promise().execute(getUserByEmail_q, [email]);
     return userRows[0]; // Return the first user found (if any)
   } catch (error) {
     console.error('Error fetching user by email:', error);
@@ -24,7 +24,7 @@ const getUserByEmail = async (email) => {
     }
 
     // Update the user's role to 'admin' in the database
-    const roleRows = await pool.query(setUserRole_q, [role, email]);
+    const roleRows = await db.promise().execute(setUserRole_q, [role, email]);
 
     if (roleRows.affectedRows > 0) {
       // Role updated successfully

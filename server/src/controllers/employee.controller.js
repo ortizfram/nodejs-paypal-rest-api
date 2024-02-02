@@ -6,10 +6,10 @@ import {
   delEmployeeQuery,
   putEmployeeQuery,
 } from "../../db/queries.js";
-import { pool } from "../db.js";
+import { db } from "../db.js";
 
 const getEmployees = async (req, res) => {
-  const [rows] = await pool.query(getEmployeesQuery);
+  const [rows] = await db.promise().execute(getEmployeesQuery);
   try {
     console.log("getting employees");
     res.json(rows);
@@ -21,7 +21,7 @@ const getEmployees = async (req, res) => {
 const getEmployee = async (req, res) => {
   try {
     const id = await req.params.id;
-    const [rows] = await pool.query(getEmployeeQuery, [id]);
+    const [rows] = await db.promise().execute(getEmployeeQuery, [id]);
     console.log("getting one employee");
   
     if (rows.length <= 0) {
@@ -37,7 +37,7 @@ const getEmployee = async (req, res) => {
 const createEmployee = async (req, res) => {
  try {
   const { name, salary } = req.body;
-  const [rows] = await pool.query(createEmployeeQuery, [name, salary]);
+  const [rows] = await db.promise().execute(createEmployeeQuery, [name, salary]);
   console.log("Employee created");
   res.send({
     id: rows.insertId,
@@ -56,13 +56,13 @@ const updateEmployee = async (req, res) => {
   const { name, salary } = req.body;
 
   // pass to update
-  const [rows] = await pool.query(putEmployeeQuery, [name, salary, id]);
+  const [rows] = await db.promise().execute(putEmployeeQuery, [name, salary, id]);
 
   if (rows.affectedRows === 0)
     return res.status(404).json({ message: "Employee not found" });
 
   // query to just see updated
-  const [result] = await pool.query(getEmployeeQuery, [id])
+  const [result] = await db.promise().execute(getEmployeeQuery, [id])
 
   res.json(result[0])
   } catch (error) {
@@ -73,7 +73,7 @@ const updateEmployee = async (req, res) => {
 const deleteEmployee = async (req, res) => {
   try {
     const id = await req.params.id;
-    const [rows] = await pool.query(delEmployeeQuery, [id]);
+    const [rows] = await db.promise().execute(delEmployeeQuery, [id]);
 
     if (rows.affectedRows >= 1) {
       // 204 means: 202 but not returning anything

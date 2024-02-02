@@ -1,10 +1,10 @@
 // controllers/indexController.js
-import { pool } from "../db.js";
+import { db } from "../db.js";
 import path from "path";
 import sendEmailContactForm from "../utils/sendEmailContactForm.js";
 
 const getPing = async (req, res) => {
-  // const [result] = await pool.query('SELECT "PONG" AS result');
+  // const [result] = await db.promise().execute('SELECT "PONG" AS result');
   // res.json(result[0]);
   const message = req.query.message; // Retrieve success message from query params authcontroller
   const user= req.session.user || null; 

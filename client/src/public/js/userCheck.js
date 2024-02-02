@@ -1,6 +1,6 @@
 async function checkUserExistenceById(id) {
   try {
-    const [existingUser] = await pool.query(fetchUserByField("id"), [id]);
+    const [existingUser] = await db.promise().execute(fetchUserByField("id"), [id]);
     console.log(
       "\n\nuser fetcher from id",
       existingUser && existingUser[0] && existingUser[0]["id"]

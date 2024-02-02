@@ -1,14 +1,14 @@
 // createTable.js
 import { tableCheckQuery } from "../../../db/queries/course.queries.js";
-import { pool } from "../../db.js";
+import { db } from "../../db.js";
 
 const createTableIfNotExists = async (pool, tableCheckQuery, createTableQuery, tableName) => {
     try {
-      const [tableCheck] = await pool.query(tableCheckQuery, tableName);
+      const [tableCheck] = await db.promise().execute(tableCheckQuery, tableName);
       const tableExists = tableCheck.length > 0;
   
       if (!tableExists) {
-        await pool.query(createTableQuery);
+        await db.promise().execute(createTableQuery);
         console.log(`\n--- ${tableName} table created\n`);
       }
     } catch (error) {

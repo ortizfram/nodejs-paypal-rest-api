@@ -9,7 +9,7 @@ import {
   updateBlogQuery,
 } from "../../db/queries/blog.queries.js";
 import slugify from "slugify";
-import { pool } from "../db.js";
+import { db } from "../db.js";
 import path from "path";
 import { __dirname } from "../../server.js";
 import { tableCheckQuery } from "../../db/queries/course.queries.js";
@@ -127,10 +127,10 @@ const postblogCreate = async (req, res, next) => {
           );
 
           // Create the new blog using the SQL query
-          const [blogRow] = await pool.query(createBlogQuery, blogData);
+          const [blogRow] = await db.promise().execute(createBlogQuery, blogData);
 
           // Fetch the created blog & JOIN with user as author
-          const [fetchedBlog] = await pool.query(
+          const [fetchedBlog] = await db.promise().execute(
             getBlogFromSlugQuery,
             blogSlug
           );
@@ -185,7 +185,7 @@ const getBlogDetail = async (req, res, next) => {
     const message = req.query.message;
     const user = req.session.user || null;
 
-    const [blogRows] = await pool.query(getBlogFromIdQuery, blogId);
+    const [blogRows] = await db.promise().execute(getBlogFromIdQuery, blogId);
     const blog = blogRows[0];
 
     // Format course timestamps and video_link
@@ -200,7 +200,7 @@ const getBlogDetail = async (req, res, next) => {
     }
 
     // Fetching author details
-    const [authorRows] = await pool.query(getBlogAuthorQuery, [blog.author_id]);
+    const [authorRows] = await db.promise().execute(getBlogAuthorQuery, [blog.author_id]);
     const author = authorRows[0];
     console.log(author);
 
@@ -250,13 +250,13 @@ const getblogList = async (req, res, next) => {
     let perPage = parseInt(req.query.perPage) || 1;
 
     // count blogs
-    const [totalBlogs] = await pool.query(
+    const [totalBlogs] = await db.promise().execute(
       "SELECT COUNT(*) AS count FROM blogs"
     );
     const totalItems = totalBlogs[0].count;
 
     // fetch all blogs
-    const [blogRows] = await pool.query(blogFieldsPlusAuthor_q, [
+    const [blogRows] = await db.promise().execute(blogFieldsPlusAuthor_q, [
       0,
       totalItems,
     ]);
@@ -348,7 +348,7 @@ const postBlogUpdate = async (req, res) => {
 
   // get blogId
   let blogId = req.params.id; // Assuming the ID is coming from the request body
-  const [blogRows] = await pool.query(getBlogFromIdQuery, [blogId]);
+  const [blogRows] = await db.promise().execute(getBlogFromIdQuery, [blogId]);
   const blog = blogRows[0];
   blogId = blog.id;
   let thumbnailPath = "";
@@ -410,7 +410,7 @@ const postBlogUpdate = async (req, res) => {
     console.log("\n\n---Update Parameters:", updateParams); // Log the update parameters
 
     // query
-    const result = await pool.query(updateBlogQuery, updateParams);
+    const result = await db.promise().execute(updateBlogQuery, updateParams);
 
     //msg of query & result of query
     console.log("\n\n---Update Query:", updateBlogQuery);
@@ -446,7 +446,7 @@ const getBlogDelete = async (req, res) => {
   try {
     // course from id
     const blogId = req.params.id;
-    const [blogRows] = await pool.query(getBlogFromIdQuery, [blogId]);
+    const [blogRows] = await db.promise().execute(getBlogFromIdQuery, [blogId]);
     const blog = blogRows[0];
     const action = `/api/blog/${blogId}/delete`;
 
@@ -472,7 +472,7 @@ const postBlogDelete = async (req, res) => {
   try {
     // get blog
     let blogId = req.params.id;
-    const [blogRows] = await pool.query(getBlogFromIdQuery, [blogId]);
+    const [blogRows] = await db.promise().execute(getBlogFromIdQuery, [blogId]);
     const blog = blogRows[0];
     blogId = blog.id;
 
@@ -480,7 +480,7 @@ const postBlogDelete = async (req, res) => {
     console.log(`\n\n${blog.title}\n\n`);
 
     // Perform deletion query
-    await pool.query(deleteBlogQuery, [blogId]);
+    await db.promise().execute(deleteBlogQuery, [blogId]);
 
     //msgs
     const message = `blog deleted successfully`;

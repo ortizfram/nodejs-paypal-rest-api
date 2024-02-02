@@ -1,7 +1,4 @@
 import nodemailer from "nodemailer";
-import { config } from "dotenv";
-
-config(); // Load .env
 
 const sendEmailContactForm = async (recipient, subject, text, html) => {
   try {

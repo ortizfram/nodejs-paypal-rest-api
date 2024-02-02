@@ -11,13 +11,11 @@
     insertUserCourseQuery,
     tableCheckQuery,
   } from "../../db/queries/course.queries.js";
-  import { pool } from "../db.js";
+  import { db } from "../db.js";
   import { createTableUserCourses, createUserTableQuery } from "../../db/queries/auth.queries.js";
   import mercadopago from "mercadopago";
-  import { config, configDotenv } from "dotenv";
 import createTableIfNotExists from "../public/js/createTable.js";
 
-  config(); // load .ENV
 
   // PAYPAL ---------------------------------------------------
   export const createOrderPaypal = async (req, res) => {
@@ -28,7 +26,7 @@ import createTableIfNotExists from "../public/js/createTable.js";
       console.log("\n\nSQL Query:", getCourseFromIdQuery);
       console.log("\n\nparams courseId:", courseId);
       // Fetch course details based on the courseSlug using MySQL query
-      const [rows] = await pool.query(getCourseFromIdQuery, courseId);
+      const [rows] = await db.promise().execute(getCourseFromIdQuery, courseId);
       const course = rows[0];
 
       console.log("\n\nFetched Course Details:", course);
@@ -106,13 +104,13 @@ import createTableIfNotExists from "../public/js/createTable.js";
       const user = req.session.user;
 
       // Fetch course details based on the courseSlug using MySQL query
-      const [rows] = await pool.query(getCourseFromIdQuery, [courseId]);
+      const [rows] = await db.promise().execute(getCourseFromIdQuery, [courseId]);
       const course = rows[0];
       console.log("\n\nFetched Course:", course);
 
       if (course && user) {
         // Add the user and course relationship in user_courses table
-        const [insertUserCourse] = await pool.query(insertUserCourseQuery, [
+        const [insertUserCourse] = await db.promise().execute(insertUserCourseQuery, [
           user.id,
           course.id,
         ]);
@@ -146,7 +144,7 @@ import createTableIfNotExists from "../public/js/createTable.js";
     console.log(`\nuserId: ${[userId]}\n`);
 
     // Fetch the course using the query
-    const [rows] = await pool.query(getCourseFromIdQuery, courseId);
+    const [rows] = await db.promise().execute(getCourseFromIdQuery, courseId);
     // Check if the course exists
     const course = rows[0];
 
@@ -210,12 +208,12 @@ import createTableIfNotExists from "../public/js/createTable.js";
       if (paymentType === "payment" && paymentId && courseId) {
 
         // Fetch course details based on the courseSlug using MySQL query
-        const [rows] = await pool.query(getCourseFromIdQuery, [courseId]);
+        const [rows] = await db.promise().execute(getCourseFromIdQuery, [courseId]);
         const course = rows[0];
 
         if (course && userId) {
           // Add the user and course relationship in user_courses table
-          const [insertUserCourse] = await pool.query(insertUserCourseQuery, [
+          const [insertUserCourse] = await db.promise().execute(insertUserCourseQuery, [
             userId,
             course.id,
           ]);

@@ -1,19 +1,16 @@
 import bcrypt from "bcrypt";
-import { pool } from "../db.js";
+import { db } from "../db.js";
 import {
   fetchUserByField,
   updatePassword_q,
   updateUserQuery,
 } from "../../db/queries/auth.queries.js";
-import { config } from "dotenv";
 import setUserRole from "../public/js/setUserRole.js";
 import jwt from "jsonwebtoken";
 import sendResetEmail from "../utils/sendEmail.js";
 import path from "path";
 import { __dirname } from "../../server.js";
 
-// load .ENV
-config();
 
 // JWT_SECRET from env
 const JWT_SECRET = process.env.JWT_SECRET;
@@ -32,7 +29,7 @@ const postsendEmailToken = async (req, res) => {
   try {
     // 1. GET USER BASED ON ID
     let userId = req.params.id || null;
-    const [existingUser] = await pool.query(fetchUserByField("id"), [userId]);
+    const [existingUser] = await db.promise().execute(fetchUserByField("id"), [userId]);
     console.log("\n\nuser fetcher from id", existingUser[0]["id"]);
     if (!existingUser || existingUser.length === 0) {
       //validation
@@ -158,7 +155,7 @@ const postUserUpdate = async (req, res) => {
   console.log("\n\n---Update Parameters:", updateParams); // Log the update parameters
 
   // query
-  const result = await pool.query(updateUserQuery, updateParams);
+  const result = await db.promise().execute(updateUserQuery, updateParams);
 
   //msg of query & result of query
   console.log("\n\n---Update Query:", updateUserQuery);

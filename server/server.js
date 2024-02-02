@@ -21,8 +21,6 @@ import { getUserEnrolledCoursesQuery } from "./db/queries/course.queries.js";
 import { Marked, marked } from "marked";
 import bodyParser from "body-parser";
 import multer from "multer";
-import { config } from "dotenv";
-config();
 
 const app = express();
 app.use(bodyParser.json());
@@ -31,12 +29,13 @@ app.use(fileUpload());
 app.use(cors());
 const port = 5000;
 
+const isDev = process.env.NODE_ENV === 'development';
 const db = mysql.createConnection({
-  host: "127.0.0.1",
-  user: "root",
-  password: "melonmelon",
-  database: "conn",
-  port: 3307,
+  host: isDev ? "127.0.0.1" : process.env.DB_HOST,
+  user: isDev ? "root" : process.env.DB_USER,
+  password: isDev ? "melonmelon" : process.env.DB_PASSWORD,
+  database: isDev ? "conn" : process.env.DB_NAME,
+  port: isDev ? 3307 : process.env.DB_PORT,
 });
 db.connect((err) => {
   if (err) {
@@ -44,6 +43,7 @@ db.connect((err) => {
     return;
   }
   console.log("Connected to MySQL database");
+
 });
 
 const HOST = process.env.HOST;
@@ -231,7 +231,7 @@ app.post("/reset-password", async (req, res) => {
 
   // Verify again if id and token are valid
   let sql = `SELECT * FROM users WHERE id = ?`;
-  const [existingUser] = await pool.query(sql, [id]);
+  const [existingUser] = await db.promise().execute(sql, [id]);
   console.log("\n\nuser fetcher from id", existingUser[0]["id"], "\n\n");
   id = existingUser[0]["id"];
   if (!existingUser || existingUser.length === 0) {
@@ -251,7 +251,7 @@ app.post("/reset-password", async (req, res) => {
 
     // update with a new password hashed
     const hashedPassword = await bcrypt.hash(password, 10);
-    await pool.query(updatePassword_q, [hashedPassword, id]);
+    await db.promise().execute(updatePassword_q, [hashedPassword, id]);
     console.log("\n\nPassword updated\n\n");
 
     // Send JSON response
@@ -532,7 +532,7 @@ export async function checkCourseEnrollment(req, res, next) {
       return res.status(403).redirect("/api/login");
     }
     //
-    const [enrolledRows] = await pool.query(getUserEnrolledCoursesQuery, [
+    const [enrolledRows] = await db.promise().execute(getUserEnrolledCoursesQuery, [
       user.id,
     ]);
     console.log("\n\nenrolledRows: ", enrolledRows);

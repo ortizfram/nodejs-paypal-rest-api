@@ -1,5 +1,5 @@
 import crypto from "crypto";
-import { pool } from "../db.js";
+import { db } from "../db.js";
 import { setResetToken } from "../../db/queries/auth.queries.js";
 
 const generateResetToken = async (email) => {
@@ -14,7 +14,7 @@ const generateResetToken = async (email) => {
     console.log("\n\nToken enctypted ", resetToken)
 
     // store the token in DB.
-    const [savedToken] = await pool.query(setResetToken, [resetToken, email]);
+    const [savedToken] = await db.promise().execute(setResetToken, [resetToken, email]);
     console.log(`\n\nToken stored in db`);
 
     return resetToken; // Return the plain token for use

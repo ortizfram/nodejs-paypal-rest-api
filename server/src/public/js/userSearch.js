@@ -1,5 +1,5 @@
 import { listUsers_q, userSearch_q } from "../../../db/queries/admin.queries.js";
-import { pool } from "../../db.js";
+import { db } from "../../db.js";
 
 const userSearch = async (searchQuery) => {
   try {
@@ -13,12 +13,12 @@ const userSearch = async (searchQuery) => {
       const queryParams = Array(4).fill(searchPattern);
       
       // list filtered users
-      [userRows] = await pool.query(userSearch_q, queryParams);
+      [userRows] = await db.promise().execute(userSearch_q, queryParams);
 
     } else {
         
       // list all users
-      [userRows] = await pool.query(listUsers_q);
+      [userRows] = await db.promise().execute(listUsers_q);
       
     }
 
