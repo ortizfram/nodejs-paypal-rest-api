@@ -17,7 +17,7 @@ import setUserRole from "../public/js/setUserRole.js";
 import jwt from "jsonwebtoken";
 import sendResetEmail from "../utils/sendEmail.js";
 import path from "path";
-import { __dirname } from "../../index.js";
+import { __dirname } from "../../server.js";
 
 // load .ENV
 config();
