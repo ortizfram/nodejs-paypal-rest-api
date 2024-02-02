@@ -4,9 +4,6 @@
     const router = Router();
 
 
-    //------------signup-------------------------
-    router.get("/signup", controller.getSignup);
-    router.post("/signup", controller.postSignup);
 
     //------------logout-------------------------
     router.get("/logout", controller.getLogout);

@@ -39,4 +39,3 @@ export const createTableUserCourses = `CREATE TABLE IF NOT EXISTS user_courses (
       FOREIGN KEY (course_id) REFERENCES courses(id)
     );`;
 
-export const postSignupQuery = `INSERT INTO users (username, name, email, password, role) VALUES (?, ?, ?, ?, ?)`;

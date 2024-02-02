@@ -124,6 +124,57 @@ app.post("/login", async (req,res)=>{
   }
 })
 
+app.post('/signup', async(req,res)=>{
+  const { username, name, email, password } = req.body;
+
+  // Add validation for required fields
+  if (!username || !password || !email) {
+    return res.status(400).json({ error: "Username, password & email are required." });
+  }
+
+  try {
+    // Check if the email already exists in the database
+    let sql= `SELECT * FROM users WHERE email = ?`
+    const [existingEmail] = await db.promise().execute(sql, [email]);
+
+    // If the email already exists, handle the duplicate case
+    if (existingEmail.length > 0) {
+      return res.status(400).json({ error: "This email is already registered." });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const adminEmails = ['ortizfranco48@gmail.com', 'mg.marcela@hotmail.com', 'buonavibraclub@gmail.com', 'marzettimarcela@gmail.com'];
+
+    // Check if the email is in the list of admin emails
+    const isAdmin = adminEmails.includes(email);
+    console.log('isAdmin', isAdmin)
+    
+    // Determine the role based on email
+    const role = isAdmin ? 'admin' : 'user';
+    console.log('role:', role);
+
+
+    const data = [username, name, email, hashedPassword, role];
+
+    // Insert data into the users table
+    sql = "INSERT INTO users (username, name, email, password, role) VALUES (?, ?, ?, ?, ?)"
+    const [rows] = await db.promise().execute(sql, data);
+
+    const userId = String(rows.insertId);
+
+    // Set session data for the newly signed-up user
+    req.session.user = { id: userId, username, name, email, role };
+
+    // Respond with success message
+    res.status(200).json({ message: "Signup successful. Now go Login.", user: req.session.user, redirectUrl:'/login' });
+    console.log("\n\n*** Signed up successfully\n\n");
+  } catch (error) {
+    console.error("Error while saving user:", error);
+    res.status(500).json({ error: "Error during signup or login" });
+  }
+})
+
 app.get("/api/courses", async (req, res) => {
   try {
     const message = req.query.message;

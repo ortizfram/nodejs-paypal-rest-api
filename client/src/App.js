@@ -7,7 +7,7 @@ import CompBlogList from "./blog/BlogList.js";
 import CompBlogCreate from "./blog/BlogCreate.js";
 import CompBlogUpdate from "./blog/BlogUpdate.js";
 import CompHome from "./index/Home.js";
-import CompSignup from "./auth/Signup.js";
+import Signup from "./elements/Signup";
 import Login from "./elements/Login";
 import Courses from "./elements/Courses";
 import CompCourseCreate from "./courses/CourseCreate";
@@ -44,7 +44,7 @@ function App() {
             {/* router.post("/users/change-role", admin_staff_check, controller.changeUserRole); */}
             {/* router.post("/users", admin_staff_check,controller.getUsers); */}
             {/* AUTH */}
-            <Route path="/api/signup" element={<CompSignup />} />
+            <Route path="/signup" element={<Signup />} />
             <Route path="/login" element={<Login />} />
             <Route path="/api/logout" element={<CompLogout />} />
             <Route path="/api/forgot-password" element={<ForgotPassword />} />

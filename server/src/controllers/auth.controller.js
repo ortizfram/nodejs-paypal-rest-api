@@ -1,15 +1,10 @@
 import bcrypt from "bcrypt";
 import { pool } from "../db.js";
 import {
-  postSignupQuery,
-  createTableUserCourses,
-  createUserTableQuery,
   fetchUserByField,
   updatePassword_q,
   updateUserQuery,
 } from "../../db/queries/auth.queries.js";
-import { tableCheckQuery } from "../../db/queries/course.queries.js";
-import createTableIfNotExists from "../public/js/createTable.js";
 import { config } from "dotenv";
 import setUserRole from "../public/js/setUserRole.js";
 import jwt from "jsonwebtoken";
@@ -22,70 +17,6 @@ config();
 
 // JWT_SECRET from env
 const JWT_SECRET = process.env.JWT_SECRET;
-
-
-//------------signup-------------------------
-const getSignup = async (req, res) => {
-  const message = req.query.message; // Retrieve success message from query params authcontroller
-  console.log(`\n\n*** getSignup\n\n`);
-};
-
-const postSignup = async (req, res) => {
-  console.log("\n\n*** postSignup\n\n");
-
-  const { username, name, email, password } = req.body;
-
-  // Add validation for required fields
-  if (!username || !password || !email) {
-    return res.status(400).json({ error: "Username, password & email are required." });
-  }
-
-  try {
-    // Check if the email already exists in the database
-    const [existingEmail] = await pool.query(fetchUserByField("email"), [email]);
-
-    // If the email already exists, handle the duplicate case
-    if (existingEmail.length > 0) {
-      return res.status(400).json({ error: "This email is already registered." });
-    }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    const adminEmails = ['ortizfranco48@gmail.com', 'mg.marcela@hotmail.com', 'buonavibraclub@gmail.com', 'marzettimarcela@gmail.com'];
-
-    // Check if the email is in the list of admin emails
-    const isAdmin = adminEmails.includes(email);
-    console.log('isAdmin', isAdmin)
-    
-    // Determine the role based on email
-    const role = isAdmin ? 'admin' : 'user';
-    console.log('role:', role);
-
-
-    const data = [username, name, email, hashedPassword, role];
-
-    // Check and create tables if not exists
-    await createTableIfNotExists(pool, tableCheckQuery, createUserTableQuery, "users");
-    await createTableIfNotExists(pool, tableCheckQuery, createTableUserCourses, "user_courses");
-
-    // Insert data into the users table
-    const [rows] = await pool.query(postSignupQuery, data);
-
-    const userId = String(rows.insertId);
-
-    // Set session data for the newly signed-up user
-    req.session.user = { id: userId, username, name, email, role };
-
-    // Respond with success message
-    res.status(200).json({ message: "Signup successful. Now go Login.", user: req.session.user, redirectUrl:'/api/login' });
-    console.log("\n\n*** Signed up successfully\n\n");
-  } catch (error) {
-    console.error("Error while saving user:", error);
-    res.status(500).json({ error: "Error during signup or login" });
-  }
-};
-
-
 
 //------------logout-------------------------
 const getLogout = (req, res) => {
@@ -377,8 +308,6 @@ const postUserUpdate = async (req, res) => {
 };
 
 export default {
-  getSignup,
-  postSignup,
   getLogout,
   logout,
   getForgotPassword,
