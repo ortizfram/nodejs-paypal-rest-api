@@ -89,7 +89,7 @@ app.use(
 );
 
 // ENDPOINTS   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-app.get("/login", async (req,res)=>{
+app.post("/login", async (req,res)=>{
   try {
     const { email, password } = req.body;
 

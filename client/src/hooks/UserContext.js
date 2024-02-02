@@ -7,9 +7,15 @@ const UserContext = createContext({
 
 export const UserContextProvider = ({ children }) => {
   const [userData, setUserData] = useState(() => {
-    // Check for existing user data in localStorage
-    const storedUserData = localStorage.getItem('userData');
-    return storedUserData ? JSON.parse(storedUserData) : null;
+    try {
+      // Check for existing user data in localStorage
+      const storedUserData = localStorage.getItem('userData');
+      return storedUserData ? JSON.parse(storedUserData) : null;
+    } catch (error) {
+      // Handle the case where parsing fails (e.g., invalid JSON)
+      console.error('Error parsing user data from localStorage:', error);
+      return null;
+    }
   });
 
   return (
