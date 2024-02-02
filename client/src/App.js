@@ -10,11 +10,11 @@ import CompHome from "./index/Home.js";
 import Signup from "./elements/Signup";
 import Login from "./elements/Login";
 import Logout from "./elements/Logout";
+import ForgotPassword from "./elements/ForgotPassword";
+import ResetPassword from "./elements/ResetPassword";
 import Courses from "./elements/Courses";
 import CompCourseCreate from "./courses/CourseCreate";
-import ForgotPassword from "./auth/ForgotPass.js";
 import EmailSentMessage from "./auth/EmailSent.js";
-import ResetPassword from "./auth/ResetPass.js";
 
 // import Hooks
 import { UserContextProvider } from "./hooks/UserContext.js";
@@ -47,7 +47,8 @@ function App() {
             <Route path="/signup" element={<Signup />} />
             <Route path="/login" element={<Login />} />
             <Route path="/logout" element={<Logout />} />
-            <Route path="/api/forgot-password" element={<ForgotPassword />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password" element={<ForgotPassword />} />
             <Route path="/api/email-sent" element={<EmailSentMessage />} />
             <Route
               path="/reset-password/:id/:token"

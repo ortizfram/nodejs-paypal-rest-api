@@ -1,10 +1,11 @@
 import cors from "cors";
-import { config } from "dotenv";
 import express from "express";
 import session from "express-session";
 import path from "path";
 import mysql from "mysql2";
 import bcrypt from "bcrypt"
+import sendResetEmail from "./src/utils/sendEmail.js";
+import jwt from "jsonwebtoken"
 import { fileURLToPath } from "url";
 import authRoutes from "./src/routes/auth.routes.js";
 import blogRoutes from "./src/routes/blog.routes.js";
@@ -20,6 +21,7 @@ import { getUserEnrolledCoursesQuery } from "./db/queries/course.queries.js";
 import { Marked, marked } from "marked";
 import bodyParser from "body-parser";
 import multer from "multer";
+import { config } from "dotenv";
 config();
 
 const app = express();
@@ -186,6 +188,83 @@ app.post("/logout", (req,res)=>{
     }
 });
 })
+
+app.post("/forgot-password", async (req,res)=>{
+  const { email } = req.body;
+  
+  try {
+    let sql= `SELECT * FROM users WHERE email = ?`
+    const [existingUser] = await db.promise().execute(sql, [email]);
+
+    if (!existingUser || existingUser.length === 0) {
+      return res.status(404).json({ error: "Email not found" });
+    }
+
+    const secret = process.env.JWT_SECRET + existingUser[0]["password"];
+    const userId = existingUser[0]["id"];
+    const payload = {
+      email: existingUser[0]["email"],
+      id: existingUser[0]["id"],
+    };
+    const token = jwt.sign(payload, secret, { expiresIn: "1y" });
+    const link = `${process.env.BACKEND_URL}/reset-password/${userId}/${token}`;
+
+    await sendResetEmail(
+      email,
+      "Password Reset",
+      "Sending Reset password Token using Node JS & Nodemailer",
+      `<button><a href="${link}">Go to Reset Password</a></button>`
+    );
+
+    res.status(200).json({ message: "Password reset email sent, check your mailbox." });
+  } catch (error) {
+    console.error("Error sending Email for password reset:", error);
+    res.status(500).json({ error: "Error sending reset email" });
+  }
+})
+
+app.post("/reset-password", async (req, res) => {
+  console.log("\n\n*** ResetPassword\n\n");
+
+  let { id, token } = req.params;
+  const { password, repeat_password } = req.body;
+
+  // Verify again if id and token are valid
+  let sql = `SELECT * FROM users WHERE id = ?`;
+  const [existingUser] = await pool.query(sql, [id]);
+  console.log("\n\nuser fetcher from id", existingUser[0]["id"], "\n\n");
+  id = existingUser[0]["id"];
+  if (!existingUser || existingUser.length === 0) {
+    return res.status(400).json({ message: "User id not found" });
+  }
+
+  const user = existingUser[0];
+
+  // We have valid id and valid user with this id
+  const secret = JWT_SECRET + existingUser[0]["password"];
+  try {
+    const payload = jwt.verify(token, secret);
+    // password must match
+    if (password !== repeat_password) {
+      return res.status(400).json({ message: "Passwords do not match" });
+    }
+
+    // update with a new password hashed
+    const hashedPassword = await bcrypt.hash(password, 10);
+    await pool.query(updatePassword_q, [hashedPassword, id]);
+    console.log("\n\nPassword updated\n\n");
+
+    // Send JSON response
+    res.status(200).json({
+      message:
+        "Password updated successfully. Please login with your new password.",
+      user,
+    });
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({ error: error.message });
+  }
+});
 
 app.get("/api/courses", async (req, res) => {
   try {

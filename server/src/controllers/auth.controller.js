@@ -18,93 +18,6 @@ config();
 // JWT_SECRET from env
 const JWT_SECRET = process.env.JWT_SECRET;
 
-// -----------forgotPassword-----------------------
-const getForgotPassword = (req, res) => {
-  console.log("\n\n*** getForgotPassword\n\n");
-
-  };
-
-  // renderDynamicForm(res, "auth/forgotPassword", data);
-
-  const postForgotPassword = async (req, res) => {
-    const { email } = req.body;
-  
-    try {
-      const [existingUser] = await pool.query(fetchUserByField("email"), [email]);
-  
-      if (!existingUser || existingUser.length === 0) {
-        return res.status(404).json({ error: "Email not found" });
-      }
-  
-      const secret = JWT_SECRET + existingUser[0]["password"];
-      const userId = existingUser[0]["id"];
-      const payload = {
-        email: existingUser[0]["email"],
-        id: existingUser[0]["id"],
-      };
-      const token = jwt.sign(payload, secret, { expiresIn: "1y" });
-      const link = `${process.env.BACKEND_URL}/api/reset-password/${userId}/${token}`;
-  
-      await sendResetEmail(
-        email,
-        "Password Reset",
-        "Sending Reset password Token using Node JS & Nodemailer",
-        `<button><a href="${link}">Go to Reset Password</a></button>`
-      );
-  
-      res.status(200).json({ message: "Password reset email sent, check your mailbox." });
-    } catch (error) {
-      console.error("Error sending Email for password reset:", error);
-      res.status(500).json({ error: "Error sending reset email" });
-    }
-  };
-  
-
-const getResetPassword = async (req, res) => {
-  console.log("\n\n*** getResetPassword\n\n");
-};
-
-const postResetPassword = async (req, res) => {
-  console.log("\n\n*** postResetPassword\n\n");
-
-  let { id, token } = req.params;
-  const { password, repeat_password } = req.body;
-
-  // Verify again if id and token are valid
-  const [existingUser] = await pool.query(fetchUserByField("id"), [id]);
-  console.log("\n\nuser fetcher from id", existingUser[0]["id"], "\n\n");
-  id = existingUser[0]["id"];
-  if (!existingUser || existingUser.length === 0) {
-    return res.redirect("api/forgot-password?message=user id not found");
-  }
-
-  const user = existingUser[0];
-
-  // We have valid id and valid user with this id
-  const secret = JWT_SECRET + existingUser[0]["password"];
-  try {
-    const payload = jwt.verify(token, secret);
-    // password must match
-    if (password !== repeat_password) {
-      return res.redirect("api/forgot-password?message=passwords do not match");
-    }
-
-    // update with new password hashed
-    const hashedPassword = await bcrypt.hash(password, 10);
-    await pool.query(updatePassword_q, [hashedPassword, id]);
-    console.log("\n\npassword updated\n\n");
-
-    // render
-    res.render("auth/login", {
-      message:
-        "Password updated successfully. Please login with your new password.",
-      user,
-    });
-  } catch (error) {
-    console.log(error.message);
-    res.send(error.message);
-  }
-};
 
 // -----------userUpdate-----------------------
 const getsendEmailToken = async (req, res) => { 
@@ -290,10 +203,6 @@ const postUserUpdate = async (req, res) => {
 };
 
 export default {
-  getForgotPassword,
-  postForgotPassword,
-  getResetPassword,
-  postResetPassword,
   getUserUpdate,
   postUserUpdate,
   getsendEmailToken,

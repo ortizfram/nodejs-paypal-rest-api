@@ -3,12 +3,6 @@
 
     const router = Router();
 
-    // ------------forgotPassword-------------------------
-    router.get("/forgot-password", controller.getForgotPassword)
-    router.post("/forgot-password", controller.postForgotPassword)
-    router.get("/reset-password/:id/:token", controller.getResetPassword)
-    router.post("/reset-password/:id/:token",  controller.postResetPassword)
-
     // ------------userUpdate-------------------------
     router.get("/user-update/:id/confirm", controller.getsendEmailToken)
     router.post("/user-update/:id", controller.postsendEmailToken)
