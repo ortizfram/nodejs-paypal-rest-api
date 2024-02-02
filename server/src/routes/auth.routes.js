@@ -3,12 +3,6 @@
 
     const router = Router();
 
-
-
-    //------------logout-------------------------
-    router.get("/logout", controller.getLogout);
-    router.post("/logout", controller.logout);
-
     // ------------forgotPassword-------------------------
     router.get("/forgot-password", controller.getForgotPassword)
     router.post("/forgot-password", controller.postForgotPassword)

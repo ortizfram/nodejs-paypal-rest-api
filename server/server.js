@@ -175,6 +175,18 @@ app.post('/signup', async(req,res)=>{
   }
 })
 
+app.post("/logout", (req,res)=>{
+  req.session.destroy((err) => {
+    if (err) {
+        console.error("Error destroying session:", err);
+        res.status(500).json({ error: "An error occurred during logout" });
+    } else {
+        console.log("\n*** Logout successful\n");
+        res.status(204).json({ message: "Logged out successfully", redirectUrl:'/' });
+    }
+});
+})
+
 app.get("/api/courses", async (req, res) => {
   try {
     const message = req.query.message;

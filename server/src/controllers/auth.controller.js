@@ -18,24 +18,6 @@ config();
 // JWT_SECRET from env
 const JWT_SECRET = process.env.JWT_SECRET;
 
-//------------logout-------------------------
-const getLogout = (req, res) => {
-  console.log("\n*** Logout\n");
-}
-const logout = (req, res) => {
-  req.session.destroy((err) => {
-      if (err) {
-          console.error("Error destroying session:", err);
-          res.status(500).json({ error: "An error occurred during logout" });
-      } else {
-          console.log("\n*** Logout successful\n");
-          res.status(204).json({ message: "Logged out successfully", redirectUrl:'/' });
-      }
-  });
-};
-
-
-
 // -----------forgotPassword-----------------------
 const getForgotPassword = (req, res) => {
   console.log("\n\n*** getForgotPassword\n\n");
@@ -308,8 +290,6 @@ const postUserUpdate = async (req, res) => {
 };
 
 export default {
-  getLogout,
-  logout,
   getForgotPassword,
   postForgotPassword,
   getResetPassword,
