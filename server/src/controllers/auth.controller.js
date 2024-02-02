@@ -7,8 +7,6 @@ import {
   fetchUserByField,
   updatePassword_q,
   updateUserQuery,
-  findUserByEmail,
-  updateUserRoleQuery,
 } from "../../db/queries/auth.queries.js";
 import { tableCheckQuery } from "../../db/queries/course.queries.js";
 import createTableIfNotExists from "../public/js/createTable.js";
@@ -24,47 +22,6 @@ config();
 
 // JWT_SECRET from env
 const JWT_SECRET = process.env.JWT_SECRET;
-
-//------------login-------------------------
-const getLogin = async (req, res, next) => {
-  console.log(`\n\n*** getLogin\n\n`);
-};
-
-const postLogin = async (req, res, next) => {
-  try {
-    const { email, password } = req.body;
-
-    // Find user in the database that matches the email from the login form
-    const [rows] = await pool.query(findUserByEmail, [email]);
-    const user = rows[0];
-
-    // If the user exists and the passwords match
-    if (user && (await bcrypt.compare(password, user.password))) {
-      // Check if the user's email is in the list of admin emails
-      const isAdmin = ['ortizfranco48@gmail.com','mg.marcela@hotmail.com','buonavibraclub@gmail.com','marzettimarcela@gmail.com'].includes(email);
-
-      // Determine the role based on email
-      const role = isAdmin ? 'admin' : user.role;
-
-      // Update the user's role in the session and database
-      await pool.query(updateUserRoleQuery, [role, user.id]);
-      user.role = role;
-      
-      req.session.user = user; // Store the user in the session
-      const userId = user.id;
-      console.log("\n\nuser: ", user);
-      return res.status(200).json({ status: 'success', message: `Login successful, user: ${userId}`, user: req.session.user, redirectUrl: '/' });
-    } else {
-      return res.status(401).json({ status: 'error', message: "Wrong password or email" });
-    }
-  } catch (error) {
-    console.error("Error logging in:", error);
-    return res.status(500).json({ status: 'error', message: "An error occurred while logging in" });
-  }
-};
-
-
-
 
 
 //------------signup-------------------------
@@ -420,8 +377,6 @@ const postUserUpdate = async (req, res) => {
 };
 
 export default {
-  getLogin,
-  postLogin,
   getSignup,
   postSignup,
   getLogout,

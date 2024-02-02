@@ -15,9 +15,6 @@ export const fetchUserByField = (fieldName) =>`
   SELECT * FROM users WHERE ${fieldName} = ?
 `;
 
-export const updateUserRoleQuery = `
-  UPDATE users SET role = ? WHERE id = ?
-`;
 
 export const setResetToken = `
   UPDATE users SET resetToken = ? WHERE email = ?
@@ -43,4 +40,3 @@ export const createTableUserCourses = `CREATE TABLE IF NOT EXISTS user_courses (
     );`;
 
 export const postSignupQuery = `INSERT INTO users (username, name, email, password, role) VALUES (?, ?, ?, ?, ?)`;
-export const findUserByEmail = `SELECT * FROM users WHERE email = ?`;

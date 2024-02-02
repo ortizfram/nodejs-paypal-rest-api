@@ -8,7 +8,7 @@ import CompBlogCreate from "./blog/BlogCreate.js";
 import CompBlogUpdate from "./blog/BlogUpdate.js";
 import CompHome from "./index/Home.js";
 import CompSignup from "./auth/Signup.js";
-import CompLogin from "./auth/Login.js";
+import Login from "./elements/Login";
 import Courses from "./elements/Courses";
 import CompCourseCreate from "./courses/CourseCreate";
 import ForgotPassword from "./auth/ForgotPass.js";
@@ -45,7 +45,7 @@ function App() {
             {/* router.post("/users", admin_staff_check,controller.getUsers); */}
             {/* AUTH */}
             <Route path="/api/signup" element={<CompSignup />} />
-            <Route path="/api/login" element={<CompLogin />} />
+            <Route path="/login" element={<Login />} />
             <Route path="/api/logout" element={<CompLogout />} />
             <Route path="/api/forgot-password" element={<ForgotPassword />} />
             <Route path="/api/email-sent" element={<EmailSentMessage />} />

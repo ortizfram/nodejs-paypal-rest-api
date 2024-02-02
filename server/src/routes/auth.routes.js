@@ -3,10 +3,7 @@
 
     const router = Router();
 
-    //------------login-------------------------
-    router.get("/login", controller.getLogin);
-    router.post("/login", controller.postLogin);
-    
+
     //------------signup-------------------------
     router.get("/signup", controller.getSignup);
     router.post("/signup", controller.postSignup);

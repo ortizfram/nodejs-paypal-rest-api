@@ -4,6 +4,7 @@ import express from "express";
 import session from "express-session";
 import path from "path";
 import mysql from "mysql2";
+import bcrypt from "bcrypt"
 import { fileURLToPath } from "url";
 import authRoutes from "./src/routes/auth.routes.js";
 import blogRoutes from "./src/routes/blog.routes.js";
@@ -88,6 +89,41 @@ app.use(
 );
 
 // ENDPOINTS   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+app.get("/login", async (req,res)=>{
+  try {
+    const { email, password } = req.body;
+
+    // Find user in the database that matches the email from the login form
+    const sql="SELECT * FROM users WHERE email = ?"
+    const [rows] = await db.promise().execute(sql, [email]);
+    const user = rows[0];
+
+    // If the user exists and the passwords match
+    if (user && (await bcrypt.compare(password, user.password))) {
+      // Check if the user's email is in the list of admin emails
+      const isAdmin = ['ortizfranco48@gmail.com','mg.marcela@hotmail.com','buonavibraclub@gmail.com','marzettimarcela@gmail.com'].includes(email);
+
+      // Determine the role based on email
+      const role = isAdmin ? 'admin' : user.role;
+
+      // Update the user's role in the session and database
+      const sql= "UPDATE users SET role = ? WHERE id = ?"
+      await db.promise().execute(sql, [role, user.id]);
+      user.role = role;
+      
+      req.session.user = user; // Store the user in the session
+      const userId = user.id;
+      console.log("\n\nuser: ", user);
+      return res.status(200).json({ status: 'success', message: `Login successful, user: ${userId}`, user: req.session.user, redirectUrl: '/' });
+    } else {
+      return res.status(401).json({ status: 'error', message: "Wrong password or email" });
+    }
+  } catch (error) {
+    console.error("Error logging in:", error);
+    return res.status(500).json({ status: 'error', message: "An error occurred while logging in" });
+  }
+})
+
 app.get("/api/courses", async (req, res) => {
   try {
     const message = req.query.message;
