@@ -48,12 +48,11 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/logout" element={<Logout />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
-            <Route path="/reset-password" element={<ForgotPassword />} />
-            <Route path="/api/email-sent" element={<EmailSentMessage />} />
             <Route
               path="/reset-password/:id/:token"
               element={<ResetPassword />}
             />
+            <Route path="/email-sent" element={<EmailSentMessage />} />
 
             {/* COURSES */}
             <Route path="/api/courses" element={<Courses />} />

@@ -1,15 +1,13 @@
 import bcrypt from "bcrypt";
-import { db } from "../db.js";
 import {
   fetchUserByField,
-  updatePassword_q,
   updateUserQuery,
 } from "../../db/queries/auth.queries.js";
 import setUserRole from "../public/js/setUserRole.js";
 import jwt from "jsonwebtoken";
 import sendResetEmail from "../utils/sendEmail.js";
 import path from "path";
-import { __dirname } from "../../server.js";
+import { __dirname, db } from "../../server.js";
 
 
 // JWT_SECRET from env
@@ -29,7 +27,7 @@ const postsendEmailToken = async (req, res) => {
   try {
     // 1. GET USER BASED ON ID
     let userId = req.params.id || null;
-    const [existingUser] = await db.promise().execute(fetchUserByField("id"), [userId]);
+    const [existingUser] = await pool.query(fetchUserByField("id"), [userId]);
     console.log("\n\nuser fetcher from id", existingUser[0]["id"]);
     if (!existingUser || existingUser.length === 0) {
       //validation
@@ -155,7 +153,7 @@ const postUserUpdate = async (req, res) => {
   console.log("\n\n---Update Parameters:", updateParams); // Log the update parameters
 
   // query
-  const result = await db.promise().execute(updateUserQuery, updateParams);
+  const result = await pool.query(updateUserQuery, updateParams);
 
   //msg of query & result of query
   console.log("\n\n---Update Query:", updateUserQuery);

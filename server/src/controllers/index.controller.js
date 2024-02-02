@@ -1,7 +1,7 @@
 // controllers/indexController.js
-import { db } from "../db.js";
 import path from "path";
 import sendEmailContactForm from "../utils/sendEmailContactForm.js";
+import { db } from "../../server.js";
 
 const getPing = async (req, res) => {
   // const [result] = await db.promise().execute('SELECT "PONG" AS result');

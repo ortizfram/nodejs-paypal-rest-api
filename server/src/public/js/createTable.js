@@ -1,6 +1,6 @@
 // createTable.js
 import { tableCheckQuery } from "../../../db/queries/course.queries.js";
-import { db } from "../../db.js";
+import { db } from "../../../server.js";
 
 const createTableIfNotExists = async (pool, tableCheckQuery, createTableQuery, tableName) => {
     try {

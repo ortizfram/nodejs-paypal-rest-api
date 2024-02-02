@@ -6,7 +6,7 @@ import {
   delEmployeeQuery,
   putEmployeeQuery,
 } from "../../db/queries.js";
-import { db } from "../db.js";
+import { db } from "../../server.js";
 
 const getEmployees = async (req, res) => {
   const [rows] = await db.promise().execute(getEmployeesQuery);

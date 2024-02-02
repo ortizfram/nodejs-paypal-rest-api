@@ -1,6 +1,5 @@
 //src/controllers/courses.controller.js
 import slugify from "slugify";
-import { db } from "../db.js";
 import path from "path";
 import moveFile from "../utils/moveFile.js";
 import {
@@ -18,7 +17,7 @@ import {
   tableCheckQuery,
   updateCourseQuery,
 } from "../../db/queries/course.queries.js";
-import { __dirname, setCustomMimeTypes } from "../../server.js";
+import { __dirname, db, setCustomMimeTypes } from "../../server.js";
 import { fetchUserByField } from "../../db/queries/auth.queries.js";
 
 //COURSE CREATE/UPDATE/DELETE

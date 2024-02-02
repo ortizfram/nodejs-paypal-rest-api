@@ -1,5 +1,5 @@
 import { listUsers_q, userSearch_q } from "../../../db/queries/admin.queries.js";
-import { db } from "../../db.js";
+import { db } from "../../../server.js";
 
 const userSearch = async (searchQuery) => {
   try {

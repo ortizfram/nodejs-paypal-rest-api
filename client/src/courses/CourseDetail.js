@@ -5,7 +5,7 @@ import CompFooter from '../template/Footer';
 import { useUserContext } from '../hooks/UserContext';
 import '../public/css/course/courseDetail.css';
 
-const URI = "http://localhost:5000/api/course/:id";
+const URI = "/api/course/:id";
 
 const CourseDetailComponent = () => {
   const { userData } = useUserContext();

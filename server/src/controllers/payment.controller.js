@@ -11,10 +11,10 @@
     insertUserCourseQuery,
     tableCheckQuery,
   } from "../../db/queries/course.queries.js";
-  import { db } from "../db.js";
   import { createTableUserCourses, createUserTableQuery } from "../../db/queries/auth.queries.js";
   import mercadopago from "mercadopago";
 import createTableIfNotExists from "../public/js/createTable.js";
+import { db } from "../../server.js";
 
 
   // PAYPAL ---------------------------------------------------

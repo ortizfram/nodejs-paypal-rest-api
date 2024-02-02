@@ -4,23 +4,7 @@ import {DB_HOST, DB_NAME, DB_PASSWORD, DB_PORT, DB_USER} from "./config.js"
 import { createUserTableQuery } from "../db/queries/auth.queries.js";
 import { createCourseTableQuery } from "../db/queries/course.queries.js";
 import { createBlogTable } from "../db/queries/blog.queries.js";
-
-const isDev = process.env.NODE_ENV === 'development';
-export const db = mysql.createConnection({
-  host: isDev ? "127.0.0.1" : process.env.DB_HOST,
-  user: isDev ? "root" : process.env.DB_USER,
-  password: isDev ? "melonmelon" : process.env.DB_PASSWORD,
-  database: isDev ? "conn" : process.env.DB_NAME,
-  port: isDev ? 3307 : process.env.DB_PORT,
-});
-db.connect((err) => {
-  if (err) {
-    console.error("Error connecting to MySQL database:", err);
-    return;
-  }
-  console.log("Connected to MySQL database");
-
-});
+import { db } from "../server.js";
 
 // Example query to test the connection
 async function testConnection() {

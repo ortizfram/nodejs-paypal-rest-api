@@ -21,10 +21,6 @@ export const setResetToken = `
 `;
 
 
-export const updatePassword_q = `
-  UPDATE users SET password = ? WHERE id = ?
-`;
-
 export const updateUserQuery = `
     UPDATE users 
     SET username = ?, name = ?, email = ?, avatar = ?, password = ? 

@@ -39,7 +39,6 @@ const ForgotPassword = () => {
             id="email"
             name="email"
             placeholder="Email"
-            value={email}
             onChange={(e) => setEmail(e.target.value)}
           /><br />
           <button type="submit">Recuperar</button>

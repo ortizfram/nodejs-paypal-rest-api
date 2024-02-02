@@ -11,7 +11,6 @@ const ResetPassword = () => {
   const handleResetPasswordSubmit = async (e) => {
     e.preventDefault();
 
-
     try {
       const response = await axios.post(
         `/reset-password/${id}/${token}`,
