@@ -3,6 +3,7 @@ import { config } from 'dotenv';
 import express from 'express';
 import session from "express-session";
 import path from "path";
+import mysql from "mysql2"
 import { fileURLToPath } from "url";
 import authRoutes from "./src/routes/auth.routes.js";
 import blogRoutes from "./src/routes/blog.routes.js";
@@ -14,29 +15,44 @@ import indexRoutes from "./src/routes/index.routes.js";
 import morgan from "morgan";
 import methodOverride from "method-override";
 import fileUpload from "express-fileupload";
-import { pool } from "./src/db.js";
 import { getUserEnrolledCoursesQuery } from "./db/queries/course.queries.js";
 import { Marked, marked } from "marked";
 import bodyParser from 'body-parser';
 import multer from 'multer';
-
 config();
-
-const port = 5000; 
-const HOST = process.env.HOST; 
-const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000'; 
-const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:5000'; 
-
-// shortcuts for files/dirs
-export const __filename = fileURLToPath(import.meta.url);
-export const __dirname = path.dirname(__filename);
 
 
 const app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(fileUpload());
-app.use(cors({ origin: 'http://localhost:3000', credentials: true })); // frontend app can ask data
+app.use(cors());
+const port = 5000; 
+
+const db = mysql.createConnection({
+  host: "127.0.0.1",
+  user: "root",
+  password: "melonmelon",
+  database: "conn",
+  port: 3307
+})
+db.connect((err) => {
+  if (err) {
+      console.error('Error connecting to MySQL database:', err);
+      return;
+  }
+  console.log('Connected to MySQL database');
+});
+
+const HOST = process.env.HOST; 
+const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000'; 
+const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:5000'; 
+
+
+// shortcuts for files/dirs
+export const __filename = fileURLToPath(import.meta.url);
+export const __dirname = path.dirname(__filename);
+
 
 // MULTER : file uploading config *******************************************************************************
 // Multer storage configuration for images
@@ -62,10 +78,6 @@ const uploadVideo = multer({ storage: videoStorage });
 
 
 
-// CONNECTION ********************************************************************************************************************
-app.listen(port, () => {
-    console.log(`Listening ${BACKEND_URL}`);
-  });
 
 // Use sessions
 app.use(
@@ -75,6 +87,15 @@ app.use(
     saveUninitialized: true,
   })
 );
+
+// ENDPOINTS   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+app.get('/courses', (req, res) => {
+  const sql = "SELECT * FROM courses"
+  db.query(sql, (err, result)=> {
+      if(err) res.json({message:"Server Error", err}) 
+      return res.json(result)
+  })
+});
 
 
 // Use ROUTES app ==========================================================
@@ -264,6 +285,11 @@ export async function admin_staff_clicking_course (req, res, next) {
 }
 
 
+
+// CONNECTION ********************************************************************************************************************
+app.listen(port, () => {
+    console.log(`Listening ${BACKEND_URL}`);
+  });
 
 export default app;
 

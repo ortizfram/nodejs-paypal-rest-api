@@ -19,7 +19,6 @@ async function testConnection() {
   try {
     const [result] = await pool.query('SELECT DATABASE() AS database_name');
     const [tablesResult] = await pool.query('SHOW TABLES');
-    console.log('✅ DB connected:', result[0]);
   } catch (error) {
     console.error('Error connecting to the database:', error);
   }
@@ -30,7 +29,6 @@ async function tablesCreation() {
     await pool.query(createUserTableQuery);
     await pool.query(createCourseTableQuery);
     await pool.query(createBlogTable);
-    console.log("📋 ALL TABLES WERE CREATED");
   } catch (error) {
     console.error('Error creating tables', error);
   }

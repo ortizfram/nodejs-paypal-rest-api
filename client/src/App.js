@@ -9,7 +9,7 @@ import CompBlogUpdate from "./blog/BlogUpdate.js";
 import CompHome from "./index/Home.js";
 import CompSignup from "./auth/Signup.js";
 import CompLogin from "./auth/Login.js";
-import CompCourses from "./courses/Courses";
+import Courses from "./elements/Courses.jsx";
 import CompCourseCreate from "./courses/CourseCreate";
 import ForgotPassword from "./auth/ForgotPass.js";
 import EmailSentMessage from "./auth/EmailSent.js";
@@ -55,7 +55,7 @@ function App() {
             />
 
             {/* COURSES */}
-            <Route path="/api/courses" element={<CompCourses />} />
+            <Route path="/api/courses" element={<Courses />} />
             <Route path="/api/course/create" element={<CompCourseCreate />} />
             <Route path="/api/course/:id" element={<CourseDetailComponent />} />
   
