@@ -13,7 +13,7 @@ import Logout from "./elements/Logout";
 import ForgotPassword from "./elements/ForgotPassword";
 import ResetPassword from "./elements/ResetPassword";
 import Courses from "./elements/Courses";
-import CompCourseCreate from "./courses/CourseCreate";
+import CourseCreate from "./elements/CourseCreate";
 import EmailSentMessage from "./auth/EmailSent.js";
 
 // import Hooks
@@ -56,7 +56,7 @@ function App() {
 
             {/* COURSES */}
             <Route path="/api/courses" element={<Courses />} />
-            <Route path="/api/course/create" element={<CompCourseCreate />} />
+            <Route path="/api/course/create" element={<CourseCreate />} />
             <Route path="/api/course/:id" element={<CourseDetailComponent />} />
   
             {/* BLOGS */}

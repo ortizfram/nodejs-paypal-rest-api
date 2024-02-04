@@ -7,8 +7,6 @@ const router = Router();
 
 
 //------------courseCreate/Update-------------------------
-router.get("/course/create", admin_staff_check, controllers.getCourseCreate);//get
-router.post('/course/create', controllers.postCourseCreate);//post
 router.get('/course/:id/update', admin_staff_check, controllers.getCourseUpdate);//get update
 router.post('/course/:id/update',  admin_staff_check, controllers.postCourseUpdate);// post update
 router.get('/course/:id/delete',  admin_staff_check, controllers.getCourseDelete);// get del
