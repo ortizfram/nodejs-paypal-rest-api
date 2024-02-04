@@ -240,7 +240,7 @@ app.post("/forgot-password", async (req, res) => {
       id: existingUser[0]["id"],
     };
     const token = jwt.sign(payload, secret, { expiresIn: "1y" });
-    const link = `${BACKEND_URL}/reset-password/${userId}/${token}`;
+    const link = `${FRONTEND_URL}/reset-password/${userId}/${token}`;
 
     await sendResetEmail(
       email,
@@ -258,8 +258,9 @@ app.post("/forgot-password", async (req, res) => {
   }
 });
 
-app.post("/reset-password", async (req, res) => {
+app.post("/reset-password/:id/:token", async (req, res) => {
   let { id, token } = req.params;
+  console.log(`id${id},token${token}`)
   const { password, repeat_password } = req.body;
 
   // Verify again if id and token are valid
@@ -276,7 +277,7 @@ app.post("/reset-password", async (req, res) => {
   const user = existingUser[0];
 
   // We have valid id and valid user with this id
-  const secret = JWT_SECRET + existingUser[0]["password"];
+  const secret = process.env.JWT_SECRET + existingUser[0]["password"];
   try {
     const payload = jwt.verify(token, secret);
     // password must match
@@ -286,7 +287,7 @@ app.post("/reset-password", async (req, res) => {
 
     // update with a new password hashed
     const hashedPassword = await bcrypt.hash(password, 10);
-    let sql = "UPDATE users SET password = ? WHERE id = ?"
+    sql = "UPDATE users SET password = ? WHERE id = ?"
     await db.promise().execute(sql, [hashedPassword, id]);
     console.log("\n\nPassword updated\n\n");
 

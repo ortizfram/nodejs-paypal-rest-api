@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 
 const ResetPassword = () => {
-    const { id, token } = useParams();
+  const { id, token } = useParams();
+  const navigate = useNavigate();
   const [password, setPassword] = useState('');
   const [repeatPassword, setRepeatPassword] = useState('');
   const [message, setMessage] = useState(null);
@@ -20,6 +21,7 @@ const ResetPassword = () => {
       if (response.data.message) {
         setMessage(response.data.message);
         // Handle success, e.g., redirect or show a success message
+        navigate('/login')
       } else {
         setMessage(response.data.error || 'Unexpected response format. Please try again.');
       }
