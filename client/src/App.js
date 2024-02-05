@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import CompBlogList from "./blog/BlogList.js";
 import CompBlogCreate from "./blog/BlogCreate.js";
 import CompBlogUpdate from "./blog/BlogUpdate.js";
-import CompHome from "./index/Home.js";
+import Home from "./elements/Home";
 import Signup from "./elements/Signup";
 import Login from "./elements/Login";
 import Logout from "./elements/Logout";
@@ -15,7 +15,7 @@ import ResetPassword from "./elements/ResetPassword";
 import Courses from "./elements/Courses";
 import CourseCreate from "./elements/CourseCreate";
 import CourseDetail from "./elements/CourseDetail";
-import CourseUpdate from "./elements/CourseUpdate.jsx";
+import CourseUpdate from "./elements/CourseUpdate";
 import EmailSentMessage from "./auth/EmailSent.js";
 
 // import Hooks
@@ -40,7 +40,7 @@ function App() {
         <UserContextProvider>
           <Routes>
             {/* INDEX */}
-            <Route path="/" element={<CompHome />} />
+            <Route path="/" element={<Home />} />
             {/* AADMIN */}
             {/* router.post("/users/change-role", admin_staff_check, controller.changeUserRole); */}
             {/* router.post("/users", admin_staff_check,controller.getUsers); */}
@@ -59,7 +59,7 @@ function App() {
             <Route path="/api/courses" element={<Courses />} />
             <Route path="/api/course/create" element={<CourseCreate />} />
             <Route path="/api/course/:id" element={<CourseDetail/>} />
-            <Route path="/api/course/:id/update" element={<CourseUpdate/>} />
+            <Route path="/api/course/update/:id" element={<CourseUpdate/>} />
   
             {/* BLOGS */}
             <Route path="/api/blog" element={<CompBlogList />} />

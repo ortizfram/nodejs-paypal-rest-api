@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useUserContext } from "../hooks/UserContext";
 import axios from "axios";
-import "../public/css/course/courseUpdate.css"
+import "../public/css/course/courseUpdate.css";
 
 const CourseUpdate = () => {
   const { userData } = useUserContext();
@@ -44,10 +44,10 @@ const CourseUpdate = () => {
   const handleUpdateCourse = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post(`/api/course/${id}/update`, course);
+      const response = await axios.post(`http://localhost:5000/api/course/update/${id}`, course);
       if (response.status === 200) {
         alert("Course updated successfully!");
-        navigate.push(`/api/course/${id}`);
+        navigate(`/course/${id}`);
       } else {
         console.error("Error updating course. Server response:", response);
         alert("Some error occurred while updating the course.");

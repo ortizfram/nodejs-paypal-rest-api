@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { useUserContext } from "../hooks/UserContext";
+import "../public/css/layout/navbar.css"
 
 // NodeJS endpoint reference
 const URI = "http://localhost:5000"; // Update the base URL
@@ -12,7 +13,6 @@ const CompNavbar = () => {
 
     let user = userData;
     
-
     return (
         <>
           <header className="header shadow-lg">

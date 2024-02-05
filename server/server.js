@@ -91,6 +91,9 @@ app.use(
 );
 
 // ENDPOINTS   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+app.get("/", (req,res)=> {
+  
+})
 app.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -581,7 +584,7 @@ LIMIT ?,?`;
   }
 });
 
-app.get("/api/course/:id", async (req,res)=>{
+app.get("/api/course/:id", async (req, res) => {
   let courseId = req.params.id;
   const user = req.session.user || null;
   const message = req.query.message;
@@ -589,17 +592,19 @@ app.get("/api/course/:id", async (req,res)=>{
   try {
     console.log("\nCourseId:", courseId);
     let sql = `
-    SELECT 
-      courses.*,
-      users.id AS author_id,
-      users.name AS author_name,
-      users.username AS author_username,
-      users.avatar AS author_avatar
-    FROM 
-      courses
-    LEFT JOIN 
-      users ON users.id = courses.author_id
-    `
+      SELECT 
+        courses.*,
+        users.id AS author_id,
+        users.name AS author_name,
+        users.username AS author_username,
+        users.avatar AS author_avatar
+      FROM 
+        courses
+      LEFT JOIN 
+        users ON users.id = courses.author_id
+      WHERE 
+        courses.id = ?;
+    `;
     const [courseRows] = await db.promise().execute(sql, [courseId]);
 
     if (!courseRows || courseRows.length === 0) {
@@ -624,19 +629,17 @@ app.get("/api/course/:id", async (req,res)=>{
 
     // Fetching author details
     sql = `
-    SELECT 
-      id AS author_id,
-      name AS author_name,
-      username AS author_username,
-      avatar AS author_avatar
-    FROM 
-      users 
-    WHERE 
-      id = ?;
-  `
-    const [authorRows] = await db.promise().execute(sql, [
-      course.author_id,
-    ]);
+      SELECT 
+        id AS author_id,
+        name AS author_name,
+        username AS author_username,
+        avatar AS author_avatar
+      FROM 
+        users 
+      WHERE 
+        id = ?;
+    `;
+    const [authorRows] = await db.promise().execute(sql, [course.author_id]);
     const author = authorRows[0];
     console.log(author);
 
@@ -655,24 +658,22 @@ app.get("/api/course/:id", async (req,res)=>{
     // Fill array with query result
     let enrolledCourses = [];
     sql = `
-    SELECT 
-      courses.*,
-      users.name AS author_name,
-      users.username AS author_username,
-      users.avatar AS author_avatar
-    FROM 
-      user_courses 
-    JOIN 
-      courses ON user_courses.course_id = courses.id
-    JOIN 
-      users ON courses.author_id = users.id
-    WHERE 
-      user_courses.user_id = ?
-`    
+      SELECT 
+        courses.*,
+        users.name AS author_name,
+        users.username AS author_username,
+        users.avatar AS author_avatar
+      FROM 
+        user_courses 
+      JOIN 
+        courses ON user_courses.course_id = courses.id
+      JOIN 
+        users ON courses.author_id = users.id
+      WHERE 
+        user_courses.user_id = ?;
+    `;
     if (user) {
-      const [enrolledRows] = await db.promise().execute(sql, [
-        user.id,
-      ]);
+      const [enrolledRows] = await db.promise().execute(sql, [user.id]);
       enrolledCourses = enrolledRows[0]?.enrolled_courses || [];
     }
 
@@ -687,103 +688,83 @@ app.get("/api/course/:id", async (req,res)=>{
     console.error("Error fetching the course:", error);
     res.status(500).json({ error: "Error fetching the course" });
   }
-})
+});
 
-app.post("/api/course/:id/update", async(req,res) => {
+app.post("/api/course/update/:id", async (req, res) => {
   // get courseId
-  let courseId = req.params.id; // Assuming the ID is coming from the request body
-  let sql = `SELECT 
-  blogs.*,
-  users.name AS author_name,
-  users.username AS author_username,
-  users.avatar AS author_avatar
-  FROM 
-  blogs
-  LEFT JOIN 
-  users ON users.id = courses.author_id
-  WHERE
-  blogs.id = ?`
-  const [courseRows] = await db.promise().execute(sql, [courseId]);
-  const course = courseRows[0];
-  courseId = course.id;
-  console.log(`\n--- courseId: ${courseId}\n`);
-
-  // Declare
-  let courseSlug;
-  let thumbnailPath;
-  let thumbnail;
-  let discountValue;
-
-  // file upload check
-  if (!req.files || Object.keys(req.files).length === 0) {
-    const message = `(ERROR): no Thumbnail was uploaded, try again uploading a file.`;
-    return res.redirect(
-      `/api/course/${courseId}/update?courseId=${courseId}&message=${message}`
-    );
-  }
+  let courseId = req.params.id; // Assuming the ID is coming from the request params
+  let sql = `
+    UPDATE courses
+    SET title = ?,
+        slug = ?,
+        description = ?,
+        text_content = ?,
+        video = ?,
+        ars_price = ?,
+        usd_price = ?,
+        discount = ?,
+        thumbnail = ?,
+        updated_at = ${argentinaTimeZone}
+    WHERE id = ?;
+  `;
 
   const timestamp = Date.now();
 
-  // Check if thumbnail uploaded, encode, move
-  if (req.files && req.files.thumbnail) {
-    const filename = req.files.thumbnail.name;
-    const uniqueFilename = encodeURIComponent(`${timestamp}_${filename}`);
-    thumbnailPath = "/uploads/" + uniqueFilename;
-
-    // Assign the uploaded thumbnail file to the 'thumbnail' variable
-    thumbnail = req.files.thumbnail;
-
-    // Use mv() to place file on the server
-    await thumbnail.mv(path.join(__dirname, "uploads", uniqueFilename));
-  } else {
-    // If no new thumbnail uploaded, retain the existing thumbnail path
-    thumbnailPath = course.thumbnail; // Assuming course.thumbnail holds the existing thumbnail path
-  }
-
-  // Generate unique filename for video
-  const videoFile = req.files.video;
-  const videoFilename = videoFile.name.split(" ")[0];
-  const uniqueVideoFilename = encodeURIComponent(
-    `${timestamp}_${videoFilename}`
-  );
-  const videoPath = "/uploads/videos/" + uniqueVideoFilename;
-
-  // video file upload handling
-  videoFile.mv(
-    path.join(__dirname, "uploads/videos", uniqueVideoFilename),
-    async (err) => {
-      if (err) {
-        console.error(err);
-        return res.status(500).send("Error uploading the video file");
-      }
-    }
-  );
-
   try {
-    // req fields
+    // Destructure req.body for easier use
     const {
       title,
       description,
       text_content,
-      video,
       ars_price,
       usd_price,
       discount,
     } = req.body;
 
     // Autogenerate slug from title
-    if (typeof title === "string" && title.trim() !== "") {
-      courseSlug = slugify(title, { lower: true, strict: true });
+    const courseSlug = slugify(title, { lower: true, strict: true });
+
+    // !if discount: null
+    const discountValue = discount !== "" ? discount : null;
+
+    // Check if thumbnail uploaded, encode, move
+    let thumbnailPath;
+    if (req.files && req.files.thumbnail) {
+      const filename = req.files.thumbnail.name;
+      const uniqueFilename = encodeURIComponent(`${timestamp}_${filename}`);
+      thumbnailPath = "/uploads/" + uniqueFilename;
+
+      // Assign the uploaded thumbnail file to the 'thumbnail' variable
+      const thumbnail = req.files.thumbnail;
+
+      // Use mv() to place file on the server
+      await thumbnail.mv(path.join(__dirname, "uploads", uniqueFilename));
+    } else {
+      // If no new thumbnail uploaded, retain the existing thumbnail path
+      const [existingThumbnailRows] = await db
+        .promise()
+        .execute("SELECT thumbnail FROM courses WHERE id = ?", [courseId]);
+      thumbnailPath = existingThumbnailRows[0]?.thumbnail || "";
     }
 
-    // !if discount : null
-    discountValue = discount !== "" ? discount : null;
+    // Generate unique filename for video
+    const videoFile = req.files.video;
+    const videoFilename = videoFile.name.split(" ")[0];
+    const uniqueVideoFilename = encodeURIComponent(
+      `${timestamp}_${videoFilename}`
+    );
+    const videoPath = "/uploads/videos/" + uniqueVideoFilename;
 
-    // Get current timestamp in the format 'YYYY-MM-DD HH:MM:SS'
-    const currentTimestamp = new Date()
-      .toISOString()
-      .slice(0, 19)
-      .replace("T", " ");
+    // video file upload handling
+    videoFile.mv(
+      path.join(__dirname, "uploads/videos", uniqueVideoFilename),
+      async (err) => {
+        if (err) {
+          console.error(err);
+          return res.status(500).send("Error uploading the video file");
+        }
+      }
+    );
 
     const updateParams = [
       title,
@@ -795,34 +776,23 @@ app.post("/api/course/:id/update", async(req,res) => {
       usd_price,
       discountValue,
       thumbnailPath,
-      courseId, // where course.id
+      courseId,
     ];
 
-    // msg
-    console.log("\n\n---Update Parameters:", updateParams); // Log the update parameters
-
     // Execute update query
-    sql = `
-    UPDATE courses
-    SET title = ?, slug = ?, description = ?, text_content = ?,video = ?, ars_price = ?, usd_price = ?, discount = ?, thumbnail = ?, updated_at = ${argentinaTimeZone}
-    WHERE id = ?;
-  `
     const result = await db.promise().execute(sql, updateParams);
 
-    //msg of query & result of query
-    console.log("\n\n---Update Query:", updateCourseQuery);
-    console.log("\n\n---Query Result:", result); // Log the result of the query execution
+    // Log the result of the query execution
+    console.log("\n\n---Update Query Result:", result);
 
-    // update check msg
+    // Update check msg
     if (result && result[0].affectedRows !== undefined) {
-      //show if affected rows
+      // Show if affected rows
       const affectedRows = parseInt(result[0].affectedRows);
       console.log("\n\n---Affected Rows:", affectedRows);
 
-      const user = req.session.user || null;
-
       if (affectedRows > 0) {
-        const message = "course updated correctly";
+        const message = "Course updated correctly";
         console.log(`\n\n\→ Go to courseModules: ${message}`);
 
         // Set MIME type for the uploaded video
@@ -836,20 +806,18 @@ app.post("/api/course/:id/update", async(req,res) => {
 
         res.redirect(`/api/course/${courseId}`);
       } else {
-        const message = "no changes made to course";
+        const message = "No changes made to the course";
         console.log(`\n\n\→ Go to courseModules: ${message}`);
-        res.status(201).redirect(
-          `/api/course/${courseId}`
-          // `/api/course/${courseId}/module/update?courseId=${courseId}`
-        );
+        res.status(201).redirect(`/api/course/${courseId}`);
       }
     }
   } catch (error) {
     console.error("Error updating course:", error);
-    console.error("Database Error:", error.sqlMessage); // Log the database error message
+    console.error("Database Error:", error.sqlMessage);
     res.status(500).json({ message: "Error updating the course" });
   }
-})
+});
+
 // &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 
 // Handling thumbnail upload route
