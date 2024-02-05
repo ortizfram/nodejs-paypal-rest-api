@@ -475,7 +475,7 @@ app.post('/api/course/create', async (req,res)=>{
 })
 
 app.get("/api/courses", async (req, res) => {
-  try {
+try {
     const message = req.query.message;
     let user = req.session.user;
     const isAdmin = user && user.role === "admin";
@@ -826,6 +826,7 @@ app.post("/upload/image", uploadImage.single("thumbnail"), (req, res) => {
   if (!req.file) {
     return res.status(400).send("No thumbnail uploaded.");
   }
+  console.log(req.body);
   const imageUrl = `/imgs/${req.file.filename}`;
   res.status(200).json({ imageUrl: imageUrl });
 });
@@ -835,6 +836,7 @@ app.post("/upload/video", uploadVideo.single("video"), (req, res) => {
   if (!req.file) {
     return res.status(400).send("No video uploaded.");
   }
+  console.log(req.body);
   const videoUrl = `/videos/${req.file.filename}`;
   res.status(200).json({ videoUrl: videoUrl });
 });

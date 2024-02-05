@@ -61,13 +61,8 @@ const CourseUpdate = () => {
       formData.append("thumbnail", thumbnail);
 
       const response = await axios.post(
-        `/upload/image/${id}`, // Update with the appropriate endpoint for updating thumbnails
+        `http://localhost:5000/upload/image`, // Update with the appropriate endpoint for updating thumbnails
         formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
       );
 
       setThumbnailUrl(response.data.imageUrl);
@@ -84,13 +79,8 @@ const CourseUpdate = () => {
       formData.append("video", video);
 
       const response = await axios.post(
-        `/upload/video/${id}`, // Update with the appropriate endpoint for updating videos
+        `http://localhost:5000/upload/video`, // Update with the appropriate endpoint for updating videos
         formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
       );
 
       setVideoUrl(response.data.videoUrl);
