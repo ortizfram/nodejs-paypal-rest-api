@@ -14,11 +14,11 @@ import ForgotPassword from "./elements/ForgotPassword";
 import ResetPassword from "./elements/ResetPassword";
 import Courses from "./elements/Courses";
 import CourseCreate from "./elements/CourseCreate";
+import CourseDetail from "./elements/CourseDetail";
 import EmailSentMessage from "./auth/EmailSent.js";
 
 // import Hooks
 import { UserContextProvider } from "./hooks/UserContext.js";
-import CourseDetailComponent from "./courses/CourseDetail.js";
 
 function App() {
   const [message, setMessage] = useState("");
@@ -57,7 +57,7 @@ function App() {
             {/* COURSES */}
             <Route path="/api/courses" element={<Courses />} />
             <Route path="/api/course/create" element={<CourseCreate />} />
-            <Route path="/api/course/:id" element={<CourseDetailComponent />} />
+            <Route path="/api/courses/:id" element={<CourseDetail/>} />
   
             {/* BLOGS */}
             <Route path="/api/blog" element={<CompBlogList />} />

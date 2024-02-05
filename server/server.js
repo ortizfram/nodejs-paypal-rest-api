@@ -580,6 +580,76 @@ LIMIT ?,?`;
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
+
+app.get("/api/courses/:id", async (req,res)=>{
+  let courseId = req.params.id;
+  const user = req.session.user || null;
+  const message = req.query.message;
+
+  try {
+    console.log("\nCourseId:", courseId);
+    const [courseRows] = await db.promise().execute(getCourseFromIdQuery, courseId);
+
+    if (!courseRows || courseRows.length === 0) {
+      return res.status(404).json({ error: "Course not found" });
+    }
+
+    const course = courseRows[0];
+    console.log(course);
+    console.log("\n\ncourse.video", course.video);
+    courseId = course.id;
+
+    // Format course timestamps and video_link
+    const formattedCourse = {
+      ...course,
+      created_at: new Date(course.created_at).toLocaleString(),
+      updated_at: new Date(course.updated_at).toLocaleString(),
+    };
+
+    if (!course) {
+      return res.status(404).json({ error: "Course not found" });
+    }
+
+    // Fetching author details
+    const [authorRows] = await db.promise().execute(getCourseAuthorQuery, [
+      course.author_id,
+    ]);
+    const author = authorRows[0];
+    console.log(author);
+
+    if (!author) {
+      return res.status(404).json({ error: "Author details not found" });
+    }
+
+    // Extend formattedCourse with author details
+    formattedCourse.author = {
+      name: author.author_name,
+      username: author.author_username,
+      avatar: author.author_avatar,
+    };
+    console.log(formattedCourse.author);
+
+    // Fill array with query result
+    let enrolledCourses = [];
+    if (user) {
+      const [enrolledRows] = await db.promise().execute(getUserEnrolledCoursesQuery, [
+        user.id,
+      ]);
+      enrolledCourses = enrolledRows[0]?.enrolled_courses || [];
+    }
+
+    // Send JSON response with the fetched data
+    res.json({
+      course: formattedCourse,
+      message,
+      user,
+      enrolledCourses,
+    });
+  } catch (error) {
+    console.error("Error fetching the course:", error);
+    res.status(500).json({ error: "Error fetching the course" });
+  }
+})
 // &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 
 // Handling thumbnail upload route
