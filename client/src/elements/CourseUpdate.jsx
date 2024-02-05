@@ -10,6 +10,10 @@ const CourseUpdate = () => {
   const { id } = useParams();
   const navigate = useNavigate();
 
+  const [video, setVideo] = useState("");
+  const [thumbnail, setThumbnail] = useState("");
+  const [videoUrl, setVideoUrl] = useState("");
+  const [thumbnailUrl, setThumbnailUrl] = useState("");
   const [course, setCourse] = useState({
     title: "",
     description: "",
@@ -41,10 +45,70 @@ const CourseUpdate = () => {
     }));
   };
 
+  const handleThumbnailChange = (e) => {
+    setThumbnail(e.target.files[0]);
+    setThumbnailUrl(null); // Clear previous image when a new file is selected
+  };
+
+  const handleVideoChange = (e) => {
+    setVideo(e.target.files[0]);
+    setVideoUrl(null); // Clear previous video when a new file is selected
+  };
+
+  const handleThumbnailUpload = async () => {
+    try {
+      const formData = new FormData();
+      formData.append("thumbnail", thumbnail);
+
+      const response = await axios.post(
+        `/upload/image/${id}`, // Update with the appropriate endpoint for updating thumbnails
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      setThumbnailUrl(response.data.imageUrl);
+      alert("Thumbnail updated successfully.");
+    } catch (error) {
+      console.error("Error updating thumbnail:", error.message);
+      alert("Error updating thumbnail.");
+    }
+  };
+
+  const handleVideoUpload = async () => {
+    try {
+      const formData = new FormData();
+      formData.append("video", video);
+
+      const response = await axios.post(
+        `/upload/video/${id}`, // Update with the appropriate endpoint for updating videos
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      setVideoUrl(response.data.videoUrl);
+      alert("Video updated successfully.");
+    } catch (error) {
+      console.error("Error updating video:", error.message);
+      alert("Error updating video.");
+    }
+  };
+
   const handleUpdateCourse = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post(`http://localhost:5000/api/course/update/${id}`, course);
+      const updatedCourse = { ...course, videoUrl, thumbnailUrl };
+      const response = await axios.post(
+        `http://localhost:5000/api/course/update/${id}`,
+        updatedCourse
+      );
       if (response.status === 200) {
         alert("Course updated successfully!");
         navigate(`/course/${id}`);
@@ -84,7 +148,31 @@ const CourseUpdate = () => {
           value={course.text_content}
           onChange={handleInputChange}
         ></textarea>
-
+        <br />
+        <h3>Update Video</h3>
+        <label htmlFor="video">Upload new video:</label>
+        <br />
+        <input
+          type="file"
+          name="video"
+          accept="video/*"
+          onChange={handleVideoChange}
+        />
+        <button onClick={handleVideoUpload}>Update Video</button>
+        <br />
+        <hr />
+        <h3>Update Thumbnail</h3>
+        <label htmlFor="thumbnail">Upload new thumbnail:</label>
+        <br />
+        <input
+          type="file"
+          name="thumbnail"
+          accept="image/*"
+          onChange={handleThumbnailChange}
+        />
+        <button onClick={handleThumbnailUpload}>Update Thumbnail</button>
+        <br />
+        <hr />
         <label htmlFor="ars_price">ARS Price:</label>
         <input
           type="number"

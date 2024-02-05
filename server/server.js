@@ -6,6 +6,7 @@ import mysql from "mysql2";
 import bcrypt from "bcrypt";
 import sendResetEmail from "./src/utils/sendEmail.js";
 import jwt from "jsonwebtoken";
+import slugify from "slugify"
 import { fileURLToPath } from "url";
 import authRoutes from "./src/routes/auth.routes.js";
 import blogRoutes from "./src/routes/blog.routes.js";
@@ -704,7 +705,7 @@ app.post("/api/course/update/:id", async (req, res) => {
         usd_price = ?,
         discount = ?,
         thumbnail = ?,
-        updated_at = ${argentinaTimeZone}
+        updated_at = CONVERT_TZ(NOW(), 'UTC', 'America/Argentina/Buenos_Aires')
     WHERE id = ?;
   `;
 
