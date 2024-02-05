@@ -115,7 +115,7 @@ const CourseUpdate = () => {
   return (
     <div>
       <h1>Update Course</h1>
-      <form onSubmit={handleUpdateCourse}>
+      <form onSubmit={handleUpdateCourse} encType="multipart/form-data">
         <label htmlFor="title">Title:</label>
         <input
           type="text"
