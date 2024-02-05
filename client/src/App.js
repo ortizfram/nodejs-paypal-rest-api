@@ -57,7 +57,7 @@ function App() {
             {/* COURSES */}
             <Route path="/api/courses" element={<Courses />} />
             <Route path="/api/course/create" element={<CourseCreate />} />
-            <Route path="/api/courses/:id" element={<CourseDetail/>} />
+            <Route path="/api/course/:id" element={<CourseDetail/>} />
   
             {/* BLOGS */}
             <Route path="/api/blog" element={<CompBlogList />} />

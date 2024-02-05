@@ -581,14 +581,26 @@ LIMIT ?,?`;
   }
 });
 
-app.get("/api/courses/:id", async (req,res)=>{
+app.get("/api/course/:id", async (req,res)=>{
   let courseId = req.params.id;
   const user = req.session.user || null;
   const message = req.query.message;
 
   try {
     console.log("\nCourseId:", courseId);
-    const [courseRows] = await db.promise().execute(getCourseFromIdQuery, courseId);
+    let sql = `
+    SELECT 
+      courses.*,
+      users.id AS author_id,
+      users.name AS author_name,
+      users.username AS author_username,
+      users.avatar AS author_avatar
+    FROM 
+      courses
+    LEFT JOIN 
+      users ON users.id = courses.author_id
+    `
+    const [courseRows] = await db.promise().execute(sql, [courseId]);
 
     if (!courseRows || courseRows.length === 0) {
       return res.status(404).json({ error: "Course not found" });
@@ -611,7 +623,18 @@ app.get("/api/courses/:id", async (req,res)=>{
     }
 
     // Fetching author details
-    const [authorRows] = await db.promise().execute(getCourseAuthorQuery, [
+    sql = `
+    SELECT 
+      id AS author_id,
+      name AS author_name,
+      username AS author_username,
+      avatar AS author_avatar
+    FROM 
+      users 
+    WHERE 
+      id = ?;
+  `
+    const [authorRows] = await db.promise().execute(sql, [
       course.author_id,
     ]);
     const author = authorRows[0];
@@ -631,8 +654,23 @@ app.get("/api/courses/:id", async (req,res)=>{
 
     // Fill array with query result
     let enrolledCourses = [];
+    sql = `
+    SELECT 
+      courses.*,
+      users.name AS author_name,
+      users.username AS author_username,
+      users.avatar AS author_avatar
+    FROM 
+      user_courses 
+    JOIN 
+      courses ON user_courses.course_id = courses.id
+    JOIN 
+      users ON courses.author_id = users.id
+    WHERE 
+      user_courses.user_id = ?
+`    
     if (user) {
-      const [enrolledRows] = await db.promise().execute(getUserEnrolledCoursesQuery, [
+      const [enrolledRows] = await db.promise().execute(sql, [
         user.id,
       ]);
       enrolledCourses = enrolledRows[0]?.enrolled_courses || [];

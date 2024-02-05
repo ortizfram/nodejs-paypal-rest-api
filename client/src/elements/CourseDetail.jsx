@@ -5,7 +5,6 @@ import CompFooter from '../template/Footer';
 import { useUserContext } from '../hooks/UserContext';
 import '../public/css/course/courseDetail.css';
 
-
 const CourseDetail = () => {
   const { userData } = useUserContext();
   const [course, setCourse] = useState(null);
@@ -15,12 +14,11 @@ const CourseDetail = () => {
   useEffect(() => {
     const fetchCourse = async () => {
       try {
-        const response = await fetch("/api/courses/:id".replace(":id", id), {
-          method: 'POST',
+        const response = await fetch(`/api/course/${id}`, {
+          method: 'GET',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({}),
         });
 
         if (response.ok) {
@@ -40,6 +38,7 @@ const CourseDetail = () => {
   if (!course) {
     return <div>Loading...</div>;
   }
+
 
   return (
     <>
