@@ -688,6 +688,168 @@ app.get("/api/course/:id", async (req,res)=>{
     res.status(500).json({ error: "Error fetching the course" });
   }
 })
+
+app.post("/api/course/:id/update", async(req,res) => {
+  // get courseId
+  let courseId = req.params.id; // Assuming the ID is coming from the request body
+  let sql = `SELECT 
+  blogs.*,
+  users.name AS author_name,
+  users.username AS author_username,
+  users.avatar AS author_avatar
+  FROM 
+  blogs
+  LEFT JOIN 
+  users ON users.id = courses.author_id
+  WHERE
+  blogs.id = ?`
+  const [courseRows] = await db.promise().execute(sql, [courseId]);
+  const course = courseRows[0];
+  courseId = course.id;
+  console.log(`\n--- courseId: ${courseId}\n`);
+
+  // Declare
+  let courseSlug;
+  let thumbnailPath;
+  let thumbnail;
+  let discountValue;
+
+  // file upload check
+  if (!req.files || Object.keys(req.files).length === 0) {
+    const message = `(ERROR): no Thumbnail was uploaded, try again uploading a file.`;
+    return res.redirect(
+      `/api/course/${courseId}/update?courseId=${courseId}&message=${message}`
+    );
+  }
+
+  const timestamp = Date.now();
+
+  // Check if thumbnail uploaded, encode, move
+  if (req.files && req.files.thumbnail) {
+    const filename = req.files.thumbnail.name;
+    const uniqueFilename = encodeURIComponent(`${timestamp}_${filename}`);
+    thumbnailPath = "/uploads/" + uniqueFilename;
+
+    // Assign the uploaded thumbnail file to the 'thumbnail' variable
+    thumbnail = req.files.thumbnail;
+
+    // Use mv() to place file on the server
+    await thumbnail.mv(path.join(__dirname, "uploads", uniqueFilename));
+  } else {
+    // If no new thumbnail uploaded, retain the existing thumbnail path
+    thumbnailPath = course.thumbnail; // Assuming course.thumbnail holds the existing thumbnail path
+  }
+
+  // Generate unique filename for video
+  const videoFile = req.files.video;
+  const videoFilename = videoFile.name.split(" ")[0];
+  const uniqueVideoFilename = encodeURIComponent(
+    `${timestamp}_${videoFilename}`
+  );
+  const videoPath = "/uploads/videos/" + uniqueVideoFilename;
+
+  // video file upload handling
+  videoFile.mv(
+    path.join(__dirname, "uploads/videos", uniqueVideoFilename),
+    async (err) => {
+      if (err) {
+        console.error(err);
+        return res.status(500).send("Error uploading the video file");
+      }
+    }
+  );
+
+  try {
+    // req fields
+    const {
+      title,
+      description,
+      text_content,
+      video,
+      ars_price,
+      usd_price,
+      discount,
+    } = req.body;
+
+    // Autogenerate slug from title
+    if (typeof title === "string" && title.trim() !== "") {
+      courseSlug = slugify(title, { lower: true, strict: true });
+    }
+
+    // !if discount : null
+    discountValue = discount !== "" ? discount : null;
+
+    // Get current timestamp in the format 'YYYY-MM-DD HH:MM:SS'
+    const currentTimestamp = new Date()
+      .toISOString()
+      .slice(0, 19)
+      .replace("T", " ");
+
+    const updateParams = [
+      title,
+      courseSlug,
+      description,
+      text_content,
+      videoPath,
+      ars_price,
+      usd_price,
+      discountValue,
+      thumbnailPath,
+      courseId, // where course.id
+    ];
+
+    // msg
+    console.log("\n\n---Update Parameters:", updateParams); // Log the update parameters
+
+    // Execute update query
+    sql = `
+    UPDATE courses
+    SET title = ?, slug = ?, description = ?, text_content = ?,video = ?, ars_price = ?, usd_price = ?, discount = ?, thumbnail = ?, updated_at = ${argentinaTimeZone}
+    WHERE id = ?;
+  `
+    const result = await db.promise().execute(sql, updateParams);
+
+    //msg of query & result of query
+    console.log("\n\n---Update Query:", updateCourseQuery);
+    console.log("\n\n---Query Result:", result); // Log the result of the query execution
+
+    // update check msg
+    if (result && result[0].affectedRows !== undefined) {
+      //show if affected rows
+      const affectedRows = parseInt(result[0].affectedRows);
+      console.log("\n\n---Affected Rows:", affectedRows);
+
+      const user = req.session.user || null;
+
+      if (affectedRows > 0) {
+        const message = "course updated correctly";
+        console.log(`\n\n\→ Go to courseModules: ${message}`);
+
+        // Set MIME type for the uploaded video
+        setCustomMimeTypes(
+          {
+            path: `/uploads/videos/${uniqueVideoFilename}`,
+          },
+          res,
+          () => {} // Empty callback as it's not required in this context
+        );
+
+        res.redirect(`/api/course/${courseId}`);
+      } else {
+        const message = "no changes made to course";
+        console.log(`\n\n\→ Go to courseModules: ${message}`);
+        res.status(201).redirect(
+          `/api/course/${courseId}`
+          // `/api/course/${courseId}/module/update?courseId=${courseId}`
+        );
+      }
+    }
+  } catch (error) {
+    console.error("Error updating course:", error);
+    console.error("Database Error:", error.sqlMessage); // Log the database error message
+    res.status(500).json({ message: "Error updating the course" });
+  }
+})
 // &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 
 // Handling thumbnail upload route

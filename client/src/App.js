@@ -15,6 +15,7 @@ import ResetPassword from "./elements/ResetPassword";
 import Courses from "./elements/Courses";
 import CourseCreate from "./elements/CourseCreate";
 import CourseDetail from "./elements/CourseDetail";
+import CourseUpdate from "./elements/CourseUpdate.jsx";
 import EmailSentMessage from "./auth/EmailSent.js";
 
 // import Hooks
@@ -58,6 +59,7 @@ function App() {
             <Route path="/api/courses" element={<Courses />} />
             <Route path="/api/course/create" element={<CourseCreate />} />
             <Route path="/api/course/:id" element={<CourseDetail/>} />
+            <Route path="/api/course/:id/update" element={<CourseUpdate/>} />
   
             {/* BLOGS */}
             <Route path="/api/blog" element={<CompBlogList />} />
