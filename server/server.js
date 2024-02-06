@@ -94,7 +94,7 @@ app.use(
 );
 
 // Handling image upload route
-app.post("/upload/image", uploadImage.single("image"), (req, res) => {
+app.post("/upload/image", uploadImage.single("image"), async(req, res) => {
   if (!req.file) {
     return res.status(400).send("No file uploaded.");
   }
@@ -103,7 +103,7 @@ app.post("/upload/image", uploadImage.single("image"), (req, res) => {
 });
 
 // Handling video upload route
-app.post("/upload/video", uploadVideo.single("video"), (req, res) => {
+app.post("/upload/video", uploadVideo.single("video"), async(req, res) => {
   if (!req.file) {
     return res.status(400).send("No file uploaded.");
   }
@@ -113,7 +113,7 @@ app.post("/upload/video", uploadVideo.single("video"), (req, res) => {
 
 
 // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^   ENDPOINTS   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-app.get("/", (req, res) => {});
+app.get("/", async(req, res) => {});
 app.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;

@@ -40,14 +40,14 @@ const CourseCreate = () => {
       formData.append("video", video);
 
       // Upload thumbnail
-      const thumbnailResponse = await axios.post("/upload/image", formData, {
+      const thumbnailResponse = await axios.post("http://localhost:6001/upload/image", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
       });
 
       // Upload video
-      const videoResponse = await axios.post("/upload/video", formData, {
+      const videoResponse = await axios.post("http://localhost:6001/upload/video", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
