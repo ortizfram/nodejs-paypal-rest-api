@@ -21,7 +21,6 @@ export const __dirname = path.dirname(__filename);
 const app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-const port = 6001;
 app.use(cors());
 // Use sessions
 app.use(
@@ -30,28 +29,29 @@ app.use(
     resave: false,
     saveUninitialized: true,
   })
-);
-
-// ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^  DB CONFIG and BASE UR  L^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-console.log(`\n\n${process.env.NODE_ENV}\n\n`);
-const isDev = process.env.NODE_ENV === "development";
-export const db = mysql.createConnection({
-  host: isDev ? "127.0.0.1" : process.env.DB_HOST,
-  user: isDev ? "root" : process.env.DB_USER,
-  password: isDev ? "melonmelon" : process.env.DB_PASSWORD,
-  database: isDev ? "conn" : process.env.DB_NAME,
-  port: isDev ? 3307 : process.env.DB_PORT,
-});
-db.connect((err) => {
-  if (err) {
-    console.error("Error connecting to MySQL database:", err);
-    return;
-  }
-  console.log("Connected to MySQL database");
-});
-
-const HOST = process.env.HOST;
-const FRONTEND_URL = isDev ? "http://localhost:3000" : process.env.FRONTEND_URL;
+  );
+  
+  // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^  DB CONFIG and BASE UR  L^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  console.log(`\n\n${process.env.NODE_ENV}\n\n`);
+  const isDev = process.env.NODE_ENV === "development";
+  export const db = mysql.createConnection({
+    host: isDev ? "127.0.0.1" : process.env.DB_HOST,
+    user: isDev ? "root" : process.env.DB_USER,
+    password: isDev ? "melonmelon" : process.env.DB_PASSWORD,
+    database: isDev ? "conn" : process.env.DB_NAME,
+    port: isDev ? 3307 : process.env.DB_PORT,
+  });
+  db.connect((err) => {
+    if (err) {
+      console.error("Error connecting to MySQL database:", err);
+      return;
+    }
+    console.log("Connected to MySQL database");
+  });
+  
+  const port = 6001;
+  const HOST = process.env.HOST;
+  const FRONTEND_URL = isDev ? "http://localhost:3000" : process.env.FRONTEND_URL;
 const BACKEND_URL = isDev ? "http://localhost:6001" : process.env.BACKEND_URL;
 
 
@@ -109,6 +109,33 @@ app.post("/upload/video", uploadVideo.single("video"), async(req, res) => {
   }
   const videoUrl = `/videos/${req.file.filename}`;
   res.status(200).json({ videoUrl: videoUrl });
+});
+
+// &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& MIDDLEWARE ENDPOINTS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+// Define the route to retrieve userData
+app.get("/userData", async(req, res) => {
+  try {
+    // Check if the user is authenticated and their ID is available in the session
+    if (!req.session || !req.session.user || !req.session.user.id) {
+      return res
+        .status(401)
+        .json({ message: "User ID not found in the session" });
+    }
+    
+    // Retrieve userData based on the user ID from your database or any other source
+    const userId = req.session.user.id;
+    
+    // Example: Retrieve userData from a database
+    // Replace this with your actual code to fetch userData
+    let sql = "SELECT * FROM users WHERE id = ?"
+    const userData = await db.promise().execute(sql, [userId]);
+
+    // Send the userData in the response
+    res.status(200).json({ userData });
+  } catch (error) {
+    console.error("Error retrieving userData:", error);
+    res.status(500).json({ message: "Error retrieving userData" });
+  }
 });
 
 
@@ -398,7 +425,7 @@ app.post("/api/course/create", async (req, res) => {
     const videoPath = "/src/uploads/videos/" + uniqueVideoFilename;
 
     // Move uploaded thumbnail to the server
-    req.files.thumbnail.mv(
+    await req.files.thumbnail.mv(
       path.join(__dirname, "src", "uploads", "imgs", uniqueFilename),
       async (err) => {
         if (err) {
@@ -409,7 +436,7 @@ app.post("/api/course/create", async (req, res) => {
     );
 
     // video file upload handling
-    videoFile.mv(
+    await req.files.video.mv(
       path.join(__dirname, "src", "uploads", "videos", uniqueVideoFilename),
       async (err) => {
         if (err) {
@@ -459,19 +486,26 @@ app.post("/api/course/create", async (req, res) => {
       discountValue,
       relativePath,
       videoPath,
+      currentTimestamp,
+      currentTimestamp,
       authorId,
     ];
     console.log("\n\ncourseData: ", courseData);
 
     // Create the new course using the SQL query
+    let argentinaTimeZone = "CONVERT_TZ(NOW(), 'UTC', 'America/Argentina/Buenos_Aires')"
+    let sql = `INSERT INTO courses (title, slug, description, text_content,  ars_price, usd_price, discount, thumbnail, video, created_at, updated_at, author_id)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+    `
     const [courseRow] = await db
       .promise()
-      .execute(createCourseQuery, courseData);
+      .execute(sql, courseData);
 
     // Fetch the created course & JOIN with user as author
+    sql=`SELECT * FROM courses WHERE slug = ?`
     const [fetchedCourse] = await db
       .promise()
-      .execute(getCourseFromSlugQuery, courseSlug);
+      .execute(sql, courseSlug);
     const course = fetchedCourse[0];
     const courseId = course.id;
 
@@ -919,15 +953,6 @@ const initSession = (req, res, next) => {
 };
 app.use(initSession);
 
-// middleware for login user
-export function is_loggedin_check(req, res, next) {
-  const user = req.session.user;
-  if (!user) {
-    // Redirect the user to the login page
-    return res.status(403).redirect("/api/login");
-  }
-  next();
-}
 
 // middleware for admin&staff
 export function admin_staff_check(req, res, next) {

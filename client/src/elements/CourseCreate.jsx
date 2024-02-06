@@ -1,12 +1,11 @@
 import axios from "axios";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUserContext } from "../hooks/UserContext";
 
 const CourseCreate = () => {
   const { userData } = useUserContext();
-  const navigate = useNavigate();
-  const [user] = useState(userData);
+  const [user, setUser] = useState([]);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [text_content, setTextContent] = useState("");
@@ -18,6 +17,11 @@ const CourseCreate = () => {
   const [thumbnailUrl, setThumbnailUrl] = useState(null);
   const [videoUrl, setVideoUrl] = useState(null);
   const [errorMessage, setErrorMessage] = useState("");
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    setUser(userData);
+  }, [userData]);
 
   const handleThumbnailChange = (e) => {
     setThumbnail(e.target.files[0]);
@@ -77,13 +81,17 @@ const CourseCreate = () => {
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
-
     try {
+      // Check if user ID exists in session
+      if (!user || !user.id) {
+        throw new Error("User ID not found in the session");
+      }
+  
       // Upload thumbnail if it exists
       if (thumbnail) {
         const thumbnailFormData = new FormData();
         thumbnailFormData.append("image", thumbnail);
-
+  
         const thumbnailResponse = await axios.post(
           "http://localhost:6001/upload/image",
           thumbnailFormData,
@@ -93,16 +101,16 @@ const CourseCreate = () => {
             },
           }
         );
-
+  
         // Set thumbnail URL after successful upload
         setThumbnailUrl(thumbnailResponse.data.imageUrl);
       }
-
+  
       // Upload video if it exists
       if (video) {
         const videoFormData = new FormData();
         videoFormData.append("video", video);
-
+  
         const videoResponse = await axios.post(
           "http://localhost:6001/upload/video",
           videoFormData,
@@ -112,14 +120,14 @@ const CourseCreate = () => {
             },
           }
         );
-
+  
         // Set video URL after successful upload
         setVideoUrl(videoResponse.data.videoUrl);
       }
-
+  
       // Handle success
       alert("Files uploaded successfully");
-
+  
       // Create the course with updated form data
       const formData = new FormData();
       formData.append("title", title);
@@ -130,23 +138,42 @@ const CourseCreate = () => {
       formData.append("discount", discount);
       formData.append("thumbnail", thumbnailUrl); // Use the uploaded thumbnail URL
       formData.append("video", videoUrl); // Use the uploaded video URL
-      formData.append("author", user);
-
-      const courseResponse = await axios.post("/api/course/create", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
-
-      if (courseResponse.status === 201) {
-        alert("Course created successfully!");
-        navigate(courseResponse.data.redirectUrl);
-      } else {
-        console.error(
-          "Error creating course. Server response:",
-          courseResponse
+      formData.append("author_id", user.id);
+  
+      try {
+        const courseResponse = await axios.post(
+          "http://localhost:6001/api/course/create",
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+              "Authorization": `Bearer ${process.env.JWT_SECRET}`
+            },
+          }
         );
-        alert("Some error occurred while creating the course.");
+  
+        if (courseResponse.status === 201) {
+          alert("Course created successfully!");
+          console.log("redirectUrl: ", courseResponse.data.redirectUrl);
+          navigate(courseResponse.data.redirectUrl);
+        } else {
+          console.error(
+            "Error creating course. Server response:",
+            courseResponse
+          );
+          alert("Some error occurred while creating the course.");
+        }
+      } catch (error) {
+        if (error.response && error.response.status === 401) {
+          // Handle 401 Unauthorized error
+          console.error("Unauthorized request:", error.message);
+          alert("Unauthorized request. Please login again.");
+          navigate("/login")
+          // Redirect user to login page or perform any other action
+        } else {
+          console.error("Error creating course:", error.message);
+          alert(`${error.message}`);
+        }
       }
     } catch (error) {
       console.error("Error creating course:", error.message);
@@ -161,6 +188,8 @@ const CourseCreate = () => {
     <>
       <div id="create-course-container-page">
         <div id="create-course-container" className="mt-8">
+        {userData && <p className="text-primary">Hello, {userData.username}!</p>}
+        {user && <p className="text-primary">Hello, id:{user.id}!{user.username}</p>}
           <h1 className="section-title">Creando Curso</h1>
           <div>
             <form
@@ -208,11 +237,17 @@ const CourseCreate = () => {
                 accept="video/*"
                 onChange={handleVideoChange}
               />
-              <button onClick={handleVideoUpload}>Upload Video</button>
+              <button
+                type="button"
+                className="btn btn-primary btn-xs btn-sm"
+                onClick={handleVideoUpload}
+              >
+                Upload Video
+              </button>
               {videoUrl && (
                 <div>
                   <h3>Uploaded Video:</h3>
-                  <video controls width="15%">
+                  <video controls width="30%">
                     <source
                       src={`http://localhost:6001${videoUrl}`}
                       type="video/mp4"
@@ -231,13 +266,19 @@ const CourseCreate = () => {
                 accept="image/*"
                 onChange={handleThumbnailChange}
               />
-              <button onClick={handleThumbnailUpload}>Upload Image</button>
+              <button
+                type="button"
+                className="btn btn-primary btn-xs btn-sm"
+                onClick={handleThumbnailUpload}
+              >
+                Upload Image
+              </button>
               {thumbnailUrl && (
                 <div>
                   <img
                     src={`http://localhost:6001${thumbnailUrl}`}
                     alt="Uploaded"
-                    style={{ maxWidth: "15%" }}
+                    style={{ maxWidth: "30%" }}
                   />
                 </div>
               )}

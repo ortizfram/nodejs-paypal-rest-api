@@ -19,17 +19,19 @@ import CourseUpdate from "./elements/CourseUpdate";
 import EmailSentMessage from "./auth/EmailSent.js";
 
 // import Hooks
-import { UserContextProvider } from "./hooks/UserContext.js";
+import { UserContextProvider,useUserContext  } from "./hooks/UserContext.js";
 
 function App() {
   const [message, setMessage] = useState("");
+  const [userData, setUserData] = useState(null);
 
   useEffect(() => {
-    fetch("http://localhost:6001/")
+    fetch("http://localhost:6001")
       .then((res) => res.json())
       .then((data) => {
         setMessage(data.message);
         console.log(data.message);
+        setUserData(data.userData, JSON.stringify(data.userData));
       })
       .catch((err) => console.error(err));
   }, []);
@@ -40,7 +42,7 @@ function App() {
         <UserContextProvider>
           <Routes>
             {/* INDEX */}
-            <Route path="/" element={<Home />} />
+            <Route path="/" element={<Home userData={userData}/>} />
             {/* AADMIN */}
             {/* router.post("/users/change-role", admin_staff_check, controller.changeUserRole); */}
             {/* router.post("/users", admin_staff_check,controller.getUsers); */}
@@ -56,15 +58,15 @@ function App() {
             <Route path="/email-sent" element={<EmailSentMessage />} />
 
             {/* COURSES */}
-            <Route path="/api/courses" element={<Courses />} />
-            <Route path="/api/course/create" element={<CourseCreate />} />
-            <Route path="/api/course/:id" element={<CourseDetail/>} />
-            <Route path="/api/course/update/:id" element={<CourseUpdate/>} />
+            <Route path="/api/courses" element={<Courses userData={userData} />} />
+            <Route path="/api/course/create" element={<CourseCreate userData={userData} />} />
+            <Route path="/api/course/:id" element={<CourseDetail userData={userData} />} />
+            <Route path="/api/course/update/:id" element={<CourseUpdate userData={userData}/>} />
   
             {/* BLOGS */}
-            <Route path="/api/blog" element={<CompBlogList />} />
-            <Route path="/api/blog/create" element={<CompBlogCreate />} />
-            <Route path="/api/blog/:id/update" element={<CompBlogUpdate />} />
+            <Route path="/api/blog" element={<CompBlogList userData={userData} />} />
+            <Route path="/api/blog/create" element={<CompBlogCreate userData={userData} />} />
+            <Route path="/api/blog/:id/update" element={<CompBlogUpdate userData={userData} />} />
          
           </Routes>
         </UserContextProvider>
