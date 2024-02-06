@@ -15,20 +15,112 @@ const CourseCreate = () => {
   const [discount, setDiscount] = useState("");
   const [thumbnail, setThumbnail] = useState(null);
   const [video, setVideo] = useState(null);
+  const [thumbnailUrl, setThumbnailUrl] = useState(null);
+  const [videoUrl, setVideoUrl] = useState(null);
   const [errorMessage, setErrorMessage] = useState("");
 
   const handleThumbnailChange = (e) => {
     setThumbnail(e.target.files[0]);
+    setThumbnailUrl(null); // Clear previous image when a new file is selected
   };
 
   const handleVideoChange = (e) => {
     setVideo(e.target.files[0]);
+    setVideoUrl(null); // Clear previous video when a new file is selected
+  };
+
+  const handleThumbnailUpload = async () => {
+    try {
+      const formData = new FormData();
+      formData.append("image", thumbnail);
+
+      const response = await axios.post(
+        "http://localhost:6001/upload/image",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      setThumbnailUrl(response.data.imageUrl);
+      alert("Image uploaded successfully.");
+    } catch (error) {
+      console.error("Error uploading image:", error.message);
+      alert("Error uploading image.");
+    }
+  };
+
+  const handleVideoUpload = async () => {
+    try {
+      const formData = new FormData();
+      formData.append("video", video);
+
+      const response = await axios.post(
+        "http://localhost:6001/upload/video",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      setVideoUrl(response.data.videoUrl);
+      alert("Video uploaded successfully.");
+    } catch (error) {
+      console.error("Error uploading video:", error.message);
+      alert("Error uploading video.");
+    }
   };
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
 
     try {
+      // Upload thumbnail if it exists
+      if (thumbnail) {
+        const thumbnailFormData = new FormData();
+        thumbnailFormData.append("image", thumbnail);
+
+        const thumbnailResponse = await axios.post(
+          "http://localhost:6001/upload/image",
+          thumbnailFormData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+
+        // Set thumbnail URL after successful upload
+        setThumbnailUrl(thumbnailResponse.data.imageUrl);
+      }
+
+      // Upload video if it exists
+      if (video) {
+        const videoFormData = new FormData();
+        videoFormData.append("video", video);
+
+        const videoResponse = await axios.post(
+          "http://localhost:6001/upload/video",
+          videoFormData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+
+        // Set video URL after successful upload
+        setVideoUrl(videoResponse.data.videoUrl);
+      }
+
+      // Handle success
+      alert("Files uploaded successfully");
+
+      // Create the course with updated form data
       const formData = new FormData();
       formData.append("title", title);
       formData.append("description", description);
@@ -36,31 +128,10 @@ const CourseCreate = () => {
       formData.append("ars_price", ars_price);
       formData.append("usd_price", usd_price);
       formData.append("discount", discount);
-      formData.append("thumbnail", thumbnail);
-      formData.append("video", video);
+      formData.append("thumbnail", thumbnailUrl); // Use the uploaded thumbnail URL
+      formData.append("video", videoUrl); // Use the uploaded video URL
+      formData.append("author", user);
 
-      // Upload thumbnail
-      const thumbnailResponse = await axios.post("http://localhost:6001/upload/image", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
-
-      // Upload video
-      const videoResponse = await axios.post("http://localhost:6001/upload/video", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
-
-      // Handle success
-      alert("Files uploaded successfully");
-
-      // Update form data with uploaded thumbnail and video URLs
-      formData.set("thumbnail", thumbnailResponse.data.imageUrl);
-      formData.set("video", videoResponse.data.videoUrl);
-
-      // Create the course
       const courseResponse = await axios.post("/api/course/create", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
@@ -71,14 +142,17 @@ const CourseCreate = () => {
         alert("Course created successfully!");
         navigate(courseResponse.data.redirectUrl);
       } else {
-        console.error("Error creating course. Server response:", courseResponse);
+        console.error(
+          "Error creating course. Server response:",
+          courseResponse
+        );
         alert("Some error occurred while creating the course.");
       }
     } catch (error) {
       console.error("Error creating course:", error.message);
       setErrorMessage(
         error.response?.data ||
-        "An unexpected error occurred while creating the course."
+          "An unexpected error occurred while creating the course."
       );
     }
   };
@@ -134,6 +208,19 @@ const CourseCreate = () => {
                 accept="video/*"
                 onChange={handleVideoChange}
               />
+              <button onClick={handleVideoUpload}>Upload Video</button>
+              {videoUrl && (
+                <div>
+                  <h3>Uploaded Video:</h3>
+                  <video controls width="15%">
+                    <source
+                      src={`http://localhost:6001${videoUrl}`}
+                      type="video/mp4"
+                    />
+                    Your browser does not support the video tag.
+                  </video>
+                </div>
+              )}
               <br />
               <hr />
               <label htmlFor="thumbnail">subir miniatura:</label>
@@ -144,6 +231,16 @@ const CourseCreate = () => {
                 accept="image/*"
                 onChange={handleThumbnailChange}
               />
+              <button onClick={handleThumbnailUpload}>Upload Image</button>
+              {thumbnailUrl && (
+                <div>
+                  <img
+                    src={`http://localhost:6001${thumbnailUrl}`}
+                    alt="Uploaded"
+                    style={{ maxWidth: "15%" }}
+                  />
+                </div>
+              )}
               <br />
               <hr />
               <h3>Configurar precio</h3>
