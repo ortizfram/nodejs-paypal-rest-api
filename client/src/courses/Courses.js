@@ -6,7 +6,7 @@ import CompNavbar from "../template/Nabvar";
 import CompFooter from "../template/Footer";
 
 // NodeJS endpoint reference
-const URI = `http://localhost:5000/api/courses?page=1&perPage=6`;
+const URI = `http://localhost:6001/api/courses?page=1&perPage=6`;
 
 const CompCourses = () => {
   // fetch courses procedure -------------------------

@@ -1,131 +1,85 @@
 import axios from "axios";
-import { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUserContext } from "../hooks/UserContext";
-// import css
-import "../public/css/course/courseCreate.css";
-import { createRef } from "react";
 
 const CourseCreate = () => {
-  // pass context user
   const { userData } = useUserContext();
   const navigate = useNavigate();
-  let user = userData;
-
-  // form data declaration
-  const [video, setVideo] = useState("");
-  const [thumbnail, setThumbnail] = useState("");
-  const [videoUrl, setVideoUrl] = useState("");
-  const [thumbnailUrl, setThumbnailUrl] = useState("");
+  const [user] = useState(userData);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [text_content, setTextContent] = useState("");
   const [ars_price, setARSPrice] = useState("");
   const [usd_price, setUSDPrice] = useState("");
   const [discount, setDiscount] = useState("");
-  const [errorMessage, setErrorMessage] = useState(""); // Define errorMessage state
+  const [thumbnail, setThumbnail] = useState(null);
+  const [video, setVideo] = useState(null);
+  const [errorMessage, setErrorMessage] = useState("");
 
-  // createCourse procedure ------------------------------------------------
-  const handleFormSubmit = async (e) => {
-    const formData = new FormData();
-    formData.append("title", title);
-    formData.append("description", description);
-    formData.append("text_content", text_content);
-    formData.append("ars_price", ars_price);
-    formData.append("usd_price", usd_price);
-    formData.append("discount", discount);
-
-    try {
-      e.preventDefault();
-      const response = await fetch('/api/course/create', { method: "POST", body: formData });
-      // Handle successful response
-      const parsedRes = await response.json();
-
-      if (response.status === 200) {
-        alert("File uploaded!!");
-      } else {
-        console.error("Error uploading file. Server response:", response);
-
-        // Parse the error response if it's JSON
-        try {
-          const errorData = await response.json();
-          console.error("Error data:", errorData);
-
-          alert("Some error occurred on uploading");
-        } catch (error) {
-          console.error("Error parsing error response:", error.message);
-        }
-
-        setErrorMessage(""); // Reset error message
-        const next = parsedRes.redirectUrl;
-        navigate(next);
-      }
-    } catch (error) {
-      console.error("Error creating course:", error.message);
-
-      // Handle different types of errors
-      setErrorMessage(
-        error.response?.data ||
-          "An unexpected error occurred while creating the course."
-      );
-    }
-  };
-
-  // hadle video and thumbnail onChange ------------------------------------
   const handleThumbnailChange = (e) => {
     setThumbnail(e.target.files[0]);
-    setThumbnailUrl(null); // Clear previous image when a new file is selected
   };
 
   const handleVideoChange = (e) => {
     setVideo(e.target.files[0]);
-    setVideoUrl(null); // Clear previous video when a new file is selected
   };
 
-  // hadle video and thumbnail Upload -------------------------------------
-  const handleThumbnailUpload = async () => {
+  const handleFormSubmit = async (e) => {
+    e.preventDefault();
+
     try {
       const formData = new FormData();
+      formData.append("title", title);
+      formData.append("description", description);
+      formData.append("text_content", text_content);
+      formData.append("ars_price", ars_price);
+      formData.append("usd_price", usd_price);
+      formData.append("discount", discount);
       formData.append("thumbnail", thumbnail);
-
-      const response = await axios.post(
-        "/upload/image",
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-
-      setThumbnailUrl(response.data.imageUrl);
-      alert("Image uploaded successfully.");
-    } catch (error) {
-      console.error("Error uploading image:", error.message);
-      alert("Error uploading image.");
-    }
-  };
-
-  const handleVideoUpload = async () => {
-    try {
-      const formData = new FormData();
       formData.append("video", video);
 
-      const response = await axios.post(
-        "/upload/video",
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
+      // Upload thumbnail
+      const thumbnailResponse = await axios.post("/upload/image", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
 
-      setVideoUrl(response.data.videoUrl);
-      alert("Video uploaded successfully.");
+      // Upload video
+      const videoResponse = await axios.post("/upload/video", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      // Handle success
+      alert("Files uploaded successfully");
+
+      // Update form data with uploaded thumbnail and video URLs
+      formData.set("thumbnail", thumbnailResponse.data.imageUrl);
+      formData.set("video", videoResponse.data.videoUrl);
+
+      // Create the course
+      const courseResponse = await axios.post("/api/course/create", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      if (courseResponse.status === 201) {
+        alert("Course created successfully!");
+        navigate(courseResponse.data.redirectUrl);
+      } else {
+        console.error("Error creating course. Server response:", courseResponse);
+        alert("Some error occurred while creating the course.");
+      }
     } catch (error) {
-      console.error("Error uploading video:", error.message);
-      alert("Error uploading video.");
+      console.error("Error creating course:", error.message);
+      setErrorMessage(
+        error.response?.data ||
+        "An unexpected error occurred while creating the course."
+      );
     }
   };
 
@@ -140,15 +94,7 @@ const CourseCreate = () => {
               encType="multipart/form-data"
               onSubmit={handleFormSubmit}
             >
-              {/* Form action should match the route for creating a course */}
-              {/* Display error message */}
-              {errorMessage && (
-                <p style={{ color: "red" }}>
-                  {typeof errorMessage === "string"
-                    ? errorMessage
-                    : errorMessage.message || "An unexpected error occurred."}
-                </p>
-              )}
+              {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
               <h3>Titulo & contenido:</h3>
               <label htmlFor="title">titulo:</label>
               <br />
@@ -188,7 +134,6 @@ const CourseCreate = () => {
                 accept="video/*"
                 onChange={handleVideoChange}
               />
-              <button onClick={handleVideoUpload}>Guardar Video</button>
               <br />
               <hr />
               <label htmlFor="thumbnail">subir miniatura:</label>
@@ -199,7 +144,6 @@ const CourseCreate = () => {
                 accept="image/*"
                 onChange={handleThumbnailChange}
               />
-              <button onClick={handleThumbnailUpload}>Guardar Miniatura</button>
               <br />
               <hr />
               <h3>Configurar precio</h3>
@@ -224,7 +168,9 @@ const CourseCreate = () => {
               />
               <br />
               <h3>Adicionales</h3>
-              <label htmlFor="discount">descuento opcional (numeros enteros):</label>
+              <label htmlFor="discount">
+                descuento opcional (numeros enteros):
+              </label>
               <br />%{" "}
               <input
                 type="number"
@@ -236,8 +182,6 @@ const CourseCreate = () => {
               <br />
               <input type="hidden" name="author" value={user} />
               <button type="submit">Create Course</button>
-              {/* Display error message */}
-              {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
             </form>
           </div>
         </div>
