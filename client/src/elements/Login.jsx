@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../hooks/UserContext.js";
 
@@ -8,6 +8,14 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [backendMessage, setBackendMessage] = useState("");
+
+  useEffect(() => {
+    // Check if user data exists in session
+    const userFromSession = JSON.parse(localStorage.getItem("user"));
+    if (userFromSession) {
+      setUser(userFromSession);
+    }
+  }, [setUser]);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -21,11 +29,15 @@ const Login = () => {
         },
       });
       const data = await response.json();
+      console.log("\n\nDATA", data)
 
       if (response.ok) {
         setUser(data.user); // Update the user state in the App component
+        localStorage.setItem("user", JSON.stringify(data.user)); // Save user data to local storage
         const next = data.redirectUrl;
         if (data.status === "success") {
+          alert("Login successful");
+          console.log("Login successful");
           navigate(next);
         } else {
           console.error("Login failed:", data.message);

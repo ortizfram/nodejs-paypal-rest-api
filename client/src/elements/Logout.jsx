@@ -5,7 +5,7 @@ import { useContext } from "react";
 
 const Logout = () => {
   const navigate = useNavigate();
-  const { setUserData } = useContext(UserContext);
+  const { setUser } = useContext(UserContext);
 
   const handleLogout = async () => {
     try {
@@ -16,10 +16,11 @@ const Logout = () => {
       localStorage.removeItem('userData');
       
       // Reset user data in the context
-      setUserData(null);
+      setUser(null);
 
       // Perform other logout actions as needed
       console.log('Logout successful');
+      alert('Logout successful');
 
       // Redirect the user to the home page after logout
       navigate('/');

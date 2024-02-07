@@ -26,9 +26,18 @@ function App() {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
+    // Check if user data exists in local storage
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+  }, []);
+
+  useEffect(() => {
     fetch("http://localhost:6002")
       .then((res) => res.json())
       .then((data) => {
+        setUser(data.userData); // set it here so when page changes its available
         setMessage(data.message);
         console.log(data.message);
       })

@@ -1,6 +1,7 @@
 import axios from "axios";
-import React, { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+
+import React, { useContext, useState } from "react";
 import { UserContext } from "../hooks/UserContext.js";
 
 const CourseCreate = () => {
@@ -17,7 +18,7 @@ const CourseCreate = () => {
   const [videoUrl, setVideoUrl] = useState(null);
   const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
-  const {authUser} = useContext(UserContext)
+  const {user, setUser} = useContext(UserContext)
 
   const handleThumbnailChange = (e) => {
     setThumbnail(e.target.files[0]);
@@ -134,7 +135,8 @@ const CourseCreate = () => {
       formData.append("discount", discount);
       formData.append("thumbnail", thumbnailUrl); // Use the uploaded thumbnail URL
       formData.append("video", videoUrl); // Use the uploaded video URL
-      formData.append("author_id", authUser.id);
+      formData.append("author_id", user.id.toString());
+      console.log("user for course", user.toString())
   
       try {
         const courseResponse = await axios.post(
@@ -184,7 +186,8 @@ const CourseCreate = () => {
     <>
       <div id="create-course-container-page">
         <div id="create-course-container" className="mt-8">
-        {authUser && <p className="text-primary">Hello, {authUser.id}!</p>}
+        {user && <p className="text-primary">Hello, {user.id}!</p>}
+
           <h1 className="section-title">Creando Curso</h1>
           <div>
             <form
@@ -313,7 +316,7 @@ const CourseCreate = () => {
                 onChange={(e) => setDiscount(e.target.value)}
               />
               <br />
-              <input type="hidden" name="author" value={authUser} />
+              <input type="hidden" name="author" value={JSON.stringify(user)} />
               <button type="submit">Create Course</button>
             </form>
           </div>

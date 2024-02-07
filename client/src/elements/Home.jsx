@@ -3,7 +3,6 @@ import { UserContext } from "../hooks/UserContext.js";
 
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { Link } from "react-router-dom";
 import CompNavbar from "../template/Nabvar.js";
 import CompFooter from "../template/Footer";
 
@@ -69,7 +68,8 @@ const Home = () => {
 
         {/* <!-- about --> */}
         <div className="container about" id="about1">
-          <h1 className="section-title">{user.email} Acerca de.</h1>
+          {/* <h1 className="section-title">{user ? user.email : ""} Acerca de.</h1> */}
+          <h1 className="section-title">{user ? JSON.stringify(user) : ''} Acerca de.</h1>
             
 
           <div className="row">
