@@ -17,46 +17,32 @@ import CourseCreate from "./elements/CourseCreate";
 import CourseDetail from "./elements/CourseDetail";
 import CourseUpdate from "./elements/CourseUpdate";
 import EmailSentMessage from "./auth/EmailSent.js";
+// hooks
+import {UserContext} from "./hooks/UserContext.js"
 
-// import Hooks
-import { UserContextProvider,useUserContext  } from "./hooks/UserContext.js";
 
 function App() {
   const [message, setMessage] = useState("");
-  const [userData, setUserData] = useState(null);
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
-    fetch("http://localhost:6001")
+    fetch("http://localhost:6002")
       .then((res) => res.json())
       .then((data) => {
         setMessage(data.message);
         console.log(data.message);
-        fetchUserData();
       })
       .catch((err) => console.error(err));
   }, []);
 
-  const fetchUserData = async () => {
-    try {
-      const response = await fetch("http://localhost:6001/userData");
-      if (response.ok) {
-        const data = await response.json();
-        setUserData(data.userData);
-      } else {
-        throw new Error("Failed to fetch user data");
-      }
-    } catch (error) {
-      console.error("Error fetching user data:", error);
-    }
-  };
 
   return (
     <div className="App">
       <BrowserRouter>
-        <UserContextProvider>
+      <UserContext.Provider value={{user, setUser}}>
           <Routes>
             {/* INDEX */}
-            <Route path="/" element={<Home userData={userData}/>} />
+            <Route path="/" element={<Home/>} />
             {/* AADMIN */}
             {/* router.post("/users/change-role", admin_staff_check, controller.changeUserRole); */}
             {/* router.post("/users", admin_staff_check,controller.getUsers); */}
@@ -72,18 +58,18 @@ function App() {
             <Route path="/email-sent" element={<EmailSentMessage />} />
 
             {/* COURSES */}
-            <Route path="/api/courses" element={<Courses userData={userData} />} />
-            <Route path="/api/course/create" element={<CourseCreate userData={userData} />} />
-            <Route path="/api/course/:id" element={<CourseDetail userData={userData} />} />
-            <Route path="/api/course/update/:id" element={<CourseUpdate userData={userData}/>} />
+            <Route path="/api/courses" element={<Courses/>} />
+            <Route path="/api/course/create" element={<CourseCreate />} />
+            <Route path="/api/course/:id" element={<CourseDetail/>} />
+            <Route path="/api/course/update/:id" element={<CourseUpdate />} />
   
             {/* BLOGS */}
-            <Route path="/api/blog" element={<CompBlogList userData={userData} />} />
-            <Route path="/api/blog/create" element={<CompBlogCreate userData={userData} />} />
-            <Route path="/api/blog/:id/update" element={<CompBlogUpdate userData={userData} />} />
+            <Route path="/api/blog" element={<CompBlogList />} />
+            <Route path="/api/blog/create" element={<CompBlogCreate />} />
+            <Route path="/api/blog/:id/update" element={<CompBlogUpdate />} />
          
           </Routes>
-        </UserContextProvider>
+          </UserContext.Provider>
       </BrowserRouter>
     </div>
   );

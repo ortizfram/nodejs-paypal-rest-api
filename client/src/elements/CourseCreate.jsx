@@ -1,8 +1,10 @@
 import axios from "axios";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { UserContext } from "../hooks/UserContext.js";
 
-const CourseCreate = ({ userData }) => {
+const CourseCreate = () => {
+
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [text_content, setTextContent] = useState("");
@@ -15,6 +17,7 @@ const CourseCreate = ({ userData }) => {
   const [videoUrl, setVideoUrl] = useState(null);
   const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
+  const {authUser} = useContext(UserContext)
 
   const handleThumbnailChange = (e) => {
     setThumbnail(e.target.files[0]);
@@ -32,7 +35,7 @@ const CourseCreate = ({ userData }) => {
       formData.append("image", thumbnail);
 
       const response = await axios.post(
-        "http://localhost:6001/upload/image",
+        "http://localhost:6002/upload/image",
         formData,
         {
           headers: {
@@ -55,7 +58,7 @@ const CourseCreate = ({ userData }) => {
       formData.append("video", video);
 
       const response = await axios.post(
-        "http://localhost:6001/upload/video",
+        "http://localhost:6002/upload/video",
         formData,
         {
           headers: {
@@ -86,7 +89,7 @@ const CourseCreate = ({ userData }) => {
         thumbnailFormData.append("image", thumbnail);
   
         const thumbnailResponse = await axios.post(
-          "http://localhost:6001/upload/image",
+          "http://localhost:6002/upload/image",
           thumbnailFormData,
           {
             headers: {
@@ -105,7 +108,7 @@ const CourseCreate = ({ userData }) => {
         videoFormData.append("video", video);
   
         const videoResponse = await axios.post(
-          "http://localhost:6001/upload/video",
+          "http://localhost:6002/upload/video",
           videoFormData,
           {
             headers: {
@@ -131,11 +134,11 @@ const CourseCreate = ({ userData }) => {
       formData.append("discount", discount);
       formData.append("thumbnail", thumbnailUrl); // Use the uploaded thumbnail URL
       formData.append("video", videoUrl); // Use the uploaded video URL
-      formData.append("author_id", userData.id);
+      formData.append("author_id", authUser.id);
   
       try {
         const courseResponse = await axios.post(
-          "http://localhost:6001/api/course/create",
+          "http://localhost:6002/api/course/create",
           formData,
           {
             headers: {
@@ -181,7 +184,7 @@ const CourseCreate = ({ userData }) => {
     <>
       <div id="create-course-container-page">
         <div id="create-course-container" className="mt-8">
-        {userData && <p className="text-primary">Hello, {userData.id}!</p>}
+        {authUser && <p className="text-primary">Hello, {authUser.id}!</p>}
           <h1 className="section-title">Creando Curso</h1>
           <div>
             <form
@@ -241,7 +244,7 @@ const CourseCreate = ({ userData }) => {
                   <h3>Uploaded Video:</h3>
                   <video controls width="30%">
                     <source
-                      src={`http://localhost:6001${videoUrl}`}
+                      src={`http://localhost:6002${videoUrl}`}
                       type="video/mp4"
                     />
                     Your browser does not support the video tag.
@@ -268,7 +271,7 @@ const CourseCreate = ({ userData }) => {
               {thumbnailUrl && (
                 <div>
                   <img
-                    src={`http://localhost:6001${thumbnailUrl}`}
+                    src={`http://localhost:6002${thumbnailUrl}`}
                     alt="Uploaded"
                     style={{ maxWidth: "30%" }}
                   />
@@ -310,7 +313,7 @@ const CourseCreate = ({ userData }) => {
                 onChange={(e) => setDiscount(e.target.value)}
               />
               <br />
-              <input type="hidden" name="author" value={userData} />
+              <input type="hidden" name="author" value={authUser} />
               <button type="submit">Create Course</button>
             </form>
           </div>

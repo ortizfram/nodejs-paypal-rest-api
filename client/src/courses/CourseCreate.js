@@ -6,7 +6,7 @@ import CompNavbar from "../template/Nabvar";
 import CompFooter from "../template/Footer";
 // import css
 import "../public/css/course/courseCreate.css";
-import { useUserContext } from "../hooks/UserContext";
+import { UserContext } from "../hooks/UserContext.js";
 import { createRef } from "react";
 
 // NodeJS endpoint reference
@@ -14,7 +14,7 @@ const URI = `/api/course/create`;
 
 const CompCourseCreate = () => {
   // pass context user
-  const { userData } = useUserContext();
+  const { userData } = useAuth();
   const navigate = useNavigate();
   let user = userData;
 
@@ -95,7 +95,7 @@ const CompCourseCreate = () => {
       formData.append("thumbnail", thumbnail);
 
       const response = await axios.post(
-        "http://localhost:6001/upload/image",
+        "http://localhost:6002/upload/image",
         formData,
         {
           headers: {
@@ -118,7 +118,7 @@ const CompCourseCreate = () => {
       formData.append("video", video);
 
       const response = await axios.post(
-        "http://localhost:6001/upload/video",
+        "http://localhost:6002/upload/video",
         formData,
         {
           headers: {

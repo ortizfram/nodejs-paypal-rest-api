@@ -49,10 +49,10 @@ app.use(
     console.log("Connected to MySQL database");
   });
   
-  const port = 6001;
+  const port = 6002;
   const HOST = process.env.HOST;
   const FRONTEND_URL = isDev ? "http://localhost:3000" : process.env.FRONTEND_URL;
-const BACKEND_URL = isDev ? "http://localhost:6001" : process.env.BACKEND_URL;
+const BACKEND_URL = isDev ? "http://localhost:6002" : process.env.BACKEND_URL;
 
 
 

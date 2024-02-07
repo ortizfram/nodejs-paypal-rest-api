@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 
 // NodeJS endpoint reference
-const URI = "http://localhost:6001/api/blog/";
+const URI = "http://localhost:6002/api/blog/";
 
 const CompBlogCreate = () => {
 // 

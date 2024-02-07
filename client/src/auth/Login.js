@@ -1,7 +1,7 @@
 // ... (other imports)
 import axios from "axios";
 import { useState } from "react";
-import { useUserContext } from "../hooks/UserContext";
+import { UserContext } from "../hooks/UserContext.js";
 import { useNavigate } from "react-router-dom";
 
 const CompLogin = () => {
@@ -9,13 +9,13 @@ const CompLogin = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [backendMessage, setBackendMessage] = useState("");
-  const { setUserData } = useUserContext();
+  const { setUserData } = useAuth();
 
   const handleLogin = async (e) => {
     e.preventDefault();
 
     try {
-      const response = await axios.post('http://localhost:6001/api/login', {
+      const response = await axios.post('http://localhost:6002/api/login', {
         email,
         password
       });

@@ -2,13 +2,13 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import CompNavbar from '../template/Nabvar';
 import CompFooter from '../template/Footer';
-import { useUserContext } from '../hooks/UserContext';
+import { UserContext } from "../hooks/UserContext.js";
 import '../public/css/course/courseDetail.css';
 
 const URI = "/api/course/:id";
 
 const CourseDetailComponent = () => {
-  const { userData } = useUserContext();
+  const { userData } = useAuth();
   const [course, setCourse] = useState(null);
   const user = userData;
   const { id } = useParams();

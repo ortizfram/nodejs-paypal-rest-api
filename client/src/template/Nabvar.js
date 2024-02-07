@@ -1,16 +1,15 @@
 import axios from "axios";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
-import { useUserContext } from "../hooks/UserContext";
+import { UserContext } from "../hooks/UserContext.js";
 import "../public/css/layout/navbar.css"
 
 // NodeJS endpoint reference
-const URI = "http://localhost:6001"; // Update the base URL
+const URI = "http://localhost:6002"; // Update the base URL
 
 const CompNavbar = () => {
-    const { userData } = useUserContext();
-
+    const { userData } = useContext(UserContext);
     let user = userData;
     
     return (

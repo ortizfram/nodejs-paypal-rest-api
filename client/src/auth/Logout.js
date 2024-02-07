@@ -1,15 +1,15 @@
 import axios from "axios";
-import { useUserContext } from "../hooks/UserContext";
+import { UserContext } from "../hooks/UserContext.js";
 import { useNavigate } from "react-router-dom";
 
 const CompLogout = () => {
   const navigate = useNavigate();
-  const { setUserData } = useUserContext();
+  const { setUserData } = useAuth();
 
   const handleLogout = async () => {
     try {
       // Make an API request to log the user out on the server
-      await axios.post('http://localhost:6001/api/logout');
+      await axios.post('http://localhost:6002/api/logout');
 
       // Clear user data from localStorage on logout
       localStorage.removeItem('userData');

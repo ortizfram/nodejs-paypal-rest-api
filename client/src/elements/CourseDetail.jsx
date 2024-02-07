@@ -1,14 +1,14 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { useParams } from "react-router-dom";
 import CompNavbar from '../template/Nabvar';
 import CompFooter from '../template/Footer';
-import { useUserContext } from '../hooks/UserContext';
+import { UserContext } from "../hooks/UserContext.js";
 import '../public/css/course/courseDetail.css';
 
 const CourseDetail = () => {
-  const { userData } = useUserContext();
-  const [course, setCourse] = useState(null);
+  const { userData } = useContext(UserContext);
   const user = userData;
+  const [course, setCourse] = useState(null);
   const { id } = useParams();
 
   useEffect(() => {

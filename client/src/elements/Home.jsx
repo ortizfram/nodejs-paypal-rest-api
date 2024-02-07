@@ -1,5 +1,7 @@
+import { useState, useEffect, useContext } from "react";
+import { UserContext } from "../hooks/UserContext.js";
+
 import axios from "axios";
-import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 import CompNavbar from "../template/Nabvar.js";
@@ -9,7 +11,7 @@ import CompFooter from "../template/Footer";
 const URI_sendEmail = "/send-email"; // Update the base URL
 
 const Home = () => {
-  let user = null;
+  const {user, setUser}= useContext(UserContext)
 
   const me_about_img_style = {
     maxWidth: "300px",
@@ -62,12 +64,13 @@ const Home = () => {
             className="hero-logo"
             src="/images/home/white-logo-buonavibra.png"
             alt=""
-          />
+            />
         </div>
 
         {/* <!-- about --> */}
         <div className="container about" id="about1">
-          <h1 className="section-title">Acerca de.</h1>
+          <h1 className="section-title">{user.email} Acerca de.</h1>
+            
 
           <div className="row">
             <div className="col-md-6 text-center">

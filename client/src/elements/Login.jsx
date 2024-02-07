@@ -1,14 +1,13 @@
-import axios from "axios";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useUserContext } from "../hooks/UserContext";
+import { UserContext } from "../hooks/UserContext.js";
 
 const Login = () => {
+  const { setUser } = useContext(UserContext);
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [backendMessage, setBackendMessage] = useState("");
-  const { setUserData,userData } = useUserContext();
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -23,14 +22,9 @@ const Login = () => {
       });
       const data = await response.json();
 
-      // fetch backendMessage
-      setBackendMessage(data.message); // Use data.message from the response
-
       if (response.ok) {
-        setUserData(data.user);
-        console.log("setUserData:",userData)
-        console.log("Login successful:", data.user);
-        const next = data.redirectUrl; // Use data.redirectUrl from the response
+        setUser(data.user); // Update the user state in the App component
+        const next = data.redirectUrl;
         if (data.status === "success") {
           navigate(next);
         } else {
@@ -40,7 +34,7 @@ const Login = () => {
           }
         }
       } else {
-        console.error("Login failed:", data.message); // Log the error message
+        console.error("Login failed:", data.message);
         setBackendMessage(data.message);
       }
     } catch (error) {
@@ -53,7 +47,7 @@ const Login = () => {
 
   return (
     <div>
-      <form>
+      <form onSubmit={handleLogin}>
         {/* Render backend message */}
         {backendMessage && (
           <p style={{ color: "red" }}>{backendMessage}</p>
@@ -62,7 +56,7 @@ const Login = () => {
         <input type="text" onChange={(e) => setEmail(e.target.value)} />
         <label>Password</label>
         <input type="password" onChange={(e) => setPassword(e.target.value)} />
-        <button onClick={handleLogin}>Login</button>
+        <button type="submit">Login</button>
       </form>
     </div>
   );

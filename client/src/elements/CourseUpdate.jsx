@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { useUserContext } from "../hooks/UserContext";
+import { UserContext } from "../hooks/UserContext.js";
 import axios from "axios";
 import "../public/css/course/courseUpdate.css";
 
 const CourseUpdate = () => {
-  const { userData } = useUserContext();
+  const { userData } = useContext(useContext);
   const user = userData;
   const { id } = useParams();
   const navigate = useNavigate();
@@ -61,7 +61,7 @@ const CourseUpdate = () => {
       formData.append("thumbnail", thumbnail);
 
       const response = await axios.post(
-        `http://localhost:6001/upload/image`, // Update with the appropriate endpoint for updating thumbnails
+        `http://localhost:6002/upload/image`, // Update with the appropriate endpoint for updating thumbnails
         formData
       );
 
@@ -79,7 +79,7 @@ const CourseUpdate = () => {
       formData.append("video", video);
 
       const response = await axios.post(
-        `http://localhost:6001/upload/video`, // Update with the appropriate endpoint for updating videos
+        `http://localhost:6002/upload/video`, // Update with the appropriate endpoint for updating videos
         formData
       );
 
@@ -101,7 +101,7 @@ const CourseUpdate = () => {
     try {
       const updatedCourse = { ...course, videoUrl, thumbnailUrl };
       const response = await axios.post(
-        `http://localhost:6001/api/course/update/${id}`,
+        `http://localhost:6002/api/course/update/${id}`,
         updatedCourse
       );
       if (response.status === 200) {
