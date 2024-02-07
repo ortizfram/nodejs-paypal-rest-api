@@ -31,10 +31,24 @@ function App() {
       .then((data) => {
         setMessage(data.message);
         console.log(data.message);
-        setUserData(data.userData, JSON.stringify(data.userData));
+        fetchUserData();
       })
       .catch((err) => console.error(err));
   }, []);
+
+  const fetchUserData = async () => {
+    try {
+      const response = await fetch("http://localhost:6001/userData");
+      if (response.ok) {
+        const data = await response.json();
+        setUserData(data.userData);
+      } else {
+        throw new Error("Failed to fetch user data");
+      }
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+    }
+  };
 
   return (
     <div className="App">

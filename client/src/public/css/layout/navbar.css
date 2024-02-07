@@ -1,3 +1,5 @@
+
+
   @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap');
 
   * {
@@ -62,7 +64,7 @@
   }
 
   .logo img {
-    width: 100%;
+    width: 75%;
     height: auto;
   }
 
@@ -196,7 +198,7 @@
       /* Add margin for better spacing */
     }
 
-    .logo {
+    .logo, .avatar {
       width: 100px; /* Adjust width for larger screens */
       height: 50px; /* Adjust height for larger screens */
       z-index: 9999 !important;
@@ -207,7 +209,7 @@
   @media (max-width: 768px) {
     /*MD ↓ *********************************/
     
-    .logo {
+    .logo, .avatar {
       width: 100px; /* Adjust width for medium screens */
       height: 50px; /* Adjust height for medium screens */
       z-index: 9999 !important;
@@ -270,7 +272,7 @@
 
   @media (max-width: 576px) {
     /* SM ↓ *********************************/
-    .logo {
+    .logo, .avatar {
       width: 100px; /* Adjust width for smaller screens */
       height: 50px; /* Adjust height for smaller screens */
       z-index: 9999 !important;

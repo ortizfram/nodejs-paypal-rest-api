@@ -18,8 +18,14 @@ export const UserContextProvider = ({ children }) => {
     }
   });
 
+  // Function to update userData and also update localStorage
+  const updateUserAndLocalStorage = (newUserData) => {
+    setUserData(newUserData);
+    localStorage.setItem('userData', JSON.stringify(newUserData));
+  };
+
   return (
-    <UserContext.Provider value={{ userData, setUserData }}>
+    <UserContext.Provider value={{ userData, setUserData: updateUserAndLocalStorage  }}>
       {children}
     </UserContext.Provider>
   );

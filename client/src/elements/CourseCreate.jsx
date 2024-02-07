@@ -1,11 +1,8 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useUserContext } from "../hooks/UserContext";
 
-const CourseCreate = () => {
-  const { userData } = useUserContext();
-  const [user, setUser] = useState([]);
+const CourseCreate = ({ userData }) => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [text_content, setTextContent] = useState("");
@@ -18,10 +15,6 @@ const CourseCreate = () => {
   const [videoUrl, setVideoUrl] = useState(null);
   const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
-
-  useEffect(() => {
-    setUser(userData);
-  }, [userData]);
 
   const handleThumbnailChange = (e) => {
     setThumbnail(e.target.files[0]);
@@ -83,9 +76,9 @@ const CourseCreate = () => {
     e.preventDefault();
     try {
       // Check if user ID exists in session
-      if (!user || !user.id) {
-        throw new Error("User ID not found in the session");
-      }
+      // if (!userData || !userData.id) {
+      //   throw new Error("User ID not found in the session");
+      // }
   
       // Upload thumbnail if it exists
       if (thumbnail) {
@@ -138,7 +131,7 @@ const CourseCreate = () => {
       formData.append("discount", discount);
       formData.append("thumbnail", thumbnailUrl); // Use the uploaded thumbnail URL
       formData.append("video", videoUrl); // Use the uploaded video URL
-      formData.append("author_id", user.id);
+      formData.append("author_id", userData.id);
   
       try {
         const courseResponse = await axios.post(
@@ -188,8 +181,7 @@ const CourseCreate = () => {
     <>
       <div id="create-course-container-page">
         <div id="create-course-container" className="mt-8">
-        {userData && <p className="text-primary">Hello, {userData.username}!</p>}
-        {user && <p className="text-primary">Hello, id:{user.id}!{user.username}</p>}
+        {userData && <p className="text-primary">Hello, {userData.id}!</p>}
           <h1 className="section-title">Creando Curso</h1>
           <div>
             <form
@@ -318,7 +310,7 @@ const CourseCreate = () => {
                 onChange={(e) => setDiscount(e.target.value)}
               />
               <br />
-              <input type="hidden" name="author" value={user} />
+              <input type="hidden" name="author" value={userData} />
               <button type="submit">Create Course</button>
             </form>
           </div>

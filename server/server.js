@@ -353,17 +353,16 @@ app.post("/reset-password/:id/:token", async (req, res) => {
   }
 });
 
+// if (!req.session || !req.session.user || !req.session.user.id) {
+//   return res
+//     .status(401)
+//     .json({ message: "User ID not found in the session" });
+// }
+
+// const authorId = req.session.user.id;
+// console.log("session user id: ", authorId);
 app.post("/api/course/create", async (req, res) => {
   try {
-    if (!req.session || !req.session.user || !req.session.user.id) {
-      return res
-        .status(401)
-        .json({ message: "User ID not found in the session" });
-    }
-
-    const authorId = req.session.user.id;
-    console.log("session user id: ", authorId);
-
     // Files upload check
     if (!req.files || !req.files.thumbnail || !req.files.video) {
       return res
