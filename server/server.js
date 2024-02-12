@@ -11,8 +11,6 @@ import { fileURLToPath } from "url";
 import morgan from "morgan";
 import methodOverride from "method-override";
 import { getUserEnrolledCoursesQuery } from "./db/queries/course.queries.js";
-import { Marked, marked } from "marked";
-import bodyParser from "body-parser";
 import multer from "multer";
 // shortcuts for files/dirs
 export const __filename = fileURLToPath(import.meta.url);
@@ -55,59 +53,6 @@ const FRONTEND_URL = isDev ? "http://localhost:3000" : process.env.FRONTEND_URL;
 const BACKEND_URL = isDev ? "http://localhost:6003" : process.env.BACKEND_URL;
 
 // %%%%%%%%%%%%%%%%%%%%%%%%%%% UPLOAD FILES & HANDLINGUPLOAD ENDPOINTS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-// // Multer storage configuration for images
-// const imageStorage = multer.diskStorage({
-//   destination: path.join(__dirname, "src", "uploads", "imgs"),
-//   filename: function (req, file, cb) {
-//     cb(
-//       null,
-//       file.fieldname + "-" + Date.now() + path.extname(file.originalname)
-//     );
-//   },
-// });
-
-// // Multer storage configuration for videos
-// const videoStorage = multer.diskStorage({
-//   destination: path.join(__dirname, "src", "uploads", "videos"),
-//   filename: function (req, file, cb) {
-//     cb(
-//       null,
-//       file.fieldname + "-" + Date.now() + path.extname(file.originalname)
-//     );
-//   },
-// });
-
-// // Multer upload instances
-// const uploadImage = multer({ storage: imageStorage });
-// const uploadVideo = multer({ storage: videoStorage });
-
-// // Serve static files from the 'uploads' directory
-// app.use(
-//   "/imgs",
-//   express.static(path.join(__dirname, "src", "uploads", "imgs"))
-// );
-// app.use(
-//   "/videos",
-//   express.static(path.join(__dirname, "src", "uploads", "videos"))
-// );
-
-// // Handling image upload route
-// app.post("/upload/image", uploadImage.single("image"), async(req, res) => {
-//   if (!req.file) {
-//     return res.status(400).send("No file uploaded.");
-//   }
-//   const imageUrl = `/imgs/${req.file.filename}`;
-//   res.status(200).json({ imageUrl: imageUrl });
-// });
-
-// // Handling video upload route
-// app.post("/upload/video", uploadVideo.single("video"), async(req, res) => {
-//   if (!req.file) {
-//     return res.status(400).send("No file uploaded.");
-//   }
-//   const videoUrl = `/videos/${req.file.filename}`;
-//   res.status(200).json({ videoUrl: videoUrl });
-// });
 
 // Multer storage configuration for both images and videos
 const storage = multer.diskStorage({
@@ -121,7 +66,7 @@ const storage = multer.diskStorage({
   },
 });
 
-// Multer upload instance for both images and videos
+// Create multer upload instance
 const upload = multer({ storage: storage });
 
 // Serve static files from the 'uploads' directory
@@ -169,14 +114,7 @@ app.get("/userData", async (req, res) => {
 // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^   ENDPOINTS   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 app.get("/", async (req, res) => {});
 
-// if (!req.session || !req.session.user || !req.session.user.id) {
-//   return res
-//     .status(401)
-//     .json({ message: "User ID not found in the session" });
-// }
-
-// const authorId = req.session.user.id;
-// console.log("session user id: ", authorId);
+// course create
 app.post(
   "/api/course/create",
   upload.fields([
@@ -184,160 +122,84 @@ app.post(
     { name: "video", maxCount: 1 },
   ]),
   async (req, res) => {
-    console.log(req.body)
-    console.log(req.files)
+    console.log(req.body);
+    console.log(req.files);
+
     try {
-      const imageUrl = req.files["image"]
-        ? "/uploads/" + req.files["image"][0].filename
-        : null;
-      const videoUrl = req.files["video"]
-        ? "/uploads/" + req.files["video"][0].filename
-        : null;
+      const imageUrl = req.files && req.files["image"] ? "/uploads/" + req.files["image"][0].filename : null;
+      const videoUrl = req.files && req.files["video"] ? "/uploads/" + req.files["video"][0].filename : null;
 
       if (!imageUrl && !videoUrl) {
         return res.status(400).send("No files uploaded.");
       }
 
       // Extract necessary data from request body
-      let { title, description, text_content, ars_price, usd_price, discount } =
-        req.body;
-      // Log the extracted data to the console
-      console.log("Extracted data from request body:", 
-        req.body
-      );
+      const { title, description, text_content, ars_price, usd_price, discount } = req.body;
 
-      // Array de campos para validar
-      const camposRequeridos = [
-        "title",
-        "description",
-        "text_content",
-        "ars_price",
-        "usd_price",
-      ];
-
-      // Validar campos no pueden estar vacíos
-      for (const campo of camposRequeridos) {
-        if (!req.body[campo]) {
-          return res
-            .status(400)
-            .json({ message: `El campo ${campo} es obligatorio` });
+      // Validate required fields
+      const requiredFields = ["title", "description", "text_content", "ars_price", "usd_price"];
+      for (const field of requiredFields) {
+        if (!req.body[field]) {
+          return res.status(400).json({ message: `The field '${field}' is required.` });
         }
       }
 
       // Ensure title is a string
+      let courseTitle = title;
       if (typeof title !== "string") {
-        title = String(title);
+        courseTitle = String(title);
       }
 
       // Generate course slug
-      const courseSlug = slugify(title, { lower: true, strict: true });
+      const courseSlug = slugify(courseTitle, { lower: true, strict: true });
 
       // Manage discount value
       const discountValue = discount !== "" ? discount : null;
 
       // Generate unique filename for thumbnail
       const timestamp = Date.now();
-      const filename = req.files.image.name;
-      const uniqueFilename = encodeURIComponent(`${timestamp}_${filename}`);
-      const relativePath = "/src/uploads/imgs/" + uniqueFilename;
+      const thumbnailFilename = req.files["image"][0].filename;
+      const thumbnailPath = "/src/uploads/imgs/" + thumbnailFilename;
 
       // Generate unique filename for video
-      const videoFile = req.files.video.name;
-      const uniqueVideoFilename = encodeURIComponent(
-        `${timestamp}_${videoFile}`
-      );
-      const videoPath = "/src/uploads/videos/" + uniqueVideoFilename;
-
-      // Move uploaded thumbnail to the server
-      await req.files.image.mv(
-        path.join(__dirname, "src", "uploads", "imgs", uniqueFilename),
-        async (err) => {
-          if (err) {
-            console.error(err);
-            return res
-              .status(500)
-              .json({ message: "Error uploading the file" });
-          }
-        }
-      );
-
-      // video file upload handling
-      await req.files.video.mv(
-        path.join(__dirname, "src", "uploads", "videos", uniqueVideoFilename),
-        async (err) => {
-          if (err) {
-            console.error(err);
-            return res
-              .status(500)
-              .json({ message: "Error uploading the video file" });
-          }
-        }
-      );
+      const videoFilename = req.files["video"][0].filename;
+      const videoPath = "/src/uploads/videos/" + videoFilename;
 
       // Get current timestamp
       const currentDate = new Date();
-      const currentTimestamp = `${currentDate
-        .getDate()
-        .toString()
-        .padStart(2, "0")}-${(currentDate.getMonth() + 1)
-        .toString()
-        .padStart(2, "0")}-${currentDate.getFullYear().toString()} ${currentDate
-        .getHours()
-        .toString()
-        .padStart(2, "0")}:${currentDate
-        .getMinutes()
-        .toString()
-        .padStart(2, "0")}:${currentDate
-        .getSeconds()
-        .toString()
-        .padStart(2, "0")}`;
-
-      // Set MIME type for the uploaded video
-      setCustomMimeTypes(
-        {
-          path: `/src/uploads/videos/${uniqueVideoFilename}`,
-        },
-        res,
-        () => {} // Empty callback as it's not required in this context
-      );
+      const currentTimestamp = `${currentDate.getDate().toString().padStart(2, "0")}-${(currentDate.getMonth() + 1).toString().padStart(2, "0")}-${currentDate.getFullYear().toString()} ${currentDate.getHours().toString().padStart(2, "0")}:${currentDate.getMinutes().toString().padStart(2, "0")}:${currentDate.getSeconds().toString().padStart(2, "0")}`;
 
       // Prepare course data
       const courseData = [
-        title,
+        courseTitle,
         courseSlug,
         description,
         text_content,
         ars_price,
         usd_price,
         discountValue,
-        relativePath,
+        thumbnailPath,
         videoPath,
         currentTimestamp,
         currentTimestamp,
         authorId,
       ];
-      console.log("\n\ncourseData: ", courseData);
 
-      // Create the new course using the SQL query
-      let argentinaTimeZone =
-        "CONVERT_TZ(NOW(), 'UTC', 'America/Argentina/Buenos_Aires')";
-      let sql = `INSERT INTO courses (title, slug, description, text_content,  ars_price, usd_price, discount, thumbnail, video, created_at, updated_at, author_id)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
-    `;
-      const [courseRow] = await db.promise().execute(sql, courseData);
+      // Insert course data into the database
+      const sql = `INSERT INTO courses (title, slug, description, text_content, ars_price, usd_price, discount, thumbnail, video, created_at, updated_at, author_id)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+      await db.promise().execute(sql, courseData);
 
-      // Fetch the created course & JOIN with user as author
-      sql = `SELECT * FROM courses WHERE slug = ?`;
-      const [fetchedCourse] = await db.promise().execute(sql, courseSlug);
+      // Fetch the created course
+      const [fetchedCourse] = await db.promise().execute(`SELECT * FROM courses WHERE slug = ?`, [courseSlug]);
       const course = fetchedCourse[0];
-      const courseId = course.id;
 
-      console.log("\n\n◘ Creating course...");
-      console.log("\n\ncourse :", course);
+      console.log("\nCreating course...");
+      console.log("\nCourse:", course);
 
       // Redirect after creating the course
       return res.status(201).json({
-        message: "course Created successfully",
+        message: "Course created successfully",
         redirectUrl: `/api/courses`,
       });
     } catch (error) {
