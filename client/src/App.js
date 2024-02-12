@@ -34,7 +34,7 @@ function App() {
   }, []);
 
   useEffect(() => {
-    fetch("http://localhost:6002")
+    fetch("http://localhost:6003")
       .then((res) => res.json())
       .then((data) => {
         setUser(data.userData); // set it here so when page changes its available

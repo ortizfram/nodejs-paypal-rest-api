@@ -95,7 +95,7 @@ const CompCourseCreate = () => {
       formData.append("thumbnail", thumbnail);
 
       const response = await axios.post(
-        "http://localhost:6002/upload/image",
+        "http://localhost:6003/upload/image",
         formData,
         {
           headers: {
@@ -118,7 +118,7 @@ const CompCourseCreate = () => {
       formData.append("video", video);
 
       const response = await axios.post(
-        "http://localhost:6002/upload/video",
+        "http://localhost:6003/upload/video",
         formData,
         {
           headers: {
