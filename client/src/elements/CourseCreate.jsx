@@ -156,7 +156,7 @@ const CourseCreate = () => {
                 onChange={handleChange}
               />
               <br />
-              <input type="hidden" name="author" value={JSON.stringify(user)} />
+              <input type="hidden" name="author" value={user.id} />
               <button type="submit">Create Course</button>
             </form>
           </div>

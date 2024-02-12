@@ -134,7 +134,7 @@ app.post(
       }
 
       // Extract necessary data from request body
-      const { title, description, text_content, ars_price, usd_price, discount } = req.body;
+      const { title, description, text_content, ars_price, usd_price, discount, autho: authorId } = req.body;
 
       // Validate required fields
       const requiredFields = ["title", "description", "text_content", "ars_price", "usd_price"];
@@ -167,7 +167,7 @@ app.post(
 
       // Get current timestamp
       const currentDate = new Date();
-      const currentTimestamp = `${currentDate.getDate().toString().padStart(2, "0")}-${(currentDate.getMonth() + 1).toString().padStart(2, "0")}-${currentDate.getFullYear().toString()} ${currentDate.getHours().toString().padStart(2, "0")}:${currentDate.getMinutes().toString().padStart(2, "0")}:${currentDate.getSeconds().toString().padStart(2, "0")}`;
+      const currentTimestamp = moment().format('YYYY-MM-DD HH:mm:ss');
 
       // Prepare course data
       const courseData = [
