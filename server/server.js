@@ -364,11 +364,11 @@ app.post("/reset-password/:id/:token", async (req, res) => {
 app.post("/api/course/create", async (req, res) => {
   try {
     // Files upload check
-    if (!req.files || !req.files.thumbnail || !req.files.video) {
-      return res
-        .status(400)
-        .json({ message: "video y miniatura no pueden estar vacios" });
-    }
+    // if (!req.file) {
+    //   return res
+    //     .status(400)
+    //     .json({ message: "video y miniatura no pueden estar vacios" });
+    // }
 
     // Extract necessary data from request body
     let { title, description, text_content, ars_price, usd_price, discount } =
