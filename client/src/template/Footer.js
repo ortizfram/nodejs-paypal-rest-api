@@ -2,6 +2,7 @@ import axios from "axios";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
+import "../public/css/navigation.css"
 
 // NodeJS endpoint reference
 const URI = "http://localhost:6004"; // Update the base URL

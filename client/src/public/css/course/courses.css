@@ -62,6 +62,7 @@ h1 {
   font-family: Arial, sans-serif;
   flex-grow: 1; /* Allows the container to grow and take available space */
   overflow-y: auto; /* Enables vertical scrolling when content overflows */
+  z-index: 1;
 }
 
 /* Style for the go back button */
@@ -88,6 +89,7 @@ h1 {
   overflow: hidden; /* Ensure content doesn't overflow */
   margin-bottom: 20px;
   position: relative; /* Adjust for button positioning */
+  z-index: 1;
 }
 
 /* Style for the course image */
