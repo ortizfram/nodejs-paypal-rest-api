@@ -56,7 +56,7 @@ function Courses() {
                 
                 {/* DISCOUNT */}
                 {course.discount_ars || course.discount_usd ? (
-                  <p className="text-green">
+                  <p className="text-white fw-bolder text-xs bg-success p-1 rounded ">
                     USD {course.discount_usd}%OFF | ARS {course.discount_ars}%OFF
                   </p>
                 ) : null}
