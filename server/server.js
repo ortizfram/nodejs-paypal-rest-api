@@ -462,30 +462,25 @@ app.get("/api/courses", async (req, res) => {
     let user = req.session.user;
     const isAdmin = user && user.role === "admin";
 
-    const page = parseInt(req.query.page) || 1;
-    let perPage = parseInt(req.query.perPage) || 1;
+    // Fetch all courses ordered by updated_at descending
+    let sql = `
+      SELECT 
+        courses.*,
+        users.id AS author_id,
+        users.name AS author_name,
+        users.username AS author_username,
+        users.avatar AS author_avatar
+      FROM 
+        courses
+      LEFT JOIN 
+        users ON users.id = courses.author_id
+      ORDER BY 
+        courses.updated_at DESC
+    `;
 
-    // count courses
-    let sql = "SELECT COUNT(*) AS count FROM courses";
-    const [totalCourses] = await db.promise().query(sql);
-    const totalItems = totalCourses[0].count;
-
-    // fetch all courses aand join users on id
-    sql = `SELECT 
-    courses.*,
-    users.id AS author_id,
-    users.name AS author_name,
-    users.username AS author_username,
-    users.avatar AS author_avatar
-  FROM 
-    courses
-  LEFT JOIN 
-    users ON users.id = courses.author_id
-  LIMIT ?,?`;
-    const [coursesRows] = await db.promise().query(sql, [0, totalItems]);
+    const [coursesRows] = await db.promise().query(sql);
     console.log("coursesRows: ", coursesRows);
 
-    // map courses to add fields
     let courses = coursesRows.map((course) => {
       return {
         title: course.title,
@@ -493,6 +488,8 @@ app.get("/api/courses", async (req, res) => {
         description: course.description,
         ars_price: course.ars_price,
         usd_price: course.usd_price,
+        discount_ars: course.discount_ars,
+        discount_usd: course.discount_usd,
         thumbnail: course.thumbnail,
         id: course.id.toString(),
         thumbnailPath: `/uploads/${course.thumbnail}`,
@@ -507,10 +504,10 @@ app.get("/api/courses", async (req, res) => {
       };
     });
 
+    // Filter courses for enrolled user
     let enrolledCourseIds = [];
-
     if (user) {
-      const sql = `
+      const enrolledSql = `
         SELECT 
           courses.*,
           users.name AS author_name,
@@ -524,48 +521,31 @@ app.get("/api/courses", async (req, res) => {
           users ON courses.author_id = users.id
         WHERE 
           user_courses.user_id = ?
-        `;
-      const [enrolledCoursesRows] = await db.promise().query(sql, [user.id]);
-      enrolledCourseIds = enrolledCoursesRows.map((enrolledCourse) =>
-        enrolledCourse.id.toString()
-      );
+      `;
+      const [enrolledCoursesRows] = await db.promise().query(enrolledSql, [user.id]);
+      enrolledCourseIds = enrolledCoursesRows.map((enrolledCourse) => enrolledCourse.id.toString());
     }
 
-    courses = courses.filter(
-      (course) => !enrolledCourseIds.includes(course.id)
-    );
+    // Filter out enrolled courses
+    courses = courses.filter((course) => !enrolledCourseIds.includes(course.id));
 
-    const totalFilteredItems = courses.length;
-    const totalPages = Math.ceil(totalFilteredItems / perPage) || 1;
-
-    // Adjust perPage if there are fewer items than perPage value
-    if (totalFilteredItems < perPage) {
-      perPage = totalFilteredItems;
-    }
-
-    const offset = (page - 1) * perPage;
-    const coursesForPage = courses.slice(offset, offset + perPage);
-
-    // JSON response
+    // Send courses response
     res.status(200).json({
       route: "courses",
       title: "Cursos",
-      courses: coursesForPage,
-      totalItems: totalFilteredItems,
+      courses,
+      totalItems: courses.length,
       user,
       message,
       isAdmin,
-      perPage,
-      page,
-      offset,
-      currentPage: page,
-      totalPages,
     });
   } catch (error) {
     console.log("Error fetching courses:", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
+
+
 
 app.get("/api/course/:id", async (req, res) => {
   let courseId = req.params.id;
