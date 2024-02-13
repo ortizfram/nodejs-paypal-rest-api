@@ -34,7 +34,7 @@ const CourseCreate = () => {
     // Validate input for discount fields to ensure positive integers
   if (name === "discount_ars" || name === "discount_usd") {
     const intValue = parseInt(value);
-    if (!Number.isInteger(intValue) || intValue < 0) {
+    if (!Number.isInteger(intValue) || intValue <= 0) {
       setErrorMessage(`The field '${name}' must be a positive integer.`);
       return;
     }

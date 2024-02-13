@@ -29,19 +29,23 @@ function Courses() {
           {courses.map((course, index) => (
             <div key={index} className="course-item backdrop-filter shadow-lg">
               <a href={`/api/course/${course.id}`}>
-
                 {/* COURSE DATA */}
                 <img src={course.thumbnail} alt={`thumbnail-${course.slug}`} />
                 <p className="timestamp text-white">{course.updated_at}</p>
 
-                  {/* AUTHOR */}
+                {/* AUTHOR */}
                 <div className="author">
                   {course.author && course.author.avatar && (
-                    <img src={course.author.avatar} alt="User Avatar" className="avatar" />
+                    <img
+                      src={course.author.avatar}
+                      alt="User Avatar"
+                      className="avatar"
+                    />
                   )}
                   {course.author && (
                     <p className="author-info text-white">
-                      <strong>{course.author.username}</strong> • {course.author.name}
+                      <strong>{course.author.username}</strong> •{" "}
+                      {course.author.name}
                     </p>
                   )}
                 </div>
@@ -53,13 +57,19 @@ function Courses() {
                     USD {course.usd_price} | ARS {course.ars_price}
                   </p>
                 ) : null}
-                
-                {/* DISCOUNT */}
-                {course.discount_ars || course.discount_usd ? (
-                  <p className="text-white fw-bolder text-xs bg-success p-1 rounded ">
-                    USD {course.discount_usd}%OFF | ARS {course.discount_ars}%OFF
+
+                {/* DISCOUNT for ARS only */}
+                {course.discount_ars >= 1 && course.discount_usd < 1 && (
+                  <p className="text-white fw-bolder text-xs bg-success p-1 rounded">
+                    ARS {course.discount_ars}%OFF
                   </p>
-                ) : null}
+                )}
+                {/* DISCOUNT for USD only */}
+                {course.discount_usd >= 1 && course.discount_ars < 1 && (
+                  <p className="text-white fw-bolder text-xs bg-success p-1 rounded">
+                    USD ${course.discount_usd}%OFF
+                  </p>
+                )}
 
                 {/* DESCRIPTION */}
                 {course.description && (
@@ -71,7 +81,10 @@ function Courses() {
               {isAdmin && (
                 <div className="course-actions">
                   <p className="text-white">
-                    <a className="text-muted" href={`/api/course/${course.id}/update`}>
+                    <a
+                      className="text-muted"
+                      href={`/api/course/${course.id}/update`}
+                    >
                       <i className="fas fa-edit me-2"></i>
                     </a>
                     <input type="hidden" name="author" value={course.author} />

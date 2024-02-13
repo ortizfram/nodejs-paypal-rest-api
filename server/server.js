@@ -185,13 +185,13 @@ app.post(
       const timestamp = Date.now();
       const thumbnailFilename = req.files["image"][0].filename;
       const thumbnailPath = req.files["image"]
-        ? "/src/uploads/imgs/" + req.files["image"][0].filename
+        ? "/uploads/imgs/" + req.files["image"][0].filename
         : null;
 
       // Generate unique filename for video
       const videoFilename = req.files["video"][0].filename;
       const videoPath = req.files["video"]
-        ? "/src/uploads/videos/" + req.files["video"][0].filename
+        ? "/uploads/videos/" + req.files["video"][0].filename
         : null;
 
       // Get current timestamp
@@ -492,7 +492,7 @@ app.get("/api/courses", async (req, res) => {
         discount_usd: course.discount_usd,
         thumbnail: course.thumbnail,
         id: course.id.toString(),
-        thumbnailPath: `/uploads/${course.thumbnail}`,
+        thumbnailPath: course.thumbnail,
         created_at: new Date(course.created_at).toLocaleString(),
         updated_at: new Date(course.updated_at).toLocaleString(),
         author: {
