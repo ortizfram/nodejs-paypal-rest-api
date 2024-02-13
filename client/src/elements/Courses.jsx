@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { Link } from "react-router-dom";
+
 
 import "../public/css/course/courses.css";
 
@@ -20,15 +22,29 @@ function Courses() {
 
   return (
     <div className="courses-page-container">
-      <div className="courses-container">
+      <div className="courses-container ">
         <div className="section-title z-index-1">
           <h1 className="text-white">Cursos</h1>
         </div>
 
         <div className="courses-grid">
           {courses.map((course, index) => (
-            <div key={index} className="course-item backdrop-filter shadow-lg">
+            <div key={index}className="course-item position-relative backdrop-filter shadow-lg">
+                  {/* DISCOUNT for ARS only */}
+                  {course.discount_ars >= 1 && course.discount_usd < 1 && (
+                    <p  className="position-absolute start-40 top-0 translate-middle-x  translate-middle-y text-white text-center fw-lighter text-xs bg-success p-[0.1] rounded">
+                      ARS {course.discount_ars}%OFF
+                    </p>
+                  )}
+                  {/* DISCOUNT for USD only */}
+                  {course.discount_usd >= 1 && course.discount_ars < 1 && (
+                    <p  className="position-absolute start-40 top-0 translate-middle-x translate-middle-y text-white text-center fw-lighter text-xs bg-success p-[0.1] rounded">
+                      USD ${course.discount_usd}%OFF
+                    </p>
+                  )}
+                  
               <a href={`/api/course/${course.id}`}>
+
                 {/* COURSE DATA */}
                 <img src={course.thumbnail} alt={`thumbnail-${course.slug}`} />
                 <p className="timestamp text-white">{course.updated_at}</p>
@@ -58,18 +74,6 @@ function Courses() {
                   </p>
                 ) : null}
 
-                {/* DISCOUNT for ARS only */}
-                {course.discount_ars >= 1 && course.discount_usd < 1 && (
-                  <p className="text-white fw-bolder text-xs bg-success p-1 rounded">
-                    ARS {course.discount_ars}%OFF
-                  </p>
-                )}
-                {/* DISCOUNT for USD only */}
-                {course.discount_usd >= 1 && course.discount_ars < 1 && (
-                  <p className="text-white fw-bolder text-xs bg-success p-1 rounded">
-                    USD ${course.discount_usd}%OFF
-                  </p>
-                )}
 
                 {/* DESCRIPTION */}
                 {course.description && (
@@ -77,22 +81,24 @@ function Courses() {
                 )}
               </a>
 
-              {/* ADMIN */}
+              {/* ADMIN OPTIONS*/}
               {isAdmin && (
                 <div className="course-actions">
+                  {/* UPDATE */}
                   <p className="text-white">
                     <a
                       className="text-muted"
-                      href={`/api/course/${course.id}/update`}
+                      href={`/api/course/update/${course.id}`}
                     >
                       <i className="fas fa-edit me-2"></i>
                     </a>
                     <input type="hidden" name="author" value={course.author} />
                   </p>
+                  {/* DEL */}
                   <p>
                     <a
                       className="text-muted"
-                      href={`/api/course/${course.id}/delete?courseId=${course.id}`}
+                      href={`/api/course/delete/${course.id}`}
                     >
                       <i className="fas fa-trash-alt me-2"></i>
                     </a>
