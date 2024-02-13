@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { Link } from "react-router-dom";
 
 
 import "../public/css/course/courses.css";
@@ -8,6 +7,8 @@ import "../public/css/course/courses.css";
 function Courses() {
   const [courses, setCourses] = useState([]);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
 
   useEffect(() => {
     axios
@@ -22,6 +23,8 @@ function Courses() {
 
   return (
     <div className="courses-page-container">
+       {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
+      {successMessage && <p style={{ color: "green" }}>{successMessage}</p>}
       <div className="courses-container ">
         <div className="section-title z-index-1">
           <h1 className="text-white">Cursos</h1>
