@@ -87,6 +87,7 @@ const CourseEnroll = () => {
           <input type="hidden" name="courseId" value={course.id} />
           {/* You should replace the value of userId with the actual userId */}
           <input type="hidden" name="userId" value="<%= userId %>" />
+          <input type="hidden" name="courseId" value="<%= id %>" />
           <button type="submit">
             <img src="/images/mercado-pago.png" alt="mercado-pago-icon" />
             <p>Continue with Mercado Pago</p>

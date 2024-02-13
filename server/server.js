@@ -10,9 +10,12 @@ import slugify from "slugify";
 import { fileURLToPath } from "url";
 import morgan from "morgan";
 import methodOverride from "method-override";
-import { getUserEnrolledCoursesQuery } from "./db/queries/course.queries.js";
 import multer from "multer";
 import moment from "moment";
+import mercadopago from "mercadopago";
+import { getCourseFromIdQuery, getUserEnrolledCoursesQuery, tableCheckQuery } from "./db/queries/course.queries.js";
+import { createUserTableQuery } from "./db/queries/auth.queries.js";
+import createTableIfNotExists from "./src/public/js/createTable.js";
 // shortcuts for files/dirs
 export const __filename = fileURLToPath(import.meta.url);
 export const __dirname = path.dirname(__filename);
@@ -113,10 +116,16 @@ app.get("/userData", async (req, res) => {
 });
 
 // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^   ENDPOINTS   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-app.get("/", async (req, res) => {});
+app.get(
+  //home
+  "/",
+  async (req, res) => {}
+);
 
-// course create
+// COURSES >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
 app.post(
+  // course create
   "/api/course/create",
   upload.fields([
     { name: "image", maxCount: 1 },
@@ -243,8 +252,9 @@ app.post(
     }
   }
 );
-// course update
+
 app.put(
+  // course update
   "/api/course/update/:id",
   upload.fields([
     { name: "image", maxCount: 1 },
@@ -346,14 +356,17 @@ app.put(
   }
 );
 
-app.get("/api/courses", async (req, res) => {
-  try {
-    const message = req.query.message;
-    let user = req.session.user;
-    const isAdmin = user && user.role === "admin";
+app.get(
+  // courses list
+  "/api/courses",
+  async (req, res) => {
+    try {
+      const message = req.query.message;
+      let user = req.session.user;
+      const isAdmin = user && user.role === "admin";
 
-    // Fetch all courses ordered by updated_at descending
-    let sql = `
+      // Fetch all courses ordered by updated_at descending
+      let sql = `
       SELECT 
         courses.*,
         users.id AS author_id,
@@ -368,36 +381,36 @@ app.get("/api/courses", async (req, res) => {
         courses.updated_at DESC
     `;
 
-    const [coursesRows] = await db.promise().query(sql);
-    console.log("coursesRows: ", coursesRows);
+      const [coursesRows] = await db.promise().query(sql);
+      console.log("coursesRows: ", coursesRows);
 
-    let courses = coursesRows.map((course) => {
-      return {
-        title: course.title,
-        slug: course.slug,
-        description: course.description,
-        ars_price: course.ars_price,
-        usd_price: course.usd_price,
-        discount_ars: course.discount_ars,
-        discount_usd: course.discount_usd,
-        thumbnail: course.thumbnail,
-        id: course.id.toString(),
-        thumbnailPath: course.thumbnail,
-        created_at: new Date(course.created_at).toLocaleString(),
-        updated_at: new Date(course.updated_at).toLocaleString(),
-        author: {
-          name: course.author_name,
-          username: course.author_username,
-          avatar: course.author_avatar,
-        },
-        next: `/api/course/${course.id}`, // Dynamic course link
-      };
-    });
+      let courses = coursesRows.map((course) => {
+        return {
+          title: course.title,
+          slug: course.slug,
+          description: course.description,
+          ars_price: course.ars_price,
+          usd_price: course.usd_price,
+          discount_ars: course.discount_ars,
+          discount_usd: course.discount_usd,
+          thumbnail: course.thumbnail,
+          id: course.id.toString(),
+          thumbnailPath: course.thumbnail,
+          created_at: new Date(course.created_at).toLocaleString(),
+          updated_at: new Date(course.updated_at).toLocaleString(),
+          author: {
+            name: course.author_name,
+            username: course.author_username,
+            avatar: course.author_avatar,
+          },
+          next: `/api/course/${course.id}`, // Dynamic course link
+        };
+      });
 
-    // Filter courses for enrolled user
-    let enrolledCourseIds = [];
-    if (user) {
-      const enrolledSql = `
+      // Filter courses for enrolled user
+      let enrolledCourseIds = [];
+      if (user) {
+        const enrolledSql = `
         SELECT 
           courses.*,
           users.name AS author_name,
@@ -412,37 +425,47 @@ app.get("/api/courses", async (req, res) => {
         WHERE 
           user_courses.user_id = ?
       `;
-      const [enrolledCoursesRows] = await db.promise().query(enrolledSql, [user.id]);
-      enrolledCourseIds = enrolledCoursesRows.map((enrolledCourse) => enrolledCourse.id.toString());
+        const [enrolledCoursesRows] = await db
+          .promise()
+          .query(enrolledSql, [user.id]);
+        enrolledCourseIds = enrolledCoursesRows.map((enrolledCourse) =>
+          enrolledCourse.id.toString()
+        );
+      }
+
+      // Filter out enrolled courses
+      courses = courses.filter(
+        (course) => !enrolledCourseIds.includes(course.id)
+      );
+
+      // Send courses response
+      res.status(200).json({
+        route: "courses",
+        title: "Cursos",
+        courses,
+        totalItems: courses.length,
+        user,
+        message,
+        isAdmin,
+      });
+    } catch (error) {
+      console.log("Error fetching courses:", error);
+      res.status(500).json({ error: "Internal Server Error" });
     }
-
-    // Filter out enrolled courses
-    courses = courses.filter((course) => !enrolledCourseIds.includes(course.id));
-
-    // Send courses response
-    res.status(200).json({
-      route: "courses",
-      title: "Cursos",
-      courses,
-      totalItems: courses.length,
-      user,
-      message,
-      isAdmin,
-    });
-  } catch (error) {
-    console.log("Error fetching courses:", error);
-    res.status(500).json({ error: "Internal Server Error" });
   }
-});
+);
 
-app.get("/api/course/:id", async (req, res) => {
-  let courseId = req.params.id;
-  const user = req.session.user || null;
-  const message = req.query.message;
+app.get(
+  //course detail
+  "/api/course/:id",
+  async (req, res) => {
+    let courseId = req.params.id;
+    const user = req.session.user || null;
+    const message = req.query.message;
 
-  try {
-    console.log("\nCourseId:", courseId);
-    let sql = `
+    try {
+      console.log("\nCourseId:", courseId);
+      let sql = `
         SELECT 
           courses.*,
           users.id AS author_id,
@@ -456,30 +479,30 @@ app.get("/api/course/:id", async (req, res) => {
         WHERE 
           courses.id = ?;
       `;
-    const [courseRows] = await db.promise().execute(sql, [courseId]);
+      const [courseRows] = await db.promise().execute(sql, [courseId]);
 
-    if (!courseRows || courseRows.length === 0) {
-      return res.status(404).json({ error: "Course not found" });
-    }
+      if (!courseRows || courseRows.length === 0) {
+        return res.status(404).json({ error: "Course not found" });
+      }
 
-    const course = courseRows[0];
-    console.log(course);
-    console.log("\n\ncourse.video", course.video);
-    courseId = course.id;
+      const course = courseRows[0];
+      console.log(course);
+      console.log("\n\ncourse.video", course.video);
+      courseId = course.id;
 
-    // Format course timestamps and video_link
-    const formattedCourse = {
-      ...course,
-      created_at: new Date(course.created_at).toLocaleString(),
-      updated_at: new Date(course.updated_at).toLocaleString(),
-    };
+      // Format course timestamps and video_link
+      const formattedCourse = {
+        ...course,
+        created_at: new Date(course.created_at).toLocaleString(),
+        updated_at: new Date(course.updated_at).toLocaleString(),
+      };
 
-    if (!course) {
-      return res.status(404).json({ error: "Course not found" });
-    }
+      if (!course) {
+        return res.status(404).json({ error: "Course not found" });
+      }
 
-    // Fetching author details
-    sql = `
+      // Fetching author details
+      sql = `
         SELECT 
           id AS author_id,
           name AS author_name,
@@ -490,25 +513,25 @@ app.get("/api/course/:id", async (req, res) => {
         WHERE 
           id = ?;
       `;
-    const [authorRows] = await db.promise().execute(sql, [course.author_id]);
-    const author = authorRows[0];
-    console.log(author);
+      const [authorRows] = await db.promise().execute(sql, [course.author_id]);
+      const author = authorRows[0];
+      console.log(author);
 
-    if (!author) {
-      return res.status(404).json({ error: "Author details not found" });
-    }
+      if (!author) {
+        return res.status(404).json({ error: "Author details not found" });
+      }
 
-    // Extend formattedCourse with author details
-    formattedCourse.author = {
-      name: author.author_name,
-      username: author.author_username,
-      avatar: author.author_avatar,
-    };
-    console.log(formattedCourse.author);
+      // Extend formattedCourse with author details
+      formattedCourse.author = {
+        name: author.author_name,
+        username: author.author_username,
+        avatar: author.author_avatar,
+      };
+      console.log(formattedCourse.author);
 
-    // Fill array with query result
-    let enrolledCourses = [];
-    sql = `
+      // Fill array with query result
+      let enrolledCourses = [];
+      sql = `
         SELECT 
           courses.*,
           users.name AS author_name,
@@ -523,47 +546,57 @@ app.get("/api/course/:id", async (req, res) => {
         WHERE 
           user_courses.user_id = ?;
       `;
-    if (user) {
-      const [enrolledRows] = await db.promise().execute(sql, [user.id]);
-      enrolledCourses = enrolledRows[0]?.enrolled_courses || [];
-    }
-
-    // Send JSON response with the fetched data
-    res.json({
-      course: formattedCourse,
-      message,
-      user,
-      enrolledCourses,
-    });
-  } catch (error) {
-    console.error("Error fetching the course:", error);
-    res.status(500).json({ error: "Error fetching the course" });
-  }
-});
-
-app.post("/api/course/delete/:id", async (req, res) => {
-  try {
-    const courseId = req.params.id;
-
-    const result = await db.promise().execute("DELETE FROM courses WHERE id = ?", [courseId]);
-
-    // Check if any rows were affected by the deletion
-    if (result && result[0].affectedRows !== undefined) {
-      const affectedRows = parseInt(result[0].affectedRows);
-
-      // Respond with a success message
-      if (affectedRows > 0) {
-        return res.status(200).json({ message: "Course deleted successfully" });
-      } else {
-        return res.status(404).json({ message: "Course not found" });
+      if (user) {
+        const [enrolledRows] = await db.promise().execute(sql, [user.id]);
+        enrolledCourses = enrolledRows[0]?.enrolled_courses || [];
       }
-    }
-  } catch (error) {
-    console.error("Error deleting course:", error);
-    res.status(500).json({ message: "Error deleting the course" });
-  }
-});
 
+      // Send JSON response with the fetched data
+      res.json({
+        course: formattedCourse,
+        message,
+        user,
+        enrolledCourses,
+      });
+    } catch (error) {
+      console.error("Error fetching the course:", error);
+      res.status(500).json({ error: "Error fetching the course" });
+    }
+  }
+);
+
+app.post(
+  //course delete
+  "/api/course/delete/:id",
+  async (req, res) => {
+    try {
+      const courseId = req.params.id;
+
+      const result = await db
+        .promise()
+        .execute("DELETE FROM courses WHERE id = ?", [courseId]);
+
+      // Check if any rows were affected by the deletion
+      if (result && result[0].affectedRows !== undefined) {
+        const affectedRows = parseInt(result[0].affectedRows);
+
+        // Respond with a success message
+        if (affectedRows > 0) {
+          return res
+            .status(200)
+            .json({ message: "Course deleted successfully" });
+        } else {
+          return res.status(404).json({ message: "Course not found" });
+        }
+      }
+    } catch (error) {
+      console.error("Error deleting course:", error);
+      res.status(500).json({ message: "Error deleting the course" });
+    }
+  }
+);
+
+// AUTH >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 app.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -775,8 +808,105 @@ app.post("/reset-password/:id/:token", async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+// PAYMENT >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+const PAYPAL_API_CLIENT = isDev ? "" : process.env.PAYPAL_API_CLIENT;
+export const PAYPAL_API_SECRET = isDev ? "" : process.env.PAYPAL_API_SECRET;
+export const PAYPAL_API = isDev ? "" : "https://api-m.sandbox.paypal.com";
 
-// *************************************  SERVE COMMON FILES CONFIG  *******************************************************************************
+// paypal ************************
+app.post("/api/create-order-paypal", async (req, res) => {
+  console.log("\n*** createOrderPaypal\n");
+
+  const courseId = req.body.courseId; // is being passed the courseSlug in the request input
+  try {
+    console.log("\n\nSQL Query:", getCourseFromIdQuery);
+    console.log("\n\nparams courseId:", courseId);
+    // Fetch course details based on the courseSlug using MySQL query
+    const [rows] = await db.promise().execute(getCourseFromIdQuery, [courseId]);
+    const course = rows[0];
+
+    console.log("\n\nFetched Course Details:", course);
+
+    //create order paypal
+    const order = {
+      intent: "CAPTURE",
+      purchase_units: [
+        {
+          amount: {
+            currency_code: "USD",
+            value: course.usd_price, // Use the course price for the order
+          },
+        },
+      ],
+      application_context: {
+        brand_name: "Mi tienda",
+        landing_page: "NO_PREFERENCE",
+        user_action: "PAY_NOW",
+        return_url: `${process.env.BACKEND_URL}/api/capture-order-paypal?courseId=${courseId}`, // Include course slug in the return URL
+        cancel_url: `${process.env.BACKEND_URL}/api/cancel-order-paypal`,
+      },
+    };
+
+    // Params for auth
+    const params = new URLSearchParams();
+    params.append("grant_type", "client_credentials"); //i pass it credentials
+
+    // Ask for token on auth
+    const {
+      data: { access_token },
+    } = await axios.post(`${PAYPAL_API}/v1/oauth2/token`, params, {
+      auth: {
+        username: PAYPAL_API_CLIENT,
+        password: PAYPAL_API_SECRET,
+      },
+    });
+
+    // Create order with order obj
+    const response = await axios.post(
+      `${PAYPAL_API}/v2/checkout/orders`,
+      order,
+      {
+        headers: {
+          Authorization: `Bearer ${access_token}`,
+        },
+      }
+    );
+
+    // Log the created order
+    console.log("\n\nCreated Order:", response.data);
+
+    // check user_courses table
+    const checkTable_users = await createTableIfNotExists(
+      pool,
+      tableCheckQuery,
+      createUserTableQuery,
+      "users"
+    );
+
+    // paypal pay link + courseId
+    const courseIdParam = `courseId=${courseId}`;
+    const approveLink = `${response.data.links[1].href}&${courseIdParam}`;
+
+    // Redirect the user to the PayPal approval link
+    res.redirect(approveLink);
+  } catch (error) {
+    console.error("Error creating order:", error);
+    res
+      .status(500)
+      .json({ message: "Error creating the order", error: error.message });
+  }
+});
+// app.get("/api/capture-order-paypal") in App.js
+app.post("/api/capture-order-paypal", async (req, res) => {});
+
+// MercadoPago ******************
+app.post("/api/webhook-mp", async (req, res) => {});
+// app.get("/api/success-mp") in App.js
+// app.get("/api/pending-mp") in App.js
+// app.get("/api/failure-mp") in App.js
+app.post("/api/create-order-mp", async (req, res) => {});
+
+// ==================================== SERVE COMMON FILES CONFIG  *******************************************************************************
 // Serve static files from React build directory
 app.use(express.static(path.join(__dirname, "../client/build")));
 
