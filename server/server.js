@@ -545,8 +545,6 @@ app.get("/api/courses", async (req, res) => {
   }
 });
 
-
-
 app.get("/api/course/:id", async (req, res) => {
   let courseId = req.params.id;
   const user = req.session.user || null;
@@ -652,6 +650,31 @@ app.get("/api/course/:id", async (req, res) => {
     res.status(500).json({ error: "Error fetching the course" });
   }
 });
+
+app.post("/api/course/delete/:id", async (req, res) => {
+  try {
+    const courseId = req.params.id;
+
+    const result = await db.promise().execute("DELETE FROM courses WHERE id = ?", [courseId]);
+
+    // Check if any rows were affected by the deletion
+    if (result && result[0].affectedRows !== undefined) {
+      const affectedRows = parseInt(result[0].affectedRows);
+
+      // Respond with a success message
+      if (affectedRows > 0) {
+        return res.status(200).json({ message: "Course deleted successfully" });
+      } else {
+        return res.status(404).json({ message: "Course not found" });
+      }
+    }
+  } catch (error) {
+    console.error("Error deleting course:", error);
+    res.status(500).json({ message: "Error deleting the course" });
+  }
+});
+
+
 
 app.post("/api/course/update/:id", async (req, res) => {
   // get courseId
