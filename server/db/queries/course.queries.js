@@ -10,7 +10,8 @@ CREATE TABLE IF NOT EXISTS courses (
   text_content TEXT DEFAULT NULL,
   ars_price DECIMAL(10, 2) NOT NULL,
   usd_price DECIMAL(10, 2) NOT NULL,
-  discount DECIMAL(10, 2) DEFAULT NULL,
+  discount_ars DECIMAL(10, 2) DEFAULT NULL,
+  discount_usd DECIMAL(10, 2) DEFAULT NULL,
   thumbnail VARCHAR(255) DEFAULT NULL,
   video VARCHAR(255) DEFAULT NULL,  /* Modified to include the video field */
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

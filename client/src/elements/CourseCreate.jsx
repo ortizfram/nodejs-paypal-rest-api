@@ -30,6 +30,16 @@ const CourseCreate = () => {
 
   const handleChange = (e) => {
     const { name, value, type } = e.target;
+
+    // Validate input for discount fields to ensure positive integers
+  if (name === "discount_ars" || name === "discount_usd") {
+    const intValue = parseInt(value);
+    if (!Number.isInteger(intValue) || intValue < 0) {
+      setErrorMessage(`The field '${name}' must be a positive integer.`);
+      return;
+    }
+  }
+
     setFormData((prevState) => ({
       ...prevState,
       [name]: value,
@@ -55,10 +65,19 @@ const CourseCreate = () => {
   }
     renderImage(formData);
     // Handle form submission logic, e.g., sending data to the server
-    await fetch("http://localhost:6003/api/course/create", {
+    const response =  await fetch("http://localhost:6004/api/course/create", {
       method: "POST",
       body: formData,
     });
+    if (response.ok) {
+      const data = await response.json();
+      // Redirect to the specified URL
+      window.location.href = data.redirectUrl;
+    } else {
+      // Handle error response
+      const errorData = await response.json();
+      setErrorMessage(errorData.message);
+    }
   };
 
   return (
@@ -100,6 +119,7 @@ const CourseCreate = () => {
               ></textarea>
               <br />
               <h3>Subir Archivos:</h3>
+              {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
               <label htmlFor="video">subir video:</label>
               <br />
               <input
@@ -126,6 +146,7 @@ const CourseCreate = () => {
               <br />
               <hr />
               <h3>Configurar precio</h3>
+              {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
               <label htmlFor="ars_price">ARS Price:</label>
               <br />
               <input
@@ -144,19 +165,32 @@ const CourseCreate = () => {
                 onChange={handleChange}
               />
               <br />
-              <h3>Adicionales</h3>
-              <label htmlFor="discount">
-                descuento opcional (numeros enteros):
+              <hr />
+              <h3>Adicionales & descuentos</h3>
+              {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
+              <label htmlFor="discount_ars">
+                descuento_ars opcional (numeros enteros):
               </label>
-              <br />%{" "}
+              <br /><strong>% ARS{" "}</strong>
               <input
                 type="number"
-                id="discount"
-                name="discount"
+                id="discount_ars"
+                name="discount_ars"
+                onChange={handleChange}
+              />
+              <label htmlFor="discount_usd">
+                descuento_usd opcional (numeros enteros):
+              </label>
+              <br /><strong>% USD{" "}</strong>
+              <input
+                type="number"
+                id="discount_usd"
+                name="discount_usd"
                 onChange={handleChange}
               />
               <br />
-              <input type="hidden" name="author" value={user.id} />
+              <input type="hidden" name="author" value={user?.id || ''} />
+
               <button type="submit">Create Course</button>
             </form>
           </div>

@@ -61,7 +61,7 @@ const CourseUpdate = () => {
       formData.append("thumbnail", thumbnail);
 
       const response = await axios.post(
-        `http://localhost:6003/upload/image`, // Update with the appropriate endpoint for updating thumbnails
+        `http://localhost:6004/upload/image`, // Update with the appropriate endpoint for updating thumbnails
         formData
       );
 
@@ -79,7 +79,7 @@ const CourseUpdate = () => {
       formData.append("video", video);
 
       const response = await axios.post(
-        `http://localhost:6003/upload/video`, // Update with the appropriate endpoint for updating videos
+        `http://localhost:6004/upload/video`, // Update with the appropriate endpoint for updating videos
         formData
       );
 
@@ -101,7 +101,7 @@ const CourseUpdate = () => {
     try {
       const updatedCourse = { ...course, videoUrl, thumbnailUrl };
       const response = await axios.post(
-        `http://localhost:6003/api/course/update/${id}`,
+        `http://localhost:6004/api/course/update/${id}`,
         updatedCourse
       );
       if (response.status === 200) {

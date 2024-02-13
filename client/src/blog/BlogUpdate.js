@@ -2,7 +2,7 @@ import axios from "axios";
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
-const URI = "http://localhost:6003/api/blog/";
+const URI = "http://localhost:6004/api/blog/";
 
 const CompBlogUpdate = () => {
   const [title, setTitle] = useState("");

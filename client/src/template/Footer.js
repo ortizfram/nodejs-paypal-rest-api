@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 
 // NodeJS endpoint reference
-const URI = "http://localhost:6003"; // Update the base URL
+const URI = "http://localhost:6004"; // Update the base URL
 
 const CompFooter = () => {
   return (

@@ -12,6 +12,7 @@ import morgan from "morgan";
 import methodOverride from "method-override";
 import { getUserEnrolledCoursesQuery } from "./db/queries/course.queries.js";
 import multer from "multer";
+import moment from "moment";
 // shortcuts for files/dirs
 export const __filename = fileURLToPath(import.meta.url);
 export const __dirname = path.dirname(__filename);
@@ -47,10 +48,10 @@ db.connect((err) => {
   console.log("Connected to MySQL database");
 });
 
-const port = 6003;
+const port = 6004;
 const HOST = process.env.HOST;
 const FRONTEND_URL = isDev ? "http://localhost:3000" : process.env.FRONTEND_URL;
-const BACKEND_URL = isDev ? "http://localhost:6003" : process.env.BACKEND_URL;
+const BACKEND_URL = isDev ? "http://localhost:6004" : process.env.BACKEND_URL;
 
 // %%%%%%%%%%%%%%%%%%%%%%%%%%% UPLOAD FILES & HANDLINGUPLOAD ENDPOINTS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -126,21 +127,44 @@ app.post(
     console.log(req.files);
 
     try {
-      const imageUrl = req.files && req.files["image"] ? "/uploads/" + req.files["image"][0].filename : null;
-      const videoUrl = req.files && req.files["video"] ? "/uploads/" + req.files["video"][0].filename : null;
+      const imageUrl =
+        req.files && req.files["image"]
+          ? "/uploads/" + req.files["image"][0].filename
+          : null;
+      const videoUrl =
+        req.files && req.files["video"]
+          ? "/uploads/" + req.files["video"][0].filename
+          : null;
 
       if (!imageUrl && !videoUrl) {
         return res.status(400).send("No files uploaded.");
       }
 
       // Extract necessary data from request body
-      const { title, description, text_content, ars_price, usd_price, discount, autho: authorId } = req.body;
+      const {
+        title,
+        description,
+        text_content,
+        ars_price,
+        usd_price,
+        discount_ars,
+        discount_usd,
+        author: authorId,
+      } = req.body;
 
       // Validate required fields
-      const requiredFields = ["title", "description", "text_content", "ars_price", "usd_price"];
+      const requiredFields = [
+        "title",
+        "description",
+        "text_content",
+        "ars_price",
+        "usd_price",
+      ];
       for (const field of requiredFields) {
         if (!req.body[field]) {
-          return res.status(400).json({ message: `The field '${field}' is required.` });
+          return res
+            .status(400)
+            .json({ message: `The field '${field}' is required.` });
         }
       }
 
@@ -154,20 +178,25 @@ app.post(
       const courseSlug = slugify(courseTitle, { lower: true, strict: true });
 
       // Manage discount value
-      const discountValue = discount !== "" ? discount : null;
+      const discountArs = discount_ars || null;
+      const discountUsd = discount_usd || null;
 
       // Generate unique filename for thumbnail
       const timestamp = Date.now();
       const thumbnailFilename = req.files["image"][0].filename;
-      const thumbnailPath = "/src/uploads/imgs/" + thumbnailFilename;
+      const thumbnailPath = req.files["image"]
+        ? "/src/uploads/imgs/" + req.files["image"][0].filename
+        : null;
 
       // Generate unique filename for video
       const videoFilename = req.files["video"][0].filename;
-      const videoPath = "/src/uploads/videos/" + videoFilename;
+      const videoPath = req.files["video"]
+        ? "/src/uploads/videos/" + req.files["video"][0].filename
+        : null;
 
       // Get current timestamp
       const currentDate = new Date();
-      const currentTimestamp = moment().format('YYYY-MM-DD HH:mm:ss');
+      const currentTimestamp = moment().format("YYYY-MM-DD HH:mm:ss");
 
       // Prepare course data
       const courseData = [
@@ -177,7 +206,8 @@ app.post(
         text_content,
         ars_price,
         usd_price,
-        discountValue,
+        discountArs,
+        discountUsd,
         thumbnailPath,
         videoPath,
         currentTimestamp,
@@ -186,12 +216,14 @@ app.post(
       ];
 
       // Insert course data into the database
-      const sql = `INSERT INTO courses (title, slug, description, text_content, ars_price, usd_price, discount, thumbnail, video, created_at, updated_at, author_id)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+      const sql = `INSERT INTO courses (title, slug, description, text_content, ars_price, usd_price, discount_ars, discount_usd, thumbnail, video, created_at, updated_at, author_id)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
       await db.promise().execute(sql, courseData);
 
       // Fetch the created course
-      const [fetchedCourse] = await db.promise().execute(`SELECT * FROM courses WHERE slug = ?`, [courseSlug]);
+      const [fetchedCourse] = await db
+        .promise()
+        .execute(`SELECT * FROM courses WHERE slug = ?`, [courseSlug]);
       const course = fetchedCourse[0];
 
       console.log("\nCreating course...");

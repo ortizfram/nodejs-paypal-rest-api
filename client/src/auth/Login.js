@@ -15,7 +15,7 @@ const CompLogin = () => {
     e.preventDefault();
 
     try {
-      const response = await axios.post('http://localhost:6003/api/login', {
+      const response = await axios.post('http://localhost:6004/api/login', {
         email,
         password
       });
