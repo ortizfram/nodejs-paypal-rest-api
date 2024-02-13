@@ -243,218 +243,108 @@ app.post(
     }
   }
 );
+// course update
+app.put(
+  "/api/course/update/:id",
+  upload.fields([
+    { name: "image", maxCount: 1 },
+    { name: "video", maxCount: 1 },
+  ]),
+  async (req, res) => {
+    console.log(req.body);
+    console.log(req.files);
 
-app.post("/login", async (req, res) => {
-  try {
-    const { email, password } = req.body;
+    try {
+      const courseId = req.params.id;
 
-    // Find user in the database that matches the email from the login form
-    const sql = "SELECT * FROM users WHERE email = ?";
-    const [rows] = await db.promise().execute(sql, [email]);
-    const user = rows[0];
+      // Fetch existing course from the database
+      const [existingCourse] = await db
+        .promise()
+        .execute(`SELECT * FROM courses WHERE id = ?`, [courseId]);
+      const course = existingCourse[0];
 
-    // If the user exists and the passwords match
-    if (user && (await bcrypt.compare(password, user.password))) {
-      // Check if the user's email is in the list of admin emails
-      const isAdmin = [
-        "ortizfranco48@gmail.com",
-        "mg.marcela@hotmail.com",
-        "buonavibraclub@gmail.com",
-        "marzettimarcela@gmail.com",
-      ].includes(email);
-
-      // Determine the role based on email
-      const role = isAdmin ? "admin" : user.role;
-
-      // Update the user's role in the session and database
-      const sql = "UPDATE users SET role = ? WHERE id = ?";
-      await db.promise().execute(sql, [role, user.id]);
-      user.role = role;
-
-      req.session.user = user; // Store the user in the session
-      const userId = user.id;
-      console.log("\n\nuser: ", user);
-      return res.status(200).json({
-        status: "success",
-        message: `Login successful, user: ${userId}`,
-        user: req.session.user,
-        redirectUrl: "/",
-      });
-    } else {
-      return res
-        .status(401)
-        .json({ status: "error", message: "Wrong password or email" });
-    }
-  } catch (error) {
-    console.error("Error logging in:", error);
-    return res
-      .status(500)
-      .json({ status: "error", message: "An error occurred while logging in" });
-  }
-});
-
-app.post("/signup", async (req, res) => {
-  const { username, name, email, password } = req.body;
-
-  // Add validation for required fields
-  if (!username || !password || !email) {
-    return res
-      .status(400)
-      .json({ error: "Username, password & email are required." });
-  }
-
-  try {
-    // Check if the email already exists in the database
-    let sql = `SELECT * FROM users WHERE email = ?`;
-    const [existingEmail] = await db.promise().execute(sql, [email]);
-
-    // If the email already exists, handle the duplicate case
-    if (existingEmail.length > 0) {
-      return res
-        .status(400)
-        .json({ error: "This email is already registered." });
-    }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    const adminEmails = [
-      "ortizfranco48@gmail.com",
-      "mg.marcela@hotmail.com",
-      "buonavibraclub@gmail.com",
-      "marzettimarcela@gmail.com",
-    ];
-
-    // Check if the email is in the list of admin emails
-    const isAdmin = adminEmails.includes(email);
-    console.log("isAdmin", isAdmin);
-
-    // Determine the role based on email
-    const role = isAdmin ? "admin" : "user";
-    console.log("role:", role);
-
-    const data = [username, name, email, hashedPassword, role];
-
-    // Insert data into the users table
-    sql =
-      "INSERT INTO users (username, name, email, password, role) VALUES (?, ?, ?, ?, ?)";
-    const [rows] = await db.promise().execute(sql, data);
-
-    const userId = String(rows.insertId);
-
-    // Set session data for the newly signed-up user
-    req.session.user = { id: userId, username, name, email, role };
-
-    // Respond with success message
-    res.status(200).json({
-      message: "Signup successful. Now go Login.",
-      user: req.session.user,
-      redirectUrl: "/login",
-    });
-    console.log("\n\n*** Signed up successfully\n\n");
-  } catch (error) {
-    console.error("Error while saving user:", error);
-    res.status(500).json({ error: "Error during signup or login" });
-  }
-});
-
-app.post("/logout", (req, res) => {
-  req.session.destroy((err) => {
-    if (err) {
-      console.error("Error destroying session:", err);
-      res.status(500).json({ error: "An error occurred during logout" });
-    } else {
-      console.log("\n*** Logout successful\n");
-      res
-        .status(204)
-        .json({ message: "Logged out successfully", redirectUrl: "/" });
-    }
-  });
-});
-
-app.post("/forgot-password", async (req, res) => {
-  const { email } = req.body;
-
-  try {
-    let sql = `SELECT * FROM users WHERE email = ?`;
-    const [existingUser] = await db.promise().execute(sql, [email]);
-
-    if (!existingUser || existingUser.length === 0) {
-      return res.status(404).json({ error: "Email not found" });
-    }
-
-    const secret = process.env.JWT_SECRET + existingUser[0]["password"];
-    const userId = existingUser[0]["id"];
-    const payload = {
-      email: existingUser[0]["email"],
-      id: existingUser[0]["id"],
-    };
-    const token = jwt.sign(payload, secret, { expiresIn: "1y" });
-    const link = `${FRONTEND_URL}/reset-password/${userId}/${token}`;
-
-    await sendResetEmail(
-      email,
-      "Password Reset",
-      "Sending Reset password Token using Node JS & Nodemailer",
-      `<button><a href="${link}">Go to Reset Password</a></button>`
-    );
-
-    res
-      .status(200)
-      .json({ message: "Password reset email sent, check your mailbox." });
-  } catch (error) {
-    console.error("Error sending Email for password reset:", error);
-    res.status(500).json({ error: "Error sending reset email" });
-  }
-});
-
-app.post("/reset-password/:id/:token", async (req, res) => {
-  let { id, token } = req.params;
-  console.log(`id${id},token${token}`);
-  const { password, repeat_password } = req.body;
-
-  // Verify again if id and token are valid
-  let sql = `SELECT * FROM users WHERE id = ?`;
-  const [existingUser] = await db
-    .promise()
-    .execute(sql, [id], (err, result) => {
-      if (err) {
-        console.log("Error ", err);
+      if (!course) {
+        return res.status(404).json({ message: "Course not found." });
       }
-    });
-  console.log("\n\nuser fetcher from id", existingUser[0]["id"], "\n\n");
-  id = existingUser[0]["id"];
-  if (!existingUser || existingUser.length === 0) {
-    return res.status(400).json({ message: "User id not found" });
-  }
 
-  const user = existingUser[0];
+      // Extract necessary data from request body
+      const {
+        title,
+        description,
+        text_content,
+        ars_price,
+        usd_price,
+        discount_ars,
+        discount_usd,
+        author: authorId,
+      } = req.body;
 
-  // We have valid id and valid user with this id
-  const secret = process.env.JWT_SECRET + existingUser[0]["password"];
-  try {
-    const payload = jwt.verify(token, secret);
-    // password must match
-    if (password !== repeat_password) {
-      return res.status(400).json({ message: "Passwords do not match" });
+      // Validate required fields
+      const requiredFields = [
+        "title",
+        "description",
+        "text_content",
+        "ars_price",
+        "usd_price",
+      ];
+      for (const field of requiredFields) {
+        if (!req.body[field]) {
+          return res
+            .status(400)
+            .json({ message: `The field '${field}' is required.` });
+        }
+      }
+
+      // Ensure title is a string
+      let courseTitle = title;
+      if (typeof title !== "string") {
+        courseTitle = String(title);
+      }
+
+      // Manage discount value
+      const discountArs = discount_ars || null;
+      const discountUsd = discount_usd || null;
+
+      // Update course details
+      const sql = `UPDATE courses SET
+        title = ?,
+        description = ?,
+        text_content = ?,
+        ars_price = ?,
+        usd_price = ?,
+        discount_ars = ?,
+        discount_usd = ?
+        WHERE id = ?`;
+      await db
+        .promise()
+        .execute(sql, [
+          title,
+          description,
+          text_content,
+          ars_price,
+          usd_price,
+          discountArs,
+          discountUsd,
+          courseId,
+        ]);
+
+      console.log("\nUpdating course...");
+      console.log("\nCourse:", course);
+
+      // Redirect after updating the course
+      return res.status(200).json({
+        message: "Course updated successfully",
+        redirectUrl: `/api/courses`,
+      });
+    } catch (error) {
+      console.error("Error updating the course:", error);
+      return res.status(500).json({
+        message: "Error updating the course",
+        error: error.message,
+      });
     }
-
-    // update with a new password hashed
-    const hashedPassword = await bcrypt.hash(password, 10);
-    sql = "UPDATE users SET password = ? WHERE id = ?";
-    await db.promise().execute(sql, [hashedPassword, id]);
-    console.log("\n\nPassword updated\n\n");
-
-    // Send JSON response
-    res.status(200).json({
-      message:
-        "Password updated successfully. Please login with your new password.",
-      user,
-    });
-  } catch (error) {
-    console.log(error.message);
-    res.status(500).json({ error: error.message });
   }
-});
+);
 
 app.get("/api/courses", async (req, res) => {
   try {
@@ -674,109 +564,217 @@ app.post("/api/course/delete/:id", async (req, res) => {
   }
 });
 
-// course update
-app.put(
-  "/api/course/update/:id",
-  upload.fields([
-    { name: "image", maxCount: 1 },
-    { name: "video", maxCount: 1 },
-  ]),
-  async (req, res) => {
-    console.log(req.body);
-    console.log(req.files);
+app.post("/login", async (req, res) => {
+  try {
+    const { email, password } = req.body;
 
-    try {
-      const courseId = req.params.id;
+    // Find user in the database that matches the email from the login form
+    const sql = "SELECT * FROM users WHERE email = ?";
+    const [rows] = await db.promise().execute(sql, [email]);
+    const user = rows[0];
 
-      // Fetch existing course from the database
-      const [existingCourse] = await db
-        .promise()
-        .execute(`SELECT * FROM courses WHERE id = ?`, [courseId]);
-      const course = existingCourse[0];
+    // If the user exists and the passwords match
+    if (user && (await bcrypt.compare(password, user.password))) {
+      // Check if the user's email is in the list of admin emails
+      const isAdmin = [
+        "ortizfranco48@gmail.com",
+        "mg.marcela@hotmail.com",
+        "buonavibraclub@gmail.com",
+        "marzettimarcela@gmail.com",
+      ].includes(email);
 
-      if (!course) {
-        return res.status(404).json({ message: "Course not found." });
-      }
+      // Determine the role based on email
+      const role = isAdmin ? "admin" : user.role;
 
-      // Extract necessary data from request body
-      const {
-        title,
-        description,
-        text_content,
-        ars_price,
-        usd_price,
-        discount_ars,
-        discount_usd,
-        author: authorId,
-      } = req.body;
+      // Update the user's role in the session and database
+      const sql = "UPDATE users SET role = ? WHERE id = ?";
+      await db.promise().execute(sql, [role, user.id]);
+      user.role = role;
 
-      // Validate required fields
-      const requiredFields = [
-        "title",
-        "description",
-        "text_content",
-        "ars_price",
-        "usd_price",
-      ];
-      for (const field of requiredFields) {
-        if (!req.body[field]) {
-          return res
-            .status(400)
-            .json({ message: `The field '${field}' is required.` });
-        }
-      }
-
-      // Ensure title is a string
-      let courseTitle = title;
-      if (typeof title !== "string") {
-        courseTitle = String(title);
-      }
-
-      // Manage discount value
-      const discountArs = discount_ars || null;
-      const discountUsd = discount_usd || null;
-
-      // Update course details
-      const sql = `UPDATE courses SET
-        title = ?,
-        description = ?,
-        text_content = ?,
-        ars_price = ?,
-        usd_price = ?,
-        discount_ars = ?,
-        discount_usd = ?
-        WHERE id = ?`;
-      await db
-        .promise()
-        .execute(sql, [
-          title,
-          description,
-          text_content,
-          ars_price,
-          usd_price,
-          discountArs,
-          discountUsd,
-          courseId,
-        ]);
-
-      console.log("\nUpdating course...");
-      console.log("\nCourse:", course);
-
-      // Redirect after updating the course
+      req.session.user = user; // Store the user in the session
+      const userId = user.id;
+      console.log("\n\nuser: ", user);
       return res.status(200).json({
-        message: "Course updated successfully",
-        redirectUrl: `/api/courses`,
+        status: "success",
+        message: `Login successful, user: ${userId}`,
+        user: req.session.user,
+        redirectUrl: "/",
       });
-    } catch (error) {
-      console.error("Error updating the course:", error);
-      return res.status(500).json({
-        message: "Error updating the course",
-        error: error.message,
-      });
+    } else {
+      return res
+        .status(401)
+        .json({ status: "error", message: "Wrong password or email" });
     }
+  } catch (error) {
+    console.error("Error logging in:", error);
+    return res
+      .status(500)
+      .json({ status: "error", message: "An error occurred while logging in" });
   }
-);
+});
 
+app.post("/signup", async (req, res) => {
+  const { username, name, email, password } = req.body;
+
+  // Add validation for required fields
+  if (!username || !password || !email) {
+    return res
+      .status(400)
+      .json({ error: "Username, password & email are required." });
+  }
+
+  try {
+    // Check if the email already exists in the database
+    let sql = `SELECT * FROM users WHERE email = ?`;
+    const [existingEmail] = await db.promise().execute(sql, [email]);
+
+    // If the email already exists, handle the duplicate case
+    if (existingEmail.length > 0) {
+      return res
+        .status(400)
+        .json({ error: "This email is already registered." });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const adminEmails = [
+      "ortizfranco48@gmail.com",
+      "mg.marcela@hotmail.com",
+      "buonavibraclub@gmail.com",
+      "marzettimarcela@gmail.com",
+    ];
+
+    // Check if the email is in the list of admin emails
+    const isAdmin = adminEmails.includes(email);
+    console.log("isAdmin", isAdmin);
+
+    // Determine the role based on email
+    const role = isAdmin ? "admin" : "user";
+    console.log("role:", role);
+
+    const data = [username, name, email, hashedPassword, role];
+
+    // Insert data into the users table
+    sql =
+      "INSERT INTO users (username, name, email, password, role) VALUES (?, ?, ?, ?, ?)";
+    const [rows] = await db.promise().execute(sql, data);
+
+    const userId = String(rows.insertId);
+
+    // Set session data for the newly signed-up user
+    req.session.user = { id: userId, username, name, email, role };
+
+    // Respond with success message
+    res.status(200).json({
+      message: "Signup successful. Now go Login.",
+      user: req.session.user,
+      redirectUrl: "/login",
+    });
+    console.log("\n\n*** Signed up successfully\n\n");
+  } catch (error) {
+    console.error("Error while saving user:", error);
+    res.status(500).json({ error: "Error during signup or login" });
+  }
+});
+
+app.post("/logout", (req, res) => {
+  req.session.destroy((err) => {
+    if (err) {
+      console.error("Error destroying session:", err);
+      res.status(500).json({ error: "An error occurred during logout" });
+    } else {
+      console.log("\n*** Logout successful\n");
+      res
+        .status(204)
+        .json({ message: "Logged out successfully", redirectUrl: "/" });
+    }
+  });
+});
+
+app.post("/forgot-password", async (req, res) => {
+  const { email } = req.body;
+
+  try {
+    let sql = `SELECT * FROM users WHERE email = ?`;
+    const [existingUser] = await db.promise().execute(sql, [email]);
+
+    if (!existingUser || existingUser.length === 0) {
+      return res.status(404).json({ error: "Email not found" });
+    }
+
+    const secret = process.env.JWT_SECRET + existingUser[0]["password"];
+    const userId = existingUser[0]["id"];
+    const payload = {
+      email: existingUser[0]["email"],
+      id: existingUser[0]["id"],
+    };
+    const token = jwt.sign(payload, secret, { expiresIn: "1y" });
+    const link = `${FRONTEND_URL}/reset-password/${userId}/${token}`;
+
+    await sendResetEmail(
+      email,
+      "Password Reset",
+      "Sending Reset password Token using Node JS & Nodemailer",
+      `<button><a href="${link}">Go to Reset Password</a></button>`
+    );
+
+    res
+      .status(200)
+      .json({ message: "Password reset email sent, check your mailbox." });
+  } catch (error) {
+    console.error("Error sending Email for password reset:", error);
+    res.status(500).json({ error: "Error sending reset email" });
+  }
+});
+
+app.post("/reset-password/:id/:token", async (req, res) => {
+  let { id, token } = req.params;
+  console.log(`id${id},token${token}`);
+  const { password, repeat_password } = req.body;
+
+  // Verify again if id and token are valid
+  let sql = `SELECT * FROM users WHERE id = ?`;
+  const [existingUser] = await db
+    .promise()
+    .execute(sql, [id], (err, result) => {
+      if (err) {
+        console.log("Error ", err);
+      }
+    });
+  console.log("\n\nuser fetcher from id", existingUser[0]["id"], "\n\n");
+  id = existingUser[0]["id"];
+  if (!existingUser || existingUser.length === 0) {
+    return res.status(400).json({ message: "User id not found" });
+  }
+
+  const user = existingUser[0];
+
+  // We have valid id and valid user with this id
+  const secret = process.env.JWT_SECRET + existingUser[0]["password"];
+  try {
+    const payload = jwt.verify(token, secret);
+    // password must match
+    if (password !== repeat_password) {
+      return res.status(400).json({ message: "Passwords do not match" });
+    }
+
+    // update with a new password hashed
+    const hashedPassword = await bcrypt.hash(password, 10);
+    sql = "UPDATE users SET password = ? WHERE id = ?";
+    await db.promise().execute(sql, [hashedPassword, id]);
+    console.log("\n\nPassword updated\n\n");
+
+    // Send JSON response
+    res.status(200).json({
+      message:
+        "Password updated successfully. Please login with your new password.",
+      user,
+    });
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({ error: error.message });
+  }
+});
 
 // *************************************  SERVE COMMON FILES CONFIG  *******************************************************************************
 // Serve static files from React build directory
