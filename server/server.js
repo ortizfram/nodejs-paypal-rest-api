@@ -674,129 +674,109 @@ app.post("/api/course/delete/:id", async (req, res) => {
   }
 });
 
+// course update
+app.put(
+  "/api/course/update/:id",
+  upload.fields([
+    { name: "image", maxCount: 1 },
+    { name: "video", maxCount: 1 },
+  ]),
+  async (req, res) => {
+    console.log(req.body);
+    console.log(req.files);
 
+    try {
+      const courseId = req.params.id;
 
-app.post("/api/course/update/:id", async (req, res) => {
-  // get courseId
-  let courseId = req.params.id; // Assuming the ID is coming from the request params
-  let sql = `
-      UPDATE courses
-      SET title = ?,
-          slug = ?,
-          description = ?,
-          text_content = ?,
-          video = ?,
-          ars_price = ?,
-          usd_price = ?,
-          discount = ?,
-          thumbnail = ?,
-          updated_at = CONVERT_TZ(NOW(), 'UTC', 'America/Argentina/Buenos_Aires')
-      WHERE id = ?;
-    `;
-
-  const timestamp = Date.now();
-
-  try {
-    // Destructure req.body for easier use
-    const { title, description, text_content, ars_price, usd_price, discount } =
-      req.body;
-
-    // Autogenerate slug from title
-    const courseSlug = slugify(title, { lower: true, strict: true });
-
-    // !if discount: null
-    const discountValue = discount !== "" ? discount : null;
-
-    // Check if thumbnail uploaded, encode, move
-    let thumbnailPath;
-    if (req.files && req.files.thumbnail) {
-      const filename = req.files.thumbnail.name;
-      const uniqueFilename = encodeURIComponent(`${timestamp}_${filename}`);
-      thumbnailPath = "/uploads/" + uniqueFilename;
-
-      // Assign the uploaded thumbnail file to the 'thumbnail' variable
-      const thumbnail = req.files.thumbnail;
-
-      // Use mv() to place file on the server
-      await thumbnail.mv(path.join(__dirname, "uploads", uniqueFilename));
-    } else {
-      // If no new thumbnail uploaded, retain the existing thumbnail path
-      const [existingThumbnailRows] = await db
+      // Fetch existing course from the database
+      const [existingCourse] = await db
         .promise()
-        .execute("SELECT thumbnail FROM courses WHERE id = ?", [courseId]);
-      thumbnailPath = existingThumbnailRows[0]?.thumbnail || "";
-    }
+        .execute(`SELECT * FROM courses WHERE id = ?`, [courseId]);
+      const course = existingCourse[0];
 
-    // Generate unique filename for video
-    const videoFile = req.files.video;
-    const videoFilename = videoFile.name.split(" ")[0];
-    const uniqueVideoFilename = encodeURIComponent(
-      `${timestamp}_${videoFilename}`
-    );
-    const videoPath = "/uploads/videos/" + uniqueVideoFilename;
+      if (!course) {
+        return res.status(404).json({ message: "Course not found." });
+      }
 
-    // video file upload handling
-    await videoFile.mv(
-      path.join(__dirname, "uploads/videos", uniqueVideoFilename),
-      async (err) => {
-        if (err) {
-          console.error(err);
-          return res.status(500).send("Error uploading the video file");
+      // Extract necessary data from request body
+      const {
+        title,
+        description,
+        text_content,
+        ars_price,
+        usd_price,
+        discount_ars,
+        discount_usd,
+        author: authorId,
+      } = req.body;
+
+      // Validate required fields
+      const requiredFields = [
+        "title",
+        "description",
+        "text_content",
+        "ars_price",
+        "usd_price",
+      ];
+      for (const field of requiredFields) {
+        if (!req.body[field]) {
+          return res
+            .status(400)
+            .json({ message: `The field '${field}' is required.` });
         }
       }
-    );
 
-    const updateParams = [
-      title,
-      courseSlug,
-      description,
-      text_content,
-      videoPath,
-      ars_price,
-      usd_price,
-      discountValue,
-      thumbnailPath,
-      courseId,
-    ];
-
-    // Execute update query
-    const result = await db.promise().execute(sql, updateParams);
-
-    // Log the result of the query execution
-    console.log("\n\n---Update Query Result:", result);
-
-    // Update check msg
-    if (result && result[0].affectedRows !== undefined) {
-      // Show if affected rows
-      const affectedRows = parseInt(result[0].affectedRows);
-      console.log("\n\n---Affected Rows:", affectedRows);
-
-      if (affectedRows > 0) {
-        const message = "Course updated correctly";
-        console.log(`\n\n\→ Go to courseModules: ${message}`);
-
-        // Set MIME type for the uploaded video
-        setCustomMimeTypes(
-          {
-            path: `/uploads/videos/${uniqueVideoFilename}`,
-          },
-          res,
-          () => {} // Empty callback as it's not required in this context
-        );
-
-        res.redirect(`/api/course/${courseId}`);
-      } else {
-        const message = "No changes made to the course";
-        console.log(`\n\n\→ Go to courseModules: ${message}`);
-        res.status(201).redirect(`/api/course/${courseId}`);
+      // Ensure title is a string
+      let courseTitle = title;
+      if (typeof title !== "string") {
+        courseTitle = String(title);
       }
+
+      // Manage discount value
+      const discountArs = discount_ars || null;
+      const discountUsd = discount_usd || null;
+
+      // Update course details
+      const sql = `UPDATE courses SET
+        title = ?,
+        description = ?,
+        text_content = ?,
+        ars_price = ?,
+        usd_price = ?,
+        discount_ars = ?,
+        discount_usd = ?
+        WHERE id = ?`;
+      await db
+        .promise()
+        .execute(sql, [
+          title,
+          description,
+          text_content,
+          ars_price,
+          usd_price,
+          discountArs,
+          discountUsd,
+          courseId,
+        ]);
+
+      console.log("\nUpdating course...");
+      console.log("\nCourse:", course);
+
+      // Redirect after updating the course
+      return res.status(200).json({
+        message: "Course updated successfully",
+        redirectUrl: `/api/courses`,
+      });
+    } catch (error) {
+      console.error("Error updating the course:", error);
+      return res.status(500).json({
+        message: "Error updating the course",
+        error: error.message,
+      });
     }
-  } catch (error) {
-    console.error("Error updating course:", error);
-    console.error("Database Error:", error.sqlMessage);
-    res.status(500).json({ message: "Error updating the course" });
   }
-});
+);
+
 
 // *************************************  SERVE COMMON FILES CONFIG  *******************************************************************************
 // Serve static files from React build directory

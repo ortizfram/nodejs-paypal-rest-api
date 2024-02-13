@@ -1,199 +1,217 @@
-import React, { useState, useEffect, useContext } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import React, { useContext, useRef, useState } from "react";
 import { UserContext } from "../hooks/UserContext.js";
-import axios from "axios";
-import "../public/css/course/courseUpdate.css";
 
-const CourseUpdate = () => {
-  const { userData } = useContext(useContext);
-  const user = userData;
-  const { id } = useParams();
-  const navigate = useNavigate();
+const CourseUpdate = ({ courseId }) => {
+  const { user, setUser } = useContext(UserContext);
+  const [errorMessage, setErrorMessage] = useState("");
 
-  const [video, setVideo] = useState("");
-  const [thumbnail, setThumbnail] = useState("");
-  const [videoUrl, setVideoUrl] = useState("");
-  const [thumbnailUrl, setThumbnailUrl] = useState("");
-  const [course, setCourse] = useState({
+  const renderImage = (formData) => {
+    const file = formData.get("image");
+    const image = URL.createObjectURL(file);
+    $image.current.setAttribute("src", image); 
+  };
+
+  const $image = useRef(null);
+
+  const [formData, setFormData] = useState({
     title: "",
     description: "",
     text_content: "",
     ars_price: 0,
     usd_price: 0,
+    thumbnail: null,
+    video: null,
+    thumbnailUrl: null,
+    videoUrl: null,
     discount: 0,
   });
 
-  useEffect(() => {
-    const fetchCourse = async () => {
-      try {
-        const response = await axios.get(`/api/course/${id}`);
-        const data = response.data.course;
-        setCourse(data);
-      } catch (error) {
-        console.error("Error fetching course data:", error);
-      }
-    };
-
-    fetchCourse();
-  }, [id]);
-
-  const handleInputChange = (e) => {
+  const handleChange = (e) => {
     const { name, value } = e.target;
-    setCourse((prevCourse) => ({
-      ...prevCourse,
+    setFormData((prevState) => ({
+      ...prevState,
       [name]: value,
     }));
   };
 
-  const handleThumbnailChange = (e) => {
-    setThumbnail(e.target.files[0]);
-    setThumbnailUrl(null); // Clear previous image when a new file is selected
-  };
-
-  const handleVideoChange = (e) => {
-    setVideo(e.target.files[0]);
-    setVideoUrl(null); // Clear previous video when a new file is selected
-  };
-
-  const handleThumbnailUpload = async () => {
-    try {
-      const formData = new FormData();
-      formData.append("thumbnail", thumbnail);
-
-      const response = await axios.post(
-        `http://localhost:6004/upload/image`, // Update with the appropriate endpoint for updating thumbnails
-        formData
-      );
-
-      setThumbnailUrl(response.data.imageUrl);
-      alert("Thumbnail updated successfully.");
-    } catch (error) {
-      console.error("Error updating thumbnail:", error.message);
-      alert("Error updating thumbnail.");
-    }
-  };
-
-  const handleVideoUpload = async () => {
-    try {
-      const formData = new FormData();
-      formData.append("video", video);
-
-      const response = await axios.post(
-        `http://localhost:6004/upload/video`, // Update with the appropriate endpoint for updating videos
-        formData
-      );
-
-      setVideoUrl(response.data.videoUrl);
-      // Update the course state with the new videoUrl
-      setCourse((prevCourse) => ({
-        ...prevCourse,
-        videoUrl: response.data.videoUrl,
-      }));
-      alert("Video updated successfully.");
-    } catch (error) {
-      console.error("Error updating video:", error.message);
-      alert("Error updating video.");
-    }
-  };
-
-  const handleUpdateCourse = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    try {
-      const updatedCourse = { ...course, videoUrl, thumbnailUrl };
-      const response = await axios.post(
-        `http://localhost:6004/api/course/update/${id}`,
-        updatedCourse
-      );
-      if (response.status === 200) {
-        alert("Course updated successfully!");
-        navigate(`/course/${id}`);
-      } else {
-        console.error("Error updating course. Server response:", response);
-        alert("Some error occurred while updating the course.");
-      }
-    } catch (error) {
-      console.error("Error updating course:", error.message);
-      alert("Error updating course.");
+    const formData = new FormData(e.target);
+
+    const imageFile = formData.get("image");
+    const videoFile = formData.get("video");
+
+    if (imageFile) {
+      formData.set("image", imageFile, imageFile.name);
+    }
+
+    if (videoFile) {
+      formData.set("video", videoFile, videoFile.name);
+    }
+    renderImage(formData);
+
+    const response = await fetch(`http://localhost:6004/api/course/update/${courseId}`, {
+      method: "PUT",
+      body: formData,
+    });
+    if (response.ok) {
+      const data = await response.json();
+      window.location.href = data.redirectUrl;
+    } else {
+      const errorData = await response.json();
+      setErrorMessage(errorData.message);
     }
   };
 
   return (
-    <div>
-      <h1>Update Course</h1>
-      <form onSubmit={handleUpdateCourse} encType="multipart/form-data">
-        <label htmlFor="title">Title:</label>
-        <input
-          type="text"
-          name="title"
-          value={course.title}
-          onChange={handleInputChange}
-        />
+    <div id="update-course-container-page">
+      <div id="update-course-container" className="mt-8 mx-5">
+        {user && <p className="text-primary">Hello, {user.id}!</p>}
 
-        <label htmlFor="description">Description:</label>
-        <input
-          type="text"
-          name="description"
-          value={course.description}
-          onChange={handleInputChange}
-        />
+        <h1 className="section-title">Actualizando Curso</h1>
+        <div>
+          <form className="form" method="POST" onSubmit={handleSubmit}>
+            {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
 
-        <label htmlFor="text_content">Text Content:</label>
-        <textarea
-          name="text_content"
-          value={course.text_content}
-          onChange={handleInputChange}
-        ></textarea>
-        <br />
-        <h3>Update Video</h3>
-        <label htmlFor="video">Upload new video:</label>
-        <br />
-        <input
-          type="file"
-          name="video"
-          accept="video/*"
-          onChange={handleVideoChange}
-        />
-        <button onClick={handleVideoUpload}>Update Video</button>
-        <br />
-        <hr />
-        <h3>Update Thumbnail</h3>
-        <label htmlFor="thumbnail">Upload new thumbnail:</label>
-        <br />
-        <input
-          type="file"
-          name="thumbnail"
-          accept="image/*"
-          onChange={handleThumbnailChange}
-        />
-        <button onClick={handleThumbnailUpload}>Update Thumbnail</button>
-        <br />
-        <hr />
-        <label htmlFor="ars_price">ARS Price:</label>
-        <input
-          type="number"
-          name="ars_price"
-          value={course.ars_price}
-          onChange={handleInputChange}
-        />
+            {/* CONTENT */}
+            <h3>Titulo & contenido:</h3>
+            <div className="row">
+              <div className="col-lg-6">
+                <label htmlFor="title">titulo:</label>
+                <input
+                  name="title"
+                  onChange={handleChange}
+                  type="text"
+                  className="form-control"
+                />
+              </div>
+              <div className="col-lg-6">
+                <label htmlFor="description">Descripcion:</label>
+                <input
+                  name="description"
+                  onChange={handleChange}
+                  type="text"
+                  className="form-control"
+                />
+              </div>
+            </div>
+            <div className="row">
+              <div className="col-lg-12">
+                <label htmlFor="text_content">contenido texto:</label>
+                <textarea
+                  name="text_content"
+                  onChange={handleChange}
+                  type="text"
+                  className="form-control"
+                ></textarea>
+              </div>
+            </div>
+            <hr />
 
-        <label htmlFor="usd_price">USD Price:</label>
-        <input
-          type="number"
-          name="usd_price"
-          value={course.usd_price}
-          onChange={handleInputChange}
-        />
+            {/* UPLOAD */}
+            <h3>Subir Archivos:</h3>
+            {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
 
-        <label htmlFor="discount">Discount (%):</label>
-        <input
-          type="number"
-          name="discount"
-          value={course.discount}
-          onChange={handleInputChange}
-        />
+            <div className="row col-lg-12 items-center">
+              <div className="">
+                <label htmlFor="video">subir video :</label>
+                <input
+                  type="file"
+                  name="video"
+                  accept="video/*"
+                  onChange={handleChange}
+                />
+              </div>
+              <br /><br />
+              <div className="">
+                <label htmlFor="image">subir miniatura:</label>
+                <input
+                  type="file"
+                  id="file"
+                  name="image"
+                  accept="image/*"
+                  onChange={handleChange}
+                />
+              </div>
+            </div>
+            <div className="row">
+              <div className="col-lg-12">
+                <div className="preview">
+                  <img id="img" ref={$image} style={{ width: 300 }} />
+                </div>
+              </div>
+            </div>
+            <hr />
 
-        <button type="submit">Update Course</button>
-      </form>
+            {/* PRICE */}
+            <h3>Configurar precio</h3>
+            {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
+
+            <div className="row col-lg-12 items-center">
+              <div className="">
+                <label htmlFor="ars_price">ARS Price:</label>
+                <input
+                  type="number"
+                  id="ars_price"
+                  name="ars_price"
+                  onChange={handleChange}
+                />
+              </div>
+              <div className="">
+                <label htmlFor="usd_price">USD Price:</label>
+                <input
+                  type="number"
+                  id="usd_price"
+                  name="usd_price"
+                  onChange={handleChange}
+                />
+              </div>
+            </div>
+            <hr />
+
+            {/* DISCOUNT */}
+            <h3>Adicionales & descuentos</h3>
+            {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
+
+            <div className="row items-center col-lg-12">
+              <div className="">
+                <label htmlFor="discount_ars">
+                  descuento_ars opcional (numeros enteros):
+                </label>
+                <br />
+                <strong>% ARS{" "}</strong>
+                <input
+                  type="number"
+                  id="discount_ars"
+                  name="discount_ars"
+                  onChange={handleChange}
+                />
+              </div>
+              <div className="">
+                <label htmlFor="discount_usd">
+                  descuento_usd opcional (numeros enteros):
+                </label>
+                <br />
+                <strong>% USD{" "}</strong>
+                <input
+                  type="number"
+                  id="discount_usd"
+                  name="discount_usd"
+                  onChange={handleChange}
+                />
+              </div>
+            </div>
+
+            <input type="hidden" name="author" value={user?.id || ''} />
+            <br /><br />
+
+            {/* submit */}
+            <div className="items-center text-center mt-20">
+            <button type="submit" className="btn btn-success">Update Course</button>
+            </div>
+          </form>
+        </div>
+      </div>
     </div>
   );
 };
