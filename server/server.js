@@ -817,7 +817,7 @@ console.log("PAYPAL_API: ",PAYPAL_API,"\nPAYPAL_API_CLIENT: ",PAYPAL_API_CLIENT,
 
 // paypal ************************
 app.post("/api/create-order-paypal", async (req, res) => {
-  console.log("\n*** createOrderPaypal\n");
+  console.log("\n\n*** createOrderPaypal\n\n");
 
   const courseId = req.body.courseId; // is being passed the courseSlug in the request input
   try {
@@ -853,12 +853,12 @@ if (course.discount_usd !== null && course.discount_usd > 0) {
         },
       ],
      
-      application_context: {
+      application_context: { 
         brand_name: "Buona Vibra",
         landing_page: "NO_PREFERENCE",
         user_action: "PAY_NOW",
-        return_url: `${process.env.BACKEND_URL}/api/capture-order-paypal?courseId=${courseId}`, // Include course slug in the return URL
-        cancel_url: `${process.env.BACKEND_URL}/api/course/enroll/${courseId}`,
+        return_url: `http://localhost:5005/api/capture-order-paypal?courseId=${courseId}`, // Include course slug in the return URL
+        cancel_url: `http://localhost:5005/api/course/enroll/${courseId}`,
       },
     };
 
@@ -891,12 +891,21 @@ if (course.discount_usd !== null && course.discount_usd > 0) {
     console.log("\n\nCreated Order:", response.data);
 
     // check user_courses table
-    const checkTable_users = await createTableIfNotExists(
-      db,
-      tableCheckQuery,
-      createUserTableQuery,
-      "users"
-    );
+    let sql = `CREATE TABLE IF NOT EXISTS user_courses (
+      user_id INT,
+      course_id INT,
+      PRIMARY KEY (user_id, course_id),
+      FOREIGN KEY (user_id) REFERENCES users(id),
+      FOREIGN KEY (course_id) REFERENCES courses(id)
+    )`;
+    
+    try {
+      await db.promise().execute(sql);
+      console.log("user_courses table created successfully");
+    } catch (error) {
+      console.error("Error creating user_courses table:", error);
+      // Handle the error accordingly
+    }
 
     // paypal pay link + courseId
     const courseIdParam = `courseId=${courseId}`;
@@ -913,7 +922,7 @@ if (course.discount_usd !== null && course.discount_usd > 0) {
 });
 // app.get("/api/capture-order-paypal") in App.js
 app.post("/api/capture-order-paypal", async (req, res) => {
-  console.log("\n*** captureOrderPaypal\n");
+  console.log("\n\n*** captureOrderPaypal\n\n");
   let courseId;
   courseId = req.query.courseId;
   try {
@@ -936,7 +945,7 @@ app.post("/api/capture-order-paypal", async (req, res) => {
         );
       }
 
-      return res.redirect(`/api/course/${courseId}`);
+      return res.redirect(`http://localhost:5005/api/course/${courseId}`);
     } else {
       return res.status(404).send("Course or user not found");
     }
