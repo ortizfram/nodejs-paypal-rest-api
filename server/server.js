@@ -1,4 +1,5 @@
 import cors from "cors";
+import axios from "axios";
 import express from "express";
 import session from "express-session";
 import path from "path";
@@ -809,9 +810,10 @@ app.post("/reset-password/:id/:token", async (req, res) => {
   }
 });
 // PAYMENT >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-const PAYPAL_API_CLIENT = isDev ? "" : process.env.PAYPAL_API_CLIENT;
-export const PAYPAL_API_SECRET = isDev ? "" : process.env.PAYPAL_API_SECRET;
-export const PAYPAL_API = isDev ? "" : "https://api-m.sandbox.paypal.com";
+const PAYPAL_API_CLIENT = isDev ? process.env.SB_PAYPAL_API_CLIENT : process.env.PAYPAL_API_CLIENT;
+export const PAYPAL_API_SECRET = isDev ? process.env.SB_PAYPAL_API_SECRET : process.env.PAYPAL_API_SECRET;
+export const PAYPAL_API = isDev ? process.env.SB_PAYPAL_API : process.env.PAYPAL_API;
+console.log("PAYPAL_API: ",PAYPAL_API,"\nPAYPAL_API_CLIENT: ",PAYPAL_API_CLIENT, "\nPAYPAL_API_SECRET: ",PAYPAL_API_SECRET, "\n\n")
 
 // paypal ************************
 app.post("/api/create-order-paypal", async (req, res) => {
@@ -827,6 +829,18 @@ app.post("/api/create-order-paypal", async (req, res) => {
 
     console.log("\n\nFetched Course Details:", course);
 
+    // calculate discount
+let adjustedDiscount = null;
+let withDiscount = null;
+if (course.discount_usd !== null && course.discount_usd > 0) {
+  adjustedDiscount = parseFloat(course.discount_usd) + 1;
+}
+
+// Render the value based on the conditions
+{adjustedDiscount !== null ? (
+    withDiscount = course.usd_price / adjustedDiscount
+) : null}
+
     //create order paypal
     const order = {
       intent: "CAPTURE",
@@ -834,16 +848,17 @@ app.post("/api/create-order-paypal", async (req, res) => {
         {
           amount: {
             currency_code: "USD",
-            value: course.usd_price, // Use the course price for the order
+            value: adjustedDiscount !== null ? course.usd_price - withDiscount : course.usd_price, // Use the course price for the order
           },
         },
       ],
+     
       application_context: {
-        brand_name: "Mi tienda",
+        brand_name: "Buona Vibra",
         landing_page: "NO_PREFERENCE",
         user_action: "PAY_NOW",
         return_url: `${process.env.BACKEND_URL}/api/capture-order-paypal?courseId=${courseId}`, // Include course slug in the return URL
-        cancel_url: `${process.env.BACKEND_URL}/api/cancel-order-paypal`,
+        cancel_url: `${process.env.BACKEND_URL}/api/course/enroll/${courseId}`,
       },
     };
 
@@ -877,7 +892,7 @@ app.post("/api/create-order-paypal", async (req, res) => {
 
     // check user_courses table
     const checkTable_users = await createTableIfNotExists(
-      pool,
+      db,
       tableCheckQuery,
       createUserTableQuery,
       "users"

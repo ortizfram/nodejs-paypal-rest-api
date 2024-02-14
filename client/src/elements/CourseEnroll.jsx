@@ -49,7 +49,7 @@ const CourseEnroll = () => {
         <img className="mb-4" src={course.thumbnail} alt={`${course.title} Image`} />
         <h2>{course.title}</h2>
         <p>{course.description}</p>
-        <div>
+        <div className="">
           <div className="row align-items-center">
             instructor:
             <div className="col-auto">
@@ -58,11 +58,12 @@ const CourseEnroll = () => {
                 alt="User Avatar"
                 className="rounded-circle me-2"
                 style={{ width: "25px", height: "25px", objectFit: "cover" }}
-              />
+                />
               <span>{course.author.username} • {course.author.name}</span>
             </div>
           </div>
         </div>
+        
 
         <p className="price-text">
           USD{course.usd_price} | ARS{course.ars_price}
