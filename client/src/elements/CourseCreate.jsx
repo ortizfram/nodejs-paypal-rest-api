@@ -204,7 +204,11 @@ const CourseCreate = () => {
               </div>
             </div>
             <input type="hidden" name="author" value={user?.id || ''} />
-            <button type="submit">Create Course</button>
+            <br /><br />
+            <div className="items-center text-center">
+
+            <button type="submit" className="btn btn-success">Create Course</button>
+            </div>
           </form>
         </div>
       </div>
