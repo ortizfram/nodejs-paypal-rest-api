@@ -47,7 +47,7 @@ const CourseEnroll = () => {
         </>
       );
     } else if (course.discount_ars > 0) {
-      return(
+      return (
       <>
           USD {course.usd_price} | <del>ARS {course.ars_price}</del>
           <p>USD {course.usd_price } | ARS {course.ars_price - (course.ars_price * course.discount_ars / 100)}</p>
@@ -61,7 +61,7 @@ const CourseEnroll = () => {
       );
     }
     }
-  };
+  
 
 
   return (

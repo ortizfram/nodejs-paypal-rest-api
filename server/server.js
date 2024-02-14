@@ -52,10 +52,10 @@ db.connect((err) => {
   console.log("Connected to MySQL database");
 });
 
-const port = 6004;
+const port = 5005;
 const HOST = process.env.HOST;
 const FRONTEND_URL = isDev ? "http://localhost:3000" : process.env.FRONTEND_URL;
-const BACKEND_URL = isDev ? "http://localhost:6004" : process.env.BACKEND_URL;
+const BACKEND_URL = isDev ? "http://localhost:5005" : process.env.BACKEND_URL;
 
 // %%%%%%%%%%%%%%%%%%%%%%%%%%% UPLOAD FILES & HANDLINGUPLOAD ENDPOINTS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

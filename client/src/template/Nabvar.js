@@ -6,7 +6,7 @@ import { UserContext } from "../hooks/UserContext.js";
 import "../public/css/navigation.css"
 
 // NodeJS endpoint reference
-const URI = "http://localhost:6004"; // Update the base URL
+const URI = "http://localhost:5005"; // Update the base URL
 
 const CompNavbar = () => {
     const { userData } = useContext(UserContext);

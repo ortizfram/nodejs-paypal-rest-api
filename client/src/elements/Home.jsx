@@ -5,6 +5,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import CompNavbar from "../template/Nabvar.js";
 import CompFooter from "../template/Footer";
+import "../public/css/home/home.css"
 
 // NodeJS endpoint reference
 const URI_sendEmail = "/send-email"; // Update the base URL
@@ -67,13 +68,13 @@ const Home = () => {
         </div>
 
         {/* <!-- about --> */}
-        <div className="container about" id="about1">
+        <div className="container about text-bg-light text-black px-4" id="about1">
           {/* <h1 className="section-title">{user ? user.email : ""} Acerca de.</h1> */}
-          <h1 className="section-title">{user ? JSON.stringify(user) : ''} Acerca de.</h1>
+          <h1 className="section-title">Acerca de.</h1>
             
 
           <div className="row">
-            <div className="col-md-6 text-center">
+            <div className="col-md-12 text-center">
               <img
                 src="images/home/me-about.jpg"
                 style={me_about_img_style}
@@ -84,7 +85,7 @@ const Home = () => {
                 Marcela Marzetti
               </h3>
             </div>
-            <div className="col-md-6 text-center">
+            <div className="col-md-12 text-center">
               <p className="text-xl">
                 <span>
                   ¡Bienvenido/a a mi página web!
