@@ -1,6 +1,7 @@
 import { useContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../hooks/UserContext.js";
+import "../public/css/login.css"; // Import your custom CSS file
 
 const Login = () => {
   const { setUser } = useContext(UserContext);
@@ -21,7 +22,7 @@ const Login = () => {
     e.preventDefault();
 
     try {
-      const response = await fetch("/login", {
+      const response = await fetch("http://localhost:5005/login", {
         method: "POST",
         body: JSON.stringify({ email, password }),
         headers: {
@@ -29,7 +30,6 @@ const Login = () => {
         },
       });
       const data = await response.json();
-      console.log("\n\nDATA", data)
 
       if (response.ok) {
         setUser(data.user); // Update the user state in the App component
@@ -37,20 +37,14 @@ const Login = () => {
         const next = data.redirectUrl;
         if (data.status === "success") {
           alert("Login successful");
-          console.log("Login successful");
           navigate(next);
         } else {
-          console.error("Login failed:", data.message);
-          if (data.status === "error") {
-            setBackendMessage(data.message);
-          }
+          setBackendMessage(data.message);
         }
       } else {
-        console.error("Login failed:", data.message);
         setBackendMessage(data.message);
       }
     } catch (error) {
-      console.error("An error occurred during login:", error);
       setBackendMessage(
         "An error occurred during login. Please check your credentials."
       );
@@ -58,18 +52,26 @@ const Login = () => {
   };
 
   return (
-    <div>
-      <form onSubmit={handleLogin}>
+    <div className="login-container flex flex-column">
+      <div className="">
+
+      <h1 className="section-title">Ingresar</h1>
+      </div>
+      <div className="">
+
+      <form onSubmit={handleLogin} className="login-form">
         {/* Render backend message */}
         {backendMessage && (
-          <p style={{ color: "red" }}>{backendMessage}</p>
+          <p className="error-message">{backendMessage}</p>
         )}
         <label>Email</label>
         <input type="text" onChange={(e) => setEmail(e.target.value)} />
         <label>Password</label>
         <input type="password" onChange={(e) => setPassword(e.target.value)} />
-        <button type="submit">Login</button>
+        <button type="submit" className="login-button">Login</button>
       </form>
+      </div>
+
     </div>
   );
 };

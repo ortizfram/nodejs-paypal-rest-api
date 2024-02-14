@@ -1,7 +1,4 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
-
-
 import "../public/css/course/courses.css";
 
 function Courses() {
@@ -11,14 +8,22 @@ function Courses() {
   const [successMessage, setSuccessMessage] = useState("");
 
   useEffect(() => {
-    axios
-      .get("/api/courses")
-      .then((res) => {
-        const { courses, isAdmin } = res.data;
+    fetch("http://localhost:5005/api/courses")
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Failed to fetch courses");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        const { courses, isAdmin } = data;
         setCourses(courses);
         setIsAdmin(isAdmin);
       })
-      .catch((err) => console.log(err));
+      .catch((error) => {
+        console.error("Error fetching courses:", error);
+        setErrorMessage("Failed to fetch courses");
+      });
   }, []);
 
   return (
