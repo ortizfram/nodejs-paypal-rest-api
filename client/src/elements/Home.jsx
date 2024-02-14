@@ -32,7 +32,7 @@ const Home = () => {
   // Fetch Home
   const getHome = async () => {
     try {
-      await axios.get("/"); //  endpoint
+      await axios.get("http://localhost:5005/"); //  endpoint
     } catch (error) {
       console.error("Error fetching Home:", error);
     }

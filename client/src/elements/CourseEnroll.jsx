@@ -13,7 +13,7 @@ const CourseEnroll = () => {
   useEffect(() => {
     const fetchCourse = async () => {
       try {
-        const response = await fetch(`/api/course/${id}`, {
+        const response = await fetch(`http://localhost:5005/api/course/${id}`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -42,8 +42,8 @@ const CourseEnroll = () => {
     if (course.discount_usd >0  ) {
       return (
         <>
-          <del>USD {course.usd_price}</del> | ARS {course.ars_price}
-          <p>USD {course.usd_price - (course.usd_price * course.discount_usd / 100)} | ARS {course.ars_price}</p>
+          <del className="text-success">antes USD {course.usd_price}</del>
+          <p><span className="text-success">USD {course.usd_price - (course.usd_price * course.discount_usd / 100)}</span> | ARS {course.ars_price}</p>
         </>
       );
     } else if (course.discount_ars > 0) {
@@ -91,7 +91,7 @@ const CourseEnroll = () => {
         </div>
         
 
-        <p className="price-text">
+        <p className="price-text border border-success rounded p-1">
         {renderPrice()}
         </p>
       </div>

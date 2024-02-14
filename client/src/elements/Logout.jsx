@@ -10,7 +10,7 @@ const Logout = () => {
   const handleLogout = async () => {
     try {
       // Make an API request to log the user out on the server
-      await axios.post('/logout');
+      await axios.post('http://localhost:5005/logout');
 
       // Clear user data from localStorage on logout
       localStorage.removeItem('userData');

@@ -14,7 +14,7 @@ import methodOverride from "method-override";
 import multer from "multer";
 import moment from "moment";
 import mercadopago from "mercadopago";
-import { getCourseFromIdQuery, getUserEnrolledCoursesQuery, tableCheckQuery } from "./db/queries/course.queries.js";
+import { getCourseFromIdQuery, getUserEnrolledCoursesQuery, insertUserCourseQuery, tableCheckQuery } from "./db/queries/course.queries.js";
 import { createUserTableQuery } from "./db/queries/auth.queries.js";
 import createTableIfNotExists from "./src/public/js/createTable.js";
 // shortcuts for files/dirs
@@ -912,7 +912,39 @@ if (course.discount_usd !== null && course.discount_usd > 0) {
   }
 });
 // app.get("/api/capture-order-paypal") in App.js
-app.post("/api/capture-order-paypal", async (req, res) => {});
+app.post("/api/capture-order-paypal", async (req, res) => {
+  console.log("\n*** captureOrderPaypal\n");
+  let courseId;
+  courseId = req.query.courseId;
+  try {
+    const user = req.session.user;
+
+    // Fetch course details based on the courseSlug using MySQL query
+    const [rows] = await db.promise().execute(getCourseFromIdQuery, [courseId]);
+    const course = rows[0];
+    console.log("\n\nFetched Course:", course);
+
+    if (course && user) {
+      // Add the user and course relationship in user_courses table
+      const [insertUserCourse] = await db.promise().execute(insertUserCourseQuery, [
+        user.id,
+        course.id,
+      ]);
+      if (insertUserCourse.affectedRows > 0) {
+        console.log(
+          `👌🏽 --Inserted into user_courses: User ID: ${user.id}, Course ID: ${course.id}`
+        );
+      }
+
+      return res.redirect(`/api/course/${courseId}`);
+    } else {
+      return res.status(404).send("Course or user not found");
+    }
+  } catch (error) {
+    console.error("Error capturing order:", error);
+    res.status(500).json({ message: "Error capturing the order" });
+  }
+});
 
 // MercadoPago ******************
 app.post("/api/webhook-mp", async (req, res) => {});
