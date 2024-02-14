@@ -833,12 +833,12 @@ app.post("/api/create-order-paypal", async (req, res) => {
 let adjustedDiscount = null;
 let withDiscount = null;
 if (course.discount_usd !== null && course.discount_usd > 0) {
-  adjustedDiscount = parseFloat(course.discount_usd) + 1;
+  adjustedDiscount = course.usd_price - (course.usd_price * course.discount_usd / 100);
 }
 
 // Render the value based on the conditions
 {adjustedDiscount !== null ? (
-    withDiscount = course.usd_price / adjustedDiscount
+    withDiscount = adjustedDiscount
 ) : null}
 
     //create order paypal
@@ -848,7 +848,7 @@ if (course.discount_usd !== null && course.discount_usd > 0) {
         {
           amount: {
             currency_code: "USD",
-            value: adjustedDiscount !== null ? course.usd_price - withDiscount : course.usd_price, // Use the course price for the order
+            value: adjustedDiscount !== null ? withDiscount : course.usd_price, // Use the course price for the order
           },
         },
       ],

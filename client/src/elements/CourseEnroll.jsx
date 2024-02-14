@@ -38,6 +38,32 @@ const CourseEnroll = () => {
     return <div>Loading...</div>;
   }
 
+  const renderPrice = () => {
+    if (course.discount_usd >0  ) {
+      return (
+        <>
+          <del>USD {course.usd_price}</del> | ARS {course.ars_price}
+          <p>USD {course.usd_price - (course.usd_price * course.discount_usd / 100)} | ARS {course.ars_price}</p>
+        </>
+      );
+    } else if (course.discount_ars > 0) {
+      return(
+      <>
+          USD {course.usd_price} | <del>ARS {course.ars_price}</del>
+          <p>USD {course.usd_price } | ARS {course.ars_price - (course.ars_price * course.discount_ars / 100)}</p>
+        </>
+      )
+    } else {
+      return (
+        <>
+          USD {course.usd_price} | ARS {course.ars_price}
+        </>
+      );
+    }
+    }
+  };
+
+
   return (
     <>
       <div className="page-container">
@@ -66,7 +92,7 @@ const CourseEnroll = () => {
         
 
         <p className="price-text">
-          USD{course.usd_price} | ARS{course.ars_price}
+        {renderPrice()}
         </p>
       </div>
 
