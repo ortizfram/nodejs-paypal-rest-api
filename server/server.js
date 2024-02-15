@@ -851,7 +851,7 @@ app.post("/api/create-order-paypal", async (req, res) => {
 
     console.log("\n\nFetched Course Details:", course);
 
-    // calculate discount
+    // calculate discount USD for paypal
     let adjustedDiscount = null;
     let withDiscount = null;
     if (course.discount_usd !== null && course.discount_usd > 0) {
@@ -1051,8 +1051,18 @@ app.post("/api/create-order-mp", async (req, res) => {
   console.log(`\nFetched Course Details:`);
   console.log(course);
 
-  // Convert course.price to a decimal
-  const priceAsFloat = parseFloat(course.ars_price);
+  // calculate discount ARS for MP
+  let adjustedDiscount = null;
+  let withDiscount = null;
+  if (course.discount_ars !== null && course.discount_ars > 0) {
+    adjustedDiscount =
+      course.ars_price - (course.ars_price * course.discount_ars) / 100;
+  }
+
+  // Render the value based on the conditions
+  {
+    adjustedDiscount !== null ? (withDiscount = adjustedDiscount) : null;
+  }
 
   mercadopago.configure({
     access_token: MP_ACCESS_TOKEN,
@@ -1064,7 +1074,7 @@ app.post("/api/create-order-mp", async (req, res) => {
         title: course.title,
         quantity: 1,
         currency_id: "ARS",
-        unit_price: priceAsFloat,
+        unit_price: parseFloat(adjustedDiscount !== null ? withDiscount : course.ars_price),
       },
     ],
     back_urls: {

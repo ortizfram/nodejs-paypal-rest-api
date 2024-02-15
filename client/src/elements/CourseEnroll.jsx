@@ -43,7 +43,7 @@ const CourseEnroll = () => {
     if (course.discount_usd > 0 && !course.discount_ars) {
       return (
         <>
-          <del className="text-success">antes USD {course.usd_price}</del>
+          <del className="text-success">USD {course.usd_price}</del>
           <p>
             <span className="text-success">
               USD{" "}
@@ -58,11 +58,11 @@ const CourseEnroll = () => {
     // * DISCOUNT for ARS * \\
     else if (course.discount_ars > 0 && !course.discount_usd) {
       return (
-        <>
-          USD {course.usd_price} | <del>ARS {course.ars_price}</del>
+        <><span className="text-xs fw-lighter">
+          USD {course.usd_price} | <del  className="text-success">ARS {course.ars_price}</del></span>
           <p>
-            USD {course.usd_price} | ARS{" "}
-            {course.ars_price - (course.ars_price * course.discount_ars) / 100}
+            USD {course.usd_price} | <span className="text-success">ARS{" "}
+            {course.ars_price - (course.ars_price * course.discount_ars) / 100}</span>
           </p>
         </>
       );
@@ -70,16 +70,16 @@ const CourseEnroll = () => {
     // * DISCOUNT for both ARS and USD * \\
     else if (course.discount_ars >= 1 && course.discount_usd >= 1) {
       return (
-        <div>
-          <span className="text-muted">
-          USD <del>{course.usd_price}</del> | ARS <del>{course.ars_price}</del>
-          </span>
+        <>
+        <span className="text-success">
+          <span className="text-xs fw-lighter">USD <del>{course.usd_price}</del> | ARS <del>{course.ars_price}</del></span>
           <p className="text-success">
             USD{" "}{course.usd_price - (course.usd_price * course.discount_usd) / 100}{" "}
             | 
             {" "}ARS{" "}{course.ars_price - ((course.ars_price * course.discount_ars) / 100)}
           </p>
-        </div>
+        </span>
+        </>
       );
     }
     // * NO-DISCOUNT * \\
@@ -97,7 +97,7 @@ const CourseEnroll = () => {
       <div className="page-container">
         <div className="course-overview">
           <div className="section-title2 mt-4 mb-4">
-            <h1>Payment Details</h1>
+            <h1>Detalles de Pago</h1>
           </div>
           {/* Payment Details */}
           <img
@@ -106,10 +106,10 @@ const CourseEnroll = () => {
             alt={`${course.title} Image`}
           />
           <h2>{course.title}</h2>
-          <p>{course.description}</p>
-          <div className="">
-            <div className="row align-items-center">
-              instructor:
+          <p className="text-black">{course.description}</p>
+          <span className="">
+            <span className="row align-items-center text-muted">
+              <span>instructor:</span>
               <div className="col-auto">
                 <img
                   src={course.author.avatar}
@@ -121,8 +121,8 @@ const CourseEnroll = () => {
                   {course.author.username} • {course.author.name}
                 </span>
               </div>
-            </div>
-          </div>
+            </span>
+          </span>
 
           <p className="price-text border border-success rounded p-1">
             {renderPrice()}
