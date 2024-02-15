@@ -816,6 +816,7 @@ app.post("/reset-password/:id/:token", async (req, res) => {
   }
 });
 // PAYMENT >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+// ## PAYPAL CONSTANTS
 const PAYPAL_API_CLIENT = isDev
   ? process.env.SB_PAYPAL_API_CLIENT
   : process.env.PAYPAL_API_CLIENT;
@@ -834,27 +835,8 @@ console.log(
   PAYPAL_API_SECRET,
   "\n\n"
 );
-
-// const MP_ACCESS_TOKEN = isDev
-//   ? process.env.MP_SB_ACCESS_TOKEN
-//   : process.env.MP_ACCESS_TOKEN;
-// export const MP_NOTIFICATION_URL = isDev
-//   ? process.env.MP_SB_NOTIFICATION_URL
-//   : process.env.MP_NOTIFICATION_URL;
-// export const PAYPAL_API = isDev
-//   ? process.env.SB_PAYPAL_API
-//   : process.env.PAYPAL_API;
-// console.log(
-//   "PAYPAL_API: ",
-//   PAYPAL_API,
-//   "\nPAYPAL_API_CLIENT: ",
-//   PAYPAL_API_CLIENT,
-//   "\nPAYPAL_API_SECRET: ",
-//   PAYPAL_API_SECRET,
-//   "\n\n"
-// );
-
 // paypal ************************
+
 app.post("/api/create-order-paypal", async (req, res) => {
   console.log("\n\n*** createOrderPaypal\n\n");
 
@@ -1039,6 +1021,20 @@ app.get("/api/capture-order-paypal", async (req, res) => {
 });
 
 // MercadoPago ******************
+//  ## MP CONSTANTS
+const MP_ACCESS_TOKEN = isDev
+  ? process.env.MP_SB_ACCESS_TOKEN
+  : process.env.MP_ACCESS_TOKEN;
+export const MP_NOTIFICATION_URL = isDev
+  ? process.env.MP_SB_NOTIFICATION_URL
+  : process.env.MP_NOTIFICATION_URL;
+console.log(
+  "\nMP_ACCESS_TOKEN: ",
+  MP_ACCESS_TOKEN,
+  "\nMP_NOTIFICATION_URL: ",
+  MP_NOTIFICATION_URL,"\n\n"
+);
+
 app.post("/api/create-order-mp", async (req, res) => {
   console.log("\n*** Creating MP order...\n");
 
@@ -1090,10 +1086,54 @@ app.post("/api/create-order-mp", async (req, res) => {
   const redirectURL = `${initPoint}&courseId=${courseId}`;
   res.redirect(redirectURL);
 });
-app.post("/api/webhook-mp", async (req, res) => {});
-// app.get("/api/success-mp") in App.js
-// app.get("/api/failure-mp") in App.js
-// app.get("/api/pending-mp") in App.js
+app.post("/api/webhook-mp", async (req, res) => {
+  console.log("\n\n*** Webhook MP...\n\n");
+
+    try {
+      const paymentType = req.query.type;
+      const paymentId = req.query["data.id"];
+      const courseId = req.query.courseId; // Ensure Mercado Pago sends courseSlug
+      const userId = req.query.userId;
+      console.log("courseId:", courseId);
+      console.log("paymentId:", paymentId);
+      console.log("paymentType:", paymentType);
+      console.log("userId:", userId);
+
+      if (paymentType === "payment" && paymentId && courseId) {
+
+        // Fetch course details based on the courseSlug using MySQL query
+        const [rows] = await db.promise().execute(getCourseFromIdQuery, [courseId]);
+        const course = rows[0];
+
+        if (course && userId) {
+          // Add the user and course relationship in user_courses table
+          const [insertUserCourse] = await db.promise().execute(insertUserCourseQuery, [
+            userId,
+            course.id,
+          ]);
+
+          if (insertUserCourse.affectedRows > 0) {
+            console.log(
+              `\n👌🏽 --Inserted into user_courses: User ID: ${userId}, Course ID: ${course.id}`
+            );
+          }
+        }
+      }
+      res.sendStatus(204); // OK but none to return
+    } catch (error) {
+      console.error("Error handling Mercado Pago webhook:", error);
+      res.sendStatus(500);
+    }
+});
+app.get("/api/success-mp"), async (req,res) => {
+  res.send("\n*** Success MP...\n");
+}
+app.get("/api/failure-mp"), async (req,res) => {
+  res.send("failure")
+}
+app.get("/api/pending-mp"), async (req,res) => {
+  res.send("pending")
+}
 
 // ==================================== SERVE COMMON FILES CONFIG  *******************************************************************************
 // Serve static files from React build directory
