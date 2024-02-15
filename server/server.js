@@ -964,9 +964,11 @@ app.post("/api/capture-order-paypal", async (req, res) => {
         console.log(
           `👌🏽 --Inserted into user_courses: User ID: ${userId}, Course ID: ${course.id}`
         );
+        // Send success response with status 201 and JSON message
       }
+      const message = `User successfully enrolled in course. User ID: ${userId}, Course ID: ${course.id}`
 
-      return res.redirect(`http://localhost:5005/api/course/${courseId}`);
+      return res.redirect(`http://localhost:3000/api/course/${courseId}&message=${message}`);
     } else {
       return res.status(404).send("Course or user not found");
     }
@@ -998,9 +1000,11 @@ app.get("/api/capture-order-paypal", async (req, res) => {
         console.log(
           `👌🏽 --Inserted into user_courses: User ID: ${userId}, Course ID: ${course.id}`
         );
+        // Send success response with status 201 and JSON message
       }
+      const message = `User successfully enrolled in course. User ID: ${userId}, Course ID: ${course.id}`
 
-      return res.redirect(`http://localhost:3000/api/course/${courseId}`);
+      return res.redirect(`http://localhost:3000/api/course/${courseId}&message=${message}`);
     } else {
       return res.status(404).send("Course or user not found");
     }

@@ -4,6 +4,7 @@ import CompNavbar from '../template/Nabvar';
 import CompFooter from '../template/Footer';
 import { UserContext } from "../hooks/UserContext.js";
 import '../public/css/course/courseDetail.css';
+import AlertMessage from "../components/alertMessage.jsx";
 
 const CourseDetail = () => {
   const { userData } = useContext(UserContext);
@@ -43,6 +44,7 @@ const CourseDetail = () => {
   return (
     <>
       <CompNavbar user={user}/>
+      <AlertMessage />
       <div className="bg-course-detail">
         <div className="background-blur"></div>
         <div className="container" style={{ margin: "6.2rem auto" }}>
