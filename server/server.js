@@ -14,7 +14,12 @@ import methodOverride from "method-override";
 import multer from "multer";
 import moment from "moment";
 import mercadopago from "mercadopago";
-import { getCourseFromIdQuery, getUserEnrolledCoursesQuery, insertUserCourseQuery, tableCheckQuery } from "./db/queries/course.queries.js";
+import {
+  getCourseFromIdQuery,
+  getUserEnrolledCoursesQuery,
+  insertUserCourseQuery,
+  tableCheckQuery,
+} from "./db/queries/course.queries.js";
 import { createUserTableQuery } from "./db/queries/auth.queries.js";
 import createTableIfNotExists from "./src/public/js/createTable.js";
 // shortcuts for files/dirs
@@ -810,16 +815,31 @@ app.post("/reset-password/:id/:token", async (req, res) => {
   }
 });
 // PAYMENT >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-const PAYPAL_API_CLIENT = isDev ? process.env.SB_PAYPAL_API_CLIENT : process.env.PAYPAL_API_CLIENT;
-export const PAYPAL_API_SECRET = isDev ? process.env.SB_PAYPAL_API_SECRET : process.env.PAYPAL_API_SECRET;
-export const PAYPAL_API = isDev ? process.env.SB_PAYPAL_API : process.env.PAYPAL_API;
-console.log("PAYPAL_API: ",PAYPAL_API,"\nPAYPAL_API_CLIENT: ",PAYPAL_API_CLIENT, "\nPAYPAL_API_SECRET: ",PAYPAL_API_SECRET, "\n\n")
+const PAYPAL_API_CLIENT = isDev
+  ? process.env.SB_PAYPAL_API_CLIENT
+  : process.env.PAYPAL_API_CLIENT;
+export const PAYPAL_API_SECRET = isDev
+  ? process.env.SB_PAYPAL_API_SECRET
+  : process.env.PAYPAL_API_SECRET;
+export const PAYPAL_API = isDev
+  ? process.env.SB_PAYPAL_API
+  : process.env.PAYPAL_API;
+console.log(
+  "PAYPAL_API: ",
+  PAYPAL_API,
+  "\nPAYPAL_API_CLIENT: ",
+  PAYPAL_API_CLIENT,
+  "\nPAYPAL_API_SECRET: ",
+  PAYPAL_API_SECRET,
+  "\n\n"
+);
 
 // paypal ************************
 app.post("/api/create-order-paypal", async (req, res) => {
   console.log("\n\n*** createOrderPaypal\n\n");
 
   const courseId = req.body.courseId; // is being passed the courseSlug in the request input
+  const userId = req.query.userId
   try {
     console.log("\n\nSQL Query:", getCourseFromIdQuery);
     console.log("\n\nparams courseId:", courseId);
@@ -830,16 +850,17 @@ app.post("/api/create-order-paypal", async (req, res) => {
     console.log("\n\nFetched Course Details:", course);
 
     // calculate discount
-let adjustedDiscount = null;
-let withDiscount = null;
-if (course.discount_usd !== null && course.discount_usd > 0) {
-  adjustedDiscount = course.usd_price - (course.usd_price * course.discount_usd / 100);
-}
+    let adjustedDiscount = null;
+    let withDiscount = null;
+    if (course.discount_usd !== null && course.discount_usd > 0) {
+      adjustedDiscount =
+        course.usd_price - (course.usd_price * course.discount_usd) / 100;
+    }
 
-// Render the value based on the conditions
-{adjustedDiscount !== null ? (
-    withDiscount = adjustedDiscount
-) : null}
+    // Render the value based on the conditions
+    {
+      adjustedDiscount !== null ? (withDiscount = adjustedDiscount) : null;
+    }
 
     //create order paypal
     const order = {
@@ -852,12 +873,12 @@ if (course.discount_usd !== null && course.discount_usd > 0) {
           },
         },
       ],
-     
-      application_context: { 
+
+      application_context: {
         brand_name: "Buona Vibra",
         landing_page: "NO_PREFERENCE",
         user_action: "PAY_NOW",
-        return_url: `http://localhost:5005/api/capture-order-paypal?courseId=${courseId}`, // Include course slug in the return URL
+        return_url: `http://localhost:5005/api/capture-order-paypal?courseId=${courseId}&userId=${userId}`, // Include course slug in the return URL
         cancel_url: `http://localhost:5005/api/course/enroll/${courseId}`,
       },
     };
@@ -898,7 +919,7 @@ if (course.discount_usd !== null && course.discount_usd > 0) {
       FOREIGN KEY (user_id) REFERENCES users(id),
       FOREIGN KEY (course_id) REFERENCES courses(id)
     )`;
-    
+
     try {
       await db.promise().execute(sql);
       console.log("user_courses table created successfully");
@@ -909,7 +930,8 @@ if (course.discount_usd !== null && course.discount_usd > 0) {
 
     // paypal pay link + courseId
     const courseIdParam = `courseId=${courseId}`;
-    const approveLink = `${response.data.links[1].href}&${courseIdParam}`;
+    const userIdParam = `userId=${userId}`;
+    const approveLink = `${response.data.links[1].href}&${courseIdParam}&${userIdParam}`;
 
     // Redirect the user to the PayPal approval link
     res.redirect(approveLink);
@@ -926,7 +948,7 @@ app.post("/api/capture-order-paypal", async (req, res) => {
   let courseId;
   courseId = req.query.courseId;
   try {
-    const user = req.session.user;
+    const userId = req.query.userId;
 
     // Fetch course details based on the courseSlug using MySQL query
     const [rows] = await db.promise().execute(getCourseFromIdQuery, [courseId]);
@@ -935,17 +957,50 @@ app.post("/api/capture-order-paypal", async (req, res) => {
 
     if (course && user) {
       // Add the user and course relationship in user_courses table
-      const [insertUserCourse] = await db.promise().execute(insertUserCourseQuery, [
-        user.id,
-        course.id,
-      ]);
+      const [insertUserCourse] = await db
+        .promise()
+        .execute(insertUserCourseQuery, [userId, course.id]);
       if (insertUserCourse.affectedRows > 0) {
         console.log(
-          `👌🏽 --Inserted into user_courses: User ID: ${user.id}, Course ID: ${course.id}`
+          `👌🏽 --Inserted into user_courses: User ID: ${userId}, Course ID: ${course.id}`
         );
       }
 
       return res.redirect(`http://localhost:5005/api/course/${courseId}`);
+    } else {
+      return res.status(404).send("Course or user not found");
+    }
+  } catch (error) {
+    console.error("Error capturing order:", error);
+    res.status(500).json({ message: "Error capturing the order" });
+  }
+});
+app.get("/api/capture-order-paypal", async (req, res) => {
+  console.log("\n\n*** captureOrderPaypal\n\n");
+  let courseId;
+  courseId = req.query.courseId;
+  try {
+    const userId = req.query.userId;
+    console.log("sessionUSerId:", userId)
+
+    // Fetch course details based on the courseSlug using MySQL query
+    const [rows] = await db.promise().execute(getCourseFromIdQuery, [courseId]);
+    const course = rows[0];
+    console.log("\n\nFetched Course:", course);
+    console.log("\n\nCourseId:", course.id);
+
+    if (course && userId) {
+      // Add the user and course relationship in user_courses table
+      const [insertUserCourse] = await db
+        .promise()
+        .execute(insertUserCourseQuery, [userId, course.id]);
+      if (insertUserCourse.affectedRows > 0) {
+        console.log(
+          `👌🏽 --Inserted into user_courses: User ID: ${userId}, Course ID: ${course.id}`
+        );
+      }
+
+      return res.redirect(`http://localhost:3000/api/course/${courseId}`);
     } else {
       return res.status(404).send("Course or user not found");
     }
@@ -1067,7 +1122,7 @@ export async function checkCourseEnrollment(req, res, next) {
 
   try {
     if (!user) {
-      return res.status(403).redirect("/api/login");
+      return res.status(403).redirect("/login");
     }
     //
     const [enrolledRows] = await db

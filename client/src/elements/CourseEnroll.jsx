@@ -113,20 +113,20 @@ const CourseEnroll = () => {
           {/* course enroll */}
           {/* The form to trigger the payment */}
           <form
-            action={`http://localhost:5005/api/create-order-paypal?courseId=${course.id}`}
+            action={`http://localhost:5005/api/create-order-paypal?courseId=${course.id}&userId=${user.id}`}
             method="POST"
           >
             {/* Hidden input to pass the course slug to the server */}
             <input type="hidden" name="courseId" value={course.id} />
             {/* You should replace the value of userId with the actual userId */}
-            <input type="hidden" name="userId" value="<%= userId %>" />
+            <input type="hidden" name="userId" value={user.id} />
             <button type="submit">
               <img src="/images/paypal.png" alt="paypal-icon" />
               <p>Continue with Paypal</p>
             </button>
           </form>
           <form
-            action={`http://localhost:5005/api/create-order-mp?courseId=${course.id}`}
+            action={`http://localhost:5005/api/create-order-mp?courseId=${course.id}&userId=${user.id}`}
             method="POST"
           >
             {/* Hidden input to pass the course slug to the server */}

@@ -51,6 +51,14 @@ const Login = () => {
     }
   };
 
+  useEffect(() => {
+    // Check if user data exists in session
+    const userFromSession = JSON.parse(localStorage.getItem("user"));
+    if (userFromSession) {
+      setUser(userFromSession);
+    }
+  }, [setUser]);
+
   return (
     <div className="login-container flex flex-column">
       <div className="">
