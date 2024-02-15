@@ -493,8 +493,8 @@ app.get(
       }
 
       const course = courseRows[0];
-      console.log(course);
-      console.log("\n\ncourse.video", course.video);
+      // console.log(course);
+      // console.log("\n\ncourse.video", course.video);
       courseId = course.id;
 
       // Format course timestamps and video_link
@@ -522,7 +522,7 @@ app.get(
       `;
       const [authorRows] = await db.promise().execute(sql, [course.author_id]);
       const author = authorRows[0];
-      console.log(author);
+      // console.log(author);
 
       if (!author) {
         return res.status(404).json({ error: "Author details not found" });
@@ -534,7 +534,7 @@ app.get(
         username: author.author_username,
         avatar: author.author_avatar,
       };
-      console.log(formattedCourse.author);
+      // console.log(formattedCourse.author);
 
       // Fill array with query result
       let enrolledCourses = [];
@@ -1040,16 +1040,16 @@ app.post("/api/create-order-mp", async (req, res) => {
 
   const courseId = req.body.courseId; // is being passed the courseSlug in the request input
   const userId = req.query.userId; // is being passed the courseSlug in the request input
-  console.log(`\nSQL Query: ${getCourseFromSlugQuery}\n`);
-  console.log(`\ncourseId: ${[courseId]}\n`);
-  console.log(`\nuserId: ${[userId]}\n`);
+  // console.log(`\nSQL Query: ${getCourseFromSlugQuery}\n`);
+  // console.log(`\ncourseId: ${[courseId]}\n`);
+  // console.log(`\nuserId: ${[userId]}\n`);
 
   // Fetch the course using the query
   const [rows] = await db.promise().execute(getCourseFromIdQuery, [courseId]);
   // Check if the course exists
   const course = rows[0];
-  console.log(`\nFetched Course Details:`);
-  console.log(course);
+  // console.log(`\nFetched Course Details:`);
+  // console.log(course);
 
   // calculate discount ARS for MP
   let adjustedDiscount = null;
@@ -1067,6 +1067,7 @@ app.post("/api/create-order-mp", async (req, res) => {
   mercadopago.configure({
     access_token: MP_ACCESS_TOKEN,
   });
+  
 
   var preference = {
     items: [
@@ -1096,6 +1097,15 @@ app.post("/api/create-order-mp", async (req, res) => {
   const redirectURL = `${initPoint}&courseId=${courseId}`;
   res.redirect(redirectURL);
 });
+app.get("/api/success-mp"), async (req,res) => {
+  res.send("\n*** Success MP...\n");
+}
+app.get("/api/failure-mp"), async (req,res) => {
+  res.send("failure")
+}
+app.get("/api/pending-mp"), async (req,res) => {
+  res.send("pending")
+}
 app.post("/api/webhook-mp", async (req, res) => {
   console.log("\n\n*** Webhook MP...\n\n");
 
@@ -1104,10 +1114,10 @@ app.post("/api/webhook-mp", async (req, res) => {
       const paymentId = req.query["data.id"];
       const courseId = req.query.courseId; // Ensure Mercado Pago sends courseSlug
       const userId = req.query.userId;
-      console.log("courseId:", courseId);
+      // console.log("courseId:", courseId);
       console.log("paymentId:", paymentId);
       console.log("paymentType:", paymentType);
-      console.log("userId:", userId);
+      // console.log("userId:", userId);
 
       if (paymentType === "payment" && paymentId && courseId) {
 
@@ -1135,15 +1145,6 @@ app.post("/api/webhook-mp", async (req, res) => {
       res.sendStatus(500);
     }
 });
-app.get("/api/success-mp"), async (req,res) => {
-  res.send("\n*** Success MP...\n");
-}
-app.get("/api/failure-mp"), async (req,res) => {
-  res.send("failure")
-}
-app.get("/api/pending-mp"), async (req,res) => {
-  res.send("pending")
-}
 
 // ==================================== SERVE COMMON FILES CONFIG  *******************************************************************************
 // Serve static files from React build directory
