@@ -2,7 +2,7 @@ import axios from "axios";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-const URI_signup = "http://localhost:5005/api/signup";
+const URI_signup = "http://localhost:5001/api/signup";
 
 const CompSignup = () => {
   const [username, setUsername] = useState("");

@@ -25,7 +25,7 @@ class AlertMessage extends React.Component {
     return (
       <>
         {this.state.showAlert && (
-          <div id='alert-box' className='bg-success text-white text-center items-center shadow' style={{ padding: '8px', marginBottom: '20px', animation: 'slideInUp 0.5s ease-in-out' }}>
+          <div id='alert-box' className='rounded bg-success text-white text-center items-center shadow' style={{ padding: '8px', marginBottom: '20px', animation: 'slideInUp 0.5s ease-in-out' }}>
             {this.state.message && <p>{this.state.message}</p>}
           </div>
         )}

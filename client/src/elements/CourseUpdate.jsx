@@ -21,7 +21,7 @@ const CourseUpdate = () => {
     // Fetch course data when the component mounts
     const fetchCourse = async () => {
       try {
-        const response = await fetch(`http://localhost:5005/api/course/${id}`);
+        const response = await fetch(`http://localhost:5001/api/course/${id}`);
         if (response.ok) {
           const data = await response.json();
           setCourse(data.course);
@@ -61,7 +61,7 @@ const CourseUpdate = () => {
     }
     renderImage(formData);
 
-    const response = await fetch(`http://localhost:5005/api/course/update/${id}`, {
+    const response = await fetch(`http://localhost:5001/api/course/update/${id}`, {
       method: "PUT",
       body: formData,
     });

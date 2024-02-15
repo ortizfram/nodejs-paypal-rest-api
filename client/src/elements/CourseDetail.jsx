@@ -15,7 +15,7 @@ const CourseDetail = () => {
   useEffect(() => {
     const fetchCourse = async () => {
       try {
-        const response = await fetch(`http://localhost:5005/api/course/${id}`, {
+        const response = await fetch(`http://localhost:5001/api/course/${id}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',

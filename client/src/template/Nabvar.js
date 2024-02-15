@@ -6,7 +6,7 @@ import { UserContext } from "../hooks/UserContext.js";
 import "../public/css/navigation.css"
 
 // NodeJS endpoint reference
-const URI = "http://localhost:5005"; // Update the base URL
+const URI = "http://localhost:5001"; // Update the base URL
 
 const CompNavbar = () => {
     const { userData } = useContext(UserContext);
@@ -76,8 +76,8 @@ const CompNavbar = () => {
               {/* Links for non-loggedin users */}
               {!user &&
                 <>
-                  <a href="/api/login" style={{ "--i": 12, border: '2px solid white', borderRadius: '10%', padding: '8px' }}>Ingresar</a>
-                  <a href="/api/signup" style={{ "--i": 13, border: '2px solid white', borderRadius: '10%', padding: '8px' }}>Registrar</a>
+                  <a href="/login" style={{ "--i": 12, border: '2px solid white', borderRadius: '10%', padding: '8px' }}>Ingresar</a>
+                  <a href="/signup" style={{ "--i": 13, border: '2px solid white', borderRadius: '10%', padding: '8px' }}>Registrar</a>
                 </>
               }
             </nav>

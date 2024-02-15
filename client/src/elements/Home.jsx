@@ -5,6 +5,8 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import CompNavbar from "../template/Nabvar.js";
 import CompFooter from "../template/Footer";
+import AlertMessage from "../components/alertMessage.jsx";
+
 import "../public/css/home/home.css"
 
 // NodeJS endpoint reference
@@ -32,7 +34,7 @@ const Home = () => {
   // Fetch Home
   const getHome = async () => {
     try {
-      await axios.get("http://localhost:5005/"); //  endpoint
+      await axios.get("http://localhost:5001/"); //  endpoint
     } catch (error) {
       console.error("Error fetching Home:", error);
     }
@@ -57,6 +59,7 @@ const Home = () => {
   return (
     <>
       <CompNavbar user={user}/>
+      <AlertMessage />  
       <div className="home-page-container">
         {/* <!-- hero --> */}
         <div className="hero-container home-hero">

@@ -57,10 +57,10 @@ db.connect((err) => {
   console.log("Connected to MySQL database");
 });
 
-const port = 5005;
+const port = 5001;
 const HOST = process.env.HOST;
 const FRONTEND_URL = isDev ? "http://localhost:3000" : process.env.FRONTEND_URL;
-const BACKEND_URL = isDev ? "http://localhost:5005" : process.env.BACKEND_URL;
+const BACKEND_URL = isDev ? "http://localhost:5001" : process.env.BACKEND_URL;
 
 // %%%%%%%%%%%%%%%%%%%%%%%%%%% UPLOAD FILES & HANDLINGUPLOAD ENDPOINTS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -878,8 +878,8 @@ app.post("/api/create-order-paypal", async (req, res) => {
         brand_name: "Buona Vibra",
         landing_page: "NO_PREFERENCE",
         user_action: "PAY_NOW",
-        return_url: `http://localhost:5005/api/capture-order-paypal?courseId=${courseId}&userId=${userId}`, // Include course slug in the return URL
-        cancel_url: `http://localhost:5005/api/course/enroll/${courseId}`,
+        return_url: `http://localhost:5001/api/capture-order-paypal?courseId=${courseId}&userId=${userId}`, // Include course slug in the return URL
+        cancel_url: `http://localhost:5001/api/course/enroll/${courseId}`,
       },
     };
 

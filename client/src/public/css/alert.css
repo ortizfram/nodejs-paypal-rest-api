@@ -8,4 +8,17 @@
       opacity: 1;
     }
   }
+
+  #alert-box{
+    position: fixed;
+    /* top: 100px; Adjust the top position according to your design */
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 9999; /* Ensure that the alert is displayed above other elements */
+    padding: 8px;
+    width: 100%;
+    margin-bottom: 20px;
+    animation: slideInUp 0.5s ease-in-out;
+  }
   

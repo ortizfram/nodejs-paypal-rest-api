@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "../public/css/course/courses.css";
+import AlertMessage from "../components/alertMessage";
 
 function Courses() {
   const [courses, setCourses] = useState([]);
@@ -8,7 +9,7 @@ function Courses() {
   const [successMessage, setSuccessMessage] = useState("");
 
   useEffect(() => {
-    fetch("http://localhost:5005/api/courses")
+    fetch("http://localhost:5001/api/courses")
       .then((response) => {
         if (!response.ok) {
           throw new Error("Failed to fetch courses");
@@ -28,6 +29,7 @@ function Courses() {
 
   return (
     <div className="courses-page-container">
+      <AlertMessage />
        {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
       {successMessage && <p style={{ color: "green" }}>{successMessage}</p>}
       <div className="courses-container ">

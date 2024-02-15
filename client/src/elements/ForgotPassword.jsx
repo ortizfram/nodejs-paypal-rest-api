@@ -10,7 +10,7 @@ const ForgotPassword = () => {
       e.preventDefault();
   
       try {
-        const response = await axios.post("http://localhost:5005/forgot-password", { email }, { headers: { "Content-Type": "application/json" } });
+        const response = await axios.post("http://localhost:5001/forgot-password", { email }, { headers: { "Content-Type": "application/json" } });
   
         if (response.data.message) {
           setBackendMessage(response.data.message);

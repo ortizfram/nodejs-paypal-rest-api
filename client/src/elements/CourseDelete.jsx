@@ -6,7 +6,7 @@ function CourseDeleteConfirmation() {
 
   const handleDelete = async () => {
     try {
-      const response = await fetch(`http://localhost:5005/api/course/delete/${id}`, {
+      const response = await fetch(`http://localhost:5001/api/course/delete/${id}`, {
         method: 'POST',
       });
       if (response.ok) {
