@@ -30,7 +30,7 @@ function Courses() {
   return (
     <div className="courses-page-container">
       <AlertMessage />
-       {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
+      {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
       {successMessage && <p style={{ color: "green" }}>{successMessage}</p>}
       <div className="courses-container ">
         <div className="section-title z-index-1">
@@ -39,22 +39,32 @@ function Courses() {
 
         <div className="courses-grid">
           {courses.map((course, index) => (
-            <div key={index}className="course-item position-relative backdrop-filter shadow-lg">
-                  {/* DISCOUNT for ARS only */}
-                  {course.discount_ars >= 1 && course.discount_usd < 1 && (
-                    <p className="position-absolute start-40 top-10 translate-middle-x  translate-middle-y text-white text-center fw-lighter text-xs bg-success p-[0.1] rounded">
-                      ARS {course.discount_ars}%OFF
-                    </p>
-                  )}
-                  {/* DISCOUNT for USD only */}
-                  {course.discount_usd >= 1 && course.discount_ars < 1 && (
-                    <p  className="position-absolute start-40 top-10 translate-middle-x translate-middle-y text-white text-center fw-lighter text-xs bg-success p-[0.1] rounded">
-                      USD ${course.discount_usd}%OFF
-                    </p>
-                  )}
-                  
-              <a href={`/api/course/${course.id}`}>
+            <div
+              key={index}
+              className="course-item position-relative backdrop-filter shadow-lg"
+            >
+              {/* DISCOUNT for ARS only */}
+              {course.discount_ars >= 1 && course.discount_usd < 1 && (
+                <p className="position-absolute start-40 top-10 translate-middle-x  translate-middle-y text-white text-center fw-lighter text-xs bg-success p-[0.1] rounded">
+                  ARS {course.discount_ars}%OFF
+                </p>
+              )}
+              {/* DISCOUNT for USD only */}
+              {course.discount_usd >= 1 && course.discount_ars < 1 && (
+                <p className="position-absolute start-40 top-10 translate-middle-x translate-middle-y text-white text-center fw-lighter text-xs bg-success p-[0.1] rounded">
+                  USD ${course.discount_usd}%OFF
+                </p>
+              )}
+              {/* DISCOUNT for both ARS and USD */}
+              {course.discount_ars >= 1 && course.discount_usd >= 1 && (
+                <div>
+                <p className="position-absolute translate-middle-x translate-middle-y text-white text-center fw-lighter text-xs bg-success p-[0.1] rounded">
+                  ARS {course.discount_ars}% USD ${course.discount_usd}%
+                </p>
+                </div>
+              )}
 
+              <a href={`/api/course/${course.id}`}>
                 {/* COURSE DATA */}
                 <img src={course.thumbnail} alt={`thumbnail-${course.slug}`} />
                 <p className="timestamp text-white">{course.updated_at}</p>
@@ -83,7 +93,6 @@ function Courses() {
                     USD {course.usd_price} | ARS {course.ars_price}
                   </p>
                 ) : null}
-
 
                 {/* DESCRIPTION */}
                 {course.description && (
