@@ -16,6 +16,7 @@ import moment from "moment";
 import mercadopago from "mercadopago";
 import {
   getCourseFromIdQuery,
+  getCourseFromSlugQuery,
   getUserEnrolledCoursesQuery,
   insertUserCourseQuery,
   tableCheckQuery,
@@ -834,12 +835,31 @@ console.log(
   "\n\n"
 );
 
+// const MP_ACCESS_TOKEN = isDev
+//   ? process.env.MP_SB_ACCESS_TOKEN
+//   : process.env.MP_ACCESS_TOKEN;
+// export const MP_NOTIFICATION_URL = isDev
+//   ? process.env.MP_SB_NOTIFICATION_URL
+//   : process.env.MP_NOTIFICATION_URL;
+// export const PAYPAL_API = isDev
+//   ? process.env.SB_PAYPAL_API
+//   : process.env.PAYPAL_API;
+// console.log(
+//   "PAYPAL_API: ",
+//   PAYPAL_API,
+//   "\nPAYPAL_API_CLIENT: ",
+//   PAYPAL_API_CLIENT,
+//   "\nPAYPAL_API_SECRET: ",
+//   PAYPAL_API_SECRET,
+//   "\n\n"
+// );
+
 // paypal ************************
 app.post("/api/create-order-paypal", async (req, res) => {
   console.log("\n\n*** createOrderPaypal\n\n");
 
   const courseId = req.body.courseId; // is being passed the courseSlug in the request input
-  const userId = req.query.userId
+  const userId = req.query.userId;
   try {
     console.log("\n\nSQL Query:", getCourseFromIdQuery);
     console.log("\n\nparams courseId:", courseId);
@@ -878,8 +898,8 @@ app.post("/api/create-order-paypal", async (req, res) => {
         brand_name: "Buona Vibra",
         landing_page: "NO_PREFERENCE",
         user_action: "PAY_NOW",
-        return_url: `http://localhost:5001/api/capture-order-paypal?courseId=${courseId}&userId=${userId}`, // Include course slug in the return URL
-        cancel_url: `http://localhost:5001/api/course/enroll/${courseId}`,
+        return_url: `${BACKEND_URL}/api/capture-order-paypal?courseId=${courseId}&userId=${userId}`, // Include course slug in the return URL
+        cancel_url: `${BACKEND_URL}/api/course/enroll/${courseId}`,
       },
     };
 
@@ -966,9 +986,11 @@ app.post("/api/capture-order-paypal", async (req, res) => {
         );
         // Send success response with status 201 and JSON message
       }
-      const message = `User successfully enrolled in course. User ID: ${userId}, Course ID: ${course.id}`
+      const message = `User successfully enrolled in course. User ID: ${userId}, Course ID: ${course.id}`;
 
-      return res.redirect(`http://localhost:3000/api/course/${courseId}?message=${message}`);
+      return res.redirect(
+        `${FRONTEND_URL}/api/course/${courseId}?message=${message}`
+      );
     } else {
       return res.status(404).send("Course or user not found");
     }
@@ -983,7 +1005,7 @@ app.get("/api/capture-order-paypal", async (req, res) => {
   courseId = req.query.courseId;
   try {
     const userId = req.query.userId;
-    console.log("sessionUSerId:", userId)
+    console.log("sessionUSerId:", userId);
 
     // Fetch course details based on the courseSlug using MySQL query
     const [rows] = await db.promise().execute(getCourseFromIdQuery, [courseId]);
@@ -1002,9 +1024,11 @@ app.get("/api/capture-order-paypal", async (req, res) => {
         );
         // Send success response with status 201 and JSON message
       }
-      const message = `User successfully enrolled in course. User ID: ${userId}, Course ID: ${course.id}`
+      const message = `User successfully enrolled in course. User ID: ${userId}, Course ID: ${course.id}`;
 
-      return res.redirect(`http://localhost:3000/api/course/${courseId}?message=${message}`);
+      return res.redirect(
+        `${FRONTEND_URL}/api/course/${courseId}?message=${message}`
+      );
     } else {
       return res.status(404).send("Course or user not found");
     }
@@ -1015,11 +1039,61 @@ app.get("/api/capture-order-paypal", async (req, res) => {
 });
 
 // MercadoPago ******************
+app.post("/api/create-order-mp", async (req, res) => {
+  console.log("\n*** Creating MP order...\n");
+
+  const courseId = req.body.courseId; // is being passed the courseSlug in the request input
+  const userId = req.query.userId; // is being passed the courseSlug in the request input
+  console.log(`\nSQL Query: ${getCourseFromSlugQuery}\n`);
+  console.log(`\ncourseId: ${[courseId]}\n`);
+  console.log(`\nuserId: ${[userId]}\n`);
+
+  // Fetch the course using the query
+  const [rows] = await db.promise().execute(getCourseFromIdQuery, [courseId]);
+  // Check if the course exists
+  const course = rows[0];
+  console.log(`\nFetched Course Details:`);
+  console.log(course);
+
+  // Convert course.price to a decimal
+  const priceAsFloat = parseFloat(course.ars_price);
+
+  mercadopago.configure({
+    access_token: MP_ACCESS_TOKEN,
+  });
+
+  var preference = {
+    items: [
+      {
+        title: course.title,
+        quantity: 1,
+        currency_id: "ARS",
+        unit_price: priceAsFloat,
+      },
+    ],
+    back_urls: {
+      success: `${BACKEND_URL}/api/course/${courseId}/`,
+      failure: `${BACKEND_URL}/api/failure-mp`,
+      pending: `${BACKEND_URL}/api/pending-mp`,
+    },
+    //here we use NGROK till it's deployed
+    notification_url: `${MP_NOTIFICATION_URL}/api/webhook-mp?courseId=${courseId}&userId=${userId}`,
+  };
+
+  const result = await mercadopago.preferences.create(preference);
+  console.log(`\n\n--- MP preference created:`);
+
+  // console.log(result.body);
+
+  // change on deployment
+  const initPoint = result.body.sandbox_init_point;
+  const redirectURL = `${initPoint}&courseId=${courseId}`;
+  res.redirect(redirectURL);
+});
 app.post("/api/webhook-mp", async (req, res) => {});
 // app.get("/api/success-mp") in App.js
-// app.get("/api/pending-mp") in App.js
 // app.get("/api/failure-mp") in App.js
-app.post("/api/create-order-mp", async (req, res) => {});
+// app.get("/api/pending-mp") in App.js
 
 // ==================================== SERVE COMMON FILES CONFIG  *******************************************************************************
 // Serve static files from React build directory
