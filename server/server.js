@@ -1068,7 +1068,7 @@ app.post("/api/create-order-mp", async (req, res) => {
 
   // Step 2: Initialize the client object
   const client = new MercadoPagoConfig({
-    access_token: process.env.MP__ACCESS_TOKEN,
+    access_token: MP_ACCESS_TOKEN,
   });
 
   // Step 3: Initialize the API object
@@ -1081,7 +1081,7 @@ app.post("/api/create-order-mp", async (req, res) => {
         title: course.title,
         quantity: 1,
         currency_id: "ARS",
-        unit_price: priceAsFloat,
+        unit_price: adjustedDiscount !== null ? withDiscount : course.ars_price,
       },
     ],
     back_urls: {
