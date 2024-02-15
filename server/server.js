@@ -13,7 +13,6 @@ import morgan from "morgan";
 import methodOverride from "method-override";
 import multer from "multer";
 import moment from "moment";
-import mercadopago from "mercadopago";
 import {
   getCourseFromIdQuery,
   getCourseFromSlugQuery,
@@ -23,6 +22,7 @@ import {
 } from "./db/queries/course.queries.js";
 import { createUserTableQuery } from "./db/queries/auth.queries.js";
 import createTableIfNotExists from "./src/public/js/createTable.js";
+import { Payment, MercadoPagoConfig } from "mercadopago";
 // shortcuts for files/dirs
 export const __filename = fileURLToPath(import.meta.url);
 export const __dirname = path.dirname(__filename);
@@ -1064,18 +1064,24 @@ app.post("/api/create-order-mp", async (req, res) => {
     adjustedDiscount !== null ? (withDiscount = adjustedDiscount) : null;
   }
 
-  mercadopago.configure({
-    access_token: MP_ACCESS_TOKEN,
-  });
-  
+   // step 1: imports
 
-  var preference = {
+  // Step 2: Initialize the client object
+  const client = new MercadoPagoConfig({
+    access_token: process.env.MP__ACCESS_TOKEN,
+  });
+
+  // Step 3: Initialize the API object
+  const payment = new Payment(client);
+
+  // Step 4: Create the request object
+  var body = {
     items: [
       {
         title: course.title,
         quantity: 1,
         currency_id: "ARS",
-        unit_price: parseFloat(adjustedDiscount !== null ? withDiscount : course.ars_price),
+        unit_price: priceAsFloat,
       },
     ],
     back_urls: {
@@ -1083,11 +1089,13 @@ app.post("/api/create-order-mp", async (req, res) => {
       failure: `${BACKEND_URL}/api/failure-mp`,
       pending: `${BACKEND_URL}/api/pending-mp`,
     },
-    //here we use NGROK till it's deployed
+    //here we use NGROK till it's deployed :IPN  (Instant Payment Notification) 
     notification_url: `${MP_NOTIFICATION_URL}/api/webhook-mp?courseId=${courseId}&userId=${userId}`,
   };
 
-  const result = await mercadopago.preferences.create(preference);
+  // Step 5: Make the request
+  const result = await payment.create({ body }).then(console.log).catch(console.log);
+
   console.log(`\n\n--- MP preference created:`);
 
   // console.log(result.body);
