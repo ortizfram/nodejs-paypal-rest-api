@@ -39,7 +39,8 @@ const CourseEnroll = () => {
   }
 
   const renderPrice = () => {
-    if (course.discount_usd > 0) {
+    // * DISCOUNT for USD * \\
+    if (course.discount_usd > 0 && !course.discount_ars) {
       return (
         <>
           <del className="text-success">antes USD {course.usd_price}</del>
@@ -53,7 +54,9 @@ const CourseEnroll = () => {
           </p>
         </>
       );
-    } else if (course.discount_ars > 0) {
+    }
+    // * DISCOUNT for ARS * \\
+    else if (course.discount_ars > 0 && !course.discount_usd) {
       return (
         <>
           USD {course.usd_price} | <del>ARS {course.ars_price}</del>
@@ -63,7 +66,24 @@ const CourseEnroll = () => {
           </p>
         </>
       );
-    } else {
+    }
+    // * DISCOUNT for both ARS and USD * \\
+    else if (course.discount_ars >= 1 && course.discount_usd >= 1) {
+      return (
+        <div>
+          <span className="text-muted">
+          USD <del>{course.usd_price}</del> | ARS <del>{course.ars_price}</del>
+          </span>
+          <p className="text-success">
+            USD{" "}{course.usd_price - (course.usd_price * course.discount_usd) / 100}{" "}
+            | 
+            {" "}ARS{" "}{course.ars_price - ((course.ars_price * course.discount_ars) / 100)}
+          </p>
+        </div>
+      );
+    }
+    // * NO-DISCOUNT * \\
+    else {
       return (
         <>
           USD {course.usd_price} | ARS {course.ars_price}
@@ -110,30 +130,28 @@ const CourseEnroll = () => {
         </div>
 
         <div className="payment-options">
-          {/* course enroll */}
-          {/* The form to trigger the payment */}
+          {/* PAY WITH PAYPAL */}
           <form
             action={`http://localhost:5001/api/create-order-paypal?courseId=${course.id}&userId=${user.id}`}
             method="POST"
           >
-            {/* Hidden input to pass the course slug to the server */}
             <input type="hidden" name="courseId" value={course.id} />
-            {/* You should replace the value of userId with the actual userId */}
             <input type="hidden" name="userId" value={user.id} />
+
             <button type="submit">
               <img src="/images/paypal.png" alt="paypal-icon" />
               <p>Continue with Paypal</p>
             </button>
           </form>
+
+          {/* PAY WITH MP */}
           <form
             action={`http://localhost:5001/api/create-order-mp?courseId=${course.id}&userId=${user.id}`}
             method="POST"
           >
-            {/* Hidden input to pass the course slug to the server */}
             <input type="hidden" name="courseId" value={course.id} />
-            {/* You should replace the value of userId with the actual userId */}
-            <input type="hidden" name="userId" value="<%= userId %>" />
-            <input type="hidden" name="courseId" value="<%= id %>" />
+            <input type="hidden" name="userId" value={user.id} />
+
             <button type="submit">
               <img src="/images/mercado-pago.png" alt="mercado-pago-icon" />
               <p>Continue with Mercado Pago</p>
