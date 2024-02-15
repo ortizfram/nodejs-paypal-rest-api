@@ -968,7 +968,7 @@ app.post("/api/capture-order-paypal", async (req, res) => {
       }
       const message = `User successfully enrolled in course. User ID: ${userId}, Course ID: ${course.id}`
 
-      return res.redirect(`http://localhost:3000/api/course/${courseId}&message=${message}`);
+      return res.redirect(`http://localhost:3000/api/course/${courseId}?message=${message}`);
     } else {
       return res.status(404).send("Course or user not found");
     }
@@ -1004,7 +1004,7 @@ app.get("/api/capture-order-paypal", async (req, res) => {
       }
       const message = `User successfully enrolled in course. User ID: ${userId}, Course ID: ${course.id}`
 
-      return res.redirect(`http://localhost:3000/api/course/${courseId}&message=${message}`);
+      return res.redirect(`http://localhost:3000/api/course/${courseId}?message=${message}`);
     } else {
       return res.status(404).send("Course or user not found");
     }

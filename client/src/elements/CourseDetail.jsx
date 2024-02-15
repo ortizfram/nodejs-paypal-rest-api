@@ -43,7 +43,7 @@ const CourseDetail = () => {
 
   return (
     <>
-      <CompNavbar user={user}/>
+      {/* <CompNavbar user={user}/> */}
       <AlertMessage />
       <div className="bg-course-detail">
         <div className="background-blur"></div>
