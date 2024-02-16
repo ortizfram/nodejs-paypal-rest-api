@@ -1126,14 +1126,58 @@ app.post("/api/create-order-mp", async (req, res) => {
   const preferenceResult = await preferences
     .create(preference)
     .then(response => {
-      console.log(`\n\n--- MP preference created:`);
       // console.log(response);
       // change on deployment
       const init_point = response[$init_point];
       const redirectURL = `${init_point}&courseId=${courseId}`;
       res.redirect(redirectURL);
+      console.log(`\n\n--- MP preference created:`);
     })
-    .catch(console.log);
+    .catch(error => {
+      console.error("Error creating MercadoPago preference:", error);
+      // Optionally, you can send an error response to the client
+      res.status(500).send("Error creating MercadoPago preference");
+    });
+});
+app.post("/api/webhook-mp", async (req, res) => {
+  console.log(req.body)
+  res.status(200).send("OK");
+
+  // try {
+  //   const paymentType = req.query.type;
+  //   const paymentId = req.query["data.id"];
+  //   const courseId = req.query.courseId; // Ensure Mercado Pago sends courseSlug
+  //   const userId = req.query.userId;
+  //   // console.log("courseId:", courseId);
+  //   console.log("paymentId:", paymentId);
+  //   console.log("paymentType:", paymentType);
+  //   // console.log("userId:", userId);
+
+  //   if (paymentType === "payment" && paymentId && courseId) {
+  //     // Fetch course details based on the courseSlug using MySQL query
+  //     const [rows] = await db
+  //       .promise()
+  //       .execute(getCourseFromIdQuery, [courseId]);
+  //     const course = rows[0];
+
+  //     if (course && userId) {
+  //       // Add the user and course relationship in user_courses table
+  //       const [insertUserCourse] = await db
+  //         .promise()
+  //         .execute(insertUserCourseQuery, [userId, course.id]);
+
+  //       if (insertUserCourse.affectedRows > 0) {
+  //         console.log(
+  //           `\n👌🏽 --Inserted into user_courses: User ID: ${userId}, Course ID: ${course.id}`
+  //         );
+  //       }
+  //     }
+  //   }
+  //   res.sendStatus(204); // OK but none to return
+  // } catch (error) {
+  //   console.error("Error handling Mercado Pago webhook:", error);
+  //   res.sendStatus(500);
+  // }
 });
 app.get("/api/success-mp"),
   async (req, res) => {
@@ -1147,45 +1191,6 @@ app.get("/api/pending-mp"),
   async (req, res) => {
     res.json({message:"*** Pending MP..."});
   };
-app.post("/api/webhook-mp", async (req, res) => {
-  console.log("\n\n*** Webhook MP...\n\n");
-
-  try {
-    const paymentType = req.query.type;
-    const paymentId = req.query["data.id"];
-    const courseId = req.query.courseId; // Ensure Mercado Pago sends courseSlug
-    const userId = req.query.userId;
-    // console.log("courseId:", courseId);
-    console.log("paymentId:", paymentId);
-    console.log("paymentType:", paymentType);
-    // console.log("userId:", userId);
-
-    if (paymentType === "payment" && paymentId && courseId) {
-      // Fetch course details based on the courseSlug using MySQL query
-      const [rows] = await db
-        .promise()
-        .execute(getCourseFromIdQuery, [courseId]);
-      const course = rows[0];
-
-      if (course && userId) {
-        // Add the user and course relationship in user_courses table
-        const [insertUserCourse] = await db
-          .promise()
-          .execute(insertUserCourseQuery, [userId, course.id]);
-
-        if (insertUserCourse.affectedRows > 0) {
-          console.log(
-            `\n👌🏽 --Inserted into user_courses: User ID: ${userId}, Course ID: ${course.id}`
-          );
-        }
-      }
-    }
-    res.sendStatus(204); // OK but none to return
-  } catch (error) {
-    console.error("Error handling Mercado Pago webhook:", error);
-    res.sendStatus(500);
-  }
-});
 
 // ==================================== SERVE COMMON FILES CONFIG  *******************************************************************************
 // Serve static files from React build directory
