@@ -22,7 +22,7 @@ const Login = () => {
     e.preventDefault();
 
     try {
-      const response = await fetch("http://localhost:5001/login", {
+      const response = await fetch("http://localhost:5002/login", {
         method: "POST",
         body: JSON.stringify({ email, password }),
         headers: {

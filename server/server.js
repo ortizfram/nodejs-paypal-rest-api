@@ -62,10 +62,10 @@ db.connect((err) => {
   console.log("Connected to MySQL database");
 });
 
-const port = 5001;
+const port = 5002;
 const HOST = process.env.HOST;
 const FRONTEND_URL = isDev ? "http://localhost:3000" : process.env.FRONTEND_URL;
-const BACKEND_URL = isDev ? "http://localhost:5001" : process.env.BACKEND_URL;
+const BACKEND_URL = isDev ? "http://localhost:5002" : process.env.BACKEND_URL;
 
 // %%%%%%%%%%%%%%%%%%%%%%%%%%% UPLOAD FILES & HANDLINGUPLOAD ENDPOINTS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -1094,9 +1094,9 @@ app.post("/api/create-order-mp", async (req, res) => {
         },
       ],
       back_urls: {
-        success: `${BACKEND_URL}/api/course/${courseId}/`,
-        failure: `${BACKEND_URL}/api/failure-mp`,
-        pending: `${BACKEND_URL}/api/pending-mp`,
+        success: `${FRONTEND_URL}/api/course/${courseId}/`,
+        failure: `${FRONTEND_URL}/api/failure-mp`,
+        pending: `${FRONTEND_URL}/api/pending-mp`,
       },
       //here we use NGROK till it's deployed :IPN  (Instant Payment Notification)
       notification_url: `${MP_NOTIFICATION_URL}/api/webhook-mp?courseId=${courseId}&userId=${userId}`,
@@ -1137,15 +1137,15 @@ app.post("/api/create-order-mp", async (req, res) => {
 });
 app.get("/api/success-mp"),
   async (req, res) => {
-    res.send("\n*** Success MP...\n");
+    res.json({message:"*** Success MP..."});
   };
 app.get("/api/failure-mp"),
   async (req, res) => {
-    res.send("failure");
+    res.json({message:"*** Failure MP..."});
   };
 app.get("/api/pending-mp"),
   async (req, res) => {
-    res.send("pending");
+    res.json({message:"*** Pending MP..."});
   };
 app.post("/api/webhook-mp", async (req, res) => {
   console.log("\n\n*** Webhook MP...\n\n");

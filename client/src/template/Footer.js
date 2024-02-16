@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import "../public/css/navigation.css"
 
 // NodeJS endpoint reference
-const URI = "http://localhost:5001"; // Update the base URL
+const URI = "http://localhost:5002"; // Update the base URL
 
 const CompFooter = () => {
   return (

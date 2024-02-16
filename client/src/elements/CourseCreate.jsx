@@ -65,7 +65,7 @@ const CourseCreate = () => {
   }
     renderImage(formData);
     // Handle form submission logic, e.g., sending data to the server
-    const response =  await fetch("http://localhost:5001/api/course/create", {
+    const response =  await fetch("http://localhost:5002/api/course/create", {
       method: "POST",
       body: formData,
     });

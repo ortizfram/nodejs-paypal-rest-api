@@ -6,8 +6,8 @@ import CompNavbar from "../template/Nabvar.js";
 import CompFooter from "../template/Footer";
 
 // NodeJS endpoint reference
-const URI = "http://localhost:5001"; // Update the base URL
-const URI_sendEmail = "http://localhost:5001/send-email"; // Update the base URL
+const URI = "http://localhost:5002"; // Update the base URL
+const URI_sendEmail = "http://localhost:5002/send-email"; // Update the base URL
 
 const CompHome = () => {
   let user = null;

@@ -34,7 +34,7 @@ const Home = () => {
   // Fetch Home
   const getHome = async () => {
     try {
-      await axios.get("http://localhost:5001/"); //  endpoint
+      await axios.get("http://localhost:5002/"); //  endpoint
     } catch (error) {
       console.error("Error fetching Home:", error);
     }
