@@ -1046,8 +1046,8 @@ console.log(
 app.post("/api/create-order-mp", async (req, res) => {
   console.log("\n*** Creating MP order...\n");
 
-  const courseId = req.body.courseId; // is being passed the courseSlug in the request input
-  const userId = req.query.userId; // is being passed the courseSlug in the request input
+  const courseId = req.query.courseId; 
+  const userId = req.query.userId;
   // console.log(`\nSQL Query: ${getCourseFromSlugQuery}\n`);
   // console.log(`\ncourseId: ${[courseId]}\n`);
   // console.log(`\nuserId: ${[userId]}\n`);
@@ -1125,7 +1125,7 @@ app.post("/api/create-order-mp", async (req, res) => {
   const preferences = new Preference(client);
   const preferenceResult = await preferences
     .create(preference)
-    .then(response => {
+    .then((response) => {
       // console.log(response);
       // change on deployment
       const init_point = response[$init_point];
@@ -1133,63 +1133,65 @@ app.post("/api/create-order-mp", async (req, res) => {
       res.redirect(redirectURL);
       console.log(`\n\n--- MP preference created:`);
     })
-    .catch(error => {
+    .catch((error) => {
       console.error("Error creating MercadoPago preference:", error);
       // Optionally, you can send an error response to the client
       res.status(500).send("Error creating MercadoPago preference");
     });
 });
 app.post("/api/webhook-mp", async (req, res) => {
-  console.log(req.body)
-  res.status(200).send("OK");
+  console.log("\n\n*** Webhook MP Received ***\n\n");
+  console.log("Request Body:", req.body);
 
   // try {
-  //   const paymentType = req.query.type;
-  //   const paymentId = req.query["data.id"];
-  //   const courseId = req.query.courseId; // Ensure Mercado Pago sends courseSlug
-  //   const userId = req.query.userId;
-  //   // console.log("courseId:", courseId);
-  //   console.log("paymentId:", paymentId);
-  //   console.log("paymentType:", paymentType);
-  //   // console.log("userId:", userId);
-
-  //   if (paymentType === "payment" && paymentId && courseId) {
-  //     // Fetch course details based on the courseSlug using MySQL query
-  //     const [rows] = await db
-  //       .promise()
-  //       .execute(getCourseFromIdQuery, [courseId]);
-  //     const course = rows[0];
-
-  //     if (course && userId) {
-  //       // Add the user and course relationship in user_courses table
-  //       const [insertUserCourse] = await db
-  //         .promise()
-  //         .execute(insertUserCourseQuery, [userId, course.id]);
-
-  //       if (insertUserCourse.affectedRows > 0) {
-  //         console.log(
-  //           `\n👌🏽 --Inserted into user_courses: User ID: ${userId}, Course ID: ${course.id}`
-  //         );
-  //       }
-  //     }
-  //   }
-  //   res.sendStatus(204); // OK but none to return
-  // } catch (error) {
-  //   console.error("Error handling Mercado Pago webhook:", error);
-  //   res.sendStatus(500);
-  // }
+  const action = req.body.action;
+  const data = req.body.data;
+  const courseId = req.query.courseId; // Ensure Mercado Pago sends courseId
+  const userId = req.query.userId;
+  const paymentId = data.id;
+  console.log(`\naction:${action}\n`);
+  if (action === "payment.update") {
+    console.log("Payment update received for paymentId:", paymentId);
+    console.log(
+      `\n\npaymentId:${paymentId}\ncourseId:${courseId}\nuserId:${userId}\n\n`
+      );
+      try {
+        // Fetch course details based on the courseSlug using MySQL query
+        const [rows] = await db
+        .promise()
+        .execute(getCourseFromIdQuery, [courseId]);
+        const course = rows[0];
+        
+        if (course && userId) {
+          // Add the user and course relationship in user_courses table
+          const [insertUserCourse] = await db
+          .promise()
+          .execute(insertUserCourseQuery, [userId, course.id]);
+          
+          if (insertUserCourse.affectedRows > 0) {
+            console.log(
+              `\n👌🏽 --Inserted into user_courses: User ID: ${userId}, Course ID: ${course.id}`
+              );
+              res.status(200).send("OK");
+            }
+          }
+        } catch (error) {
+          console.error("Error handling Mercado Pago webhook:", error);
+          res.sendStatus(500);
+    }
+  }
 });
 app.get("/api/success-mp"),
   async (req, res) => {
-    res.json({message:"*** Success MP..."});
+    res.json({ message: "*** Success MP..." });
   };
 app.get("/api/failure-mp"),
   async (req, res) => {
-    res.json({message:"*** Failure MP..."});
+    res.json({ message: "*** Failure MP..." });
   };
 app.get("/api/pending-mp"),
   async (req, res) => {
-    res.json({message:"*** Pending MP..."});
+    res.json({ message: "*** Pending MP..." });
   };
 
 // ==================================== SERVE COMMON FILES CONFIG  *******************************************************************************
