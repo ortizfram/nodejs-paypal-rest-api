@@ -1099,6 +1099,7 @@ app.post("/api/create-order-mp", async (req, res) => {
         pending: `${FRONTEND_URL}/api/pending-mp`,
       },
       //here we use NGROK till it's deployed :IPN  (Instant Payment Notification)
+      // ngrok http $port
       notification_url: `${MP_NOTIFICATION_URL}/api/webhook-mp?courseId=${courseId}&userId=${userId}`,
 
       // Asocia tu píxel de Facebook
@@ -1128,7 +1129,7 @@ app.post("/api/create-order-mp", async (req, res) => {
     .then(response => {
       console.log(`\n\n--- MP preference created:`);
       // console.log(response);
-      // change on deployment
+      //add course to user_courses
       const init_point = response[$init_point];
       const redirectURL = `${init_point}&courseId=${courseId}`;
       res.redirect(redirectURL);
@@ -1151,11 +1152,12 @@ app.post("/api/webhook-mp", async (req, res) => {
   console.log("\n\n*** Webhook MP...\n\n");
 
   try {
-    const paymentType = req.query.type;
-    const paymentId = req.query["data.id"];
-    const courseId = req.query.courseId; // Ensure Mercado Pago sends courseSlug
-    const userId = req.query.userId;
-    // console.log("courseId:", courseId);
+       // Parse request body to get payment information
+       const paymentType = req.body.type;
+       const paymentId = req.body.data.id;
+       const courseId = req.query.courseId; // Ensure courseId is passed in the query
+       const userId = req.query.userId;
+       
     console.log("paymentId:", paymentId);
     console.log("paymentType:", paymentType);
     // console.log("userId:", userId);
