@@ -1,6 +1,6 @@
 import cors from "cors";
 import axios from "axios";
-import express from "express";
+import express, { response } from "express";
 import session from "express-session";
 import path from "path";
 import mysql from "mysql2";
@@ -22,7 +22,11 @@ import {
 } from "./db/queries/course.queries.js";
 import { createUserTableQuery } from "./db/queries/auth.queries.js";
 import createTableIfNotExists from "./src/public/js/createTable.js";
-import { Payment, MercadoPagoConfig } from "mercadopago";
+import mercadopago, {
+  Payment,
+  MercadoPagoConfig,
+  Preference,
+} from "mercadopago";
 // shortcuts for files/dirs
 export const __filename = fileURLToPath(import.meta.url);
 export const __dirname = path.dirname(__filename);
@@ -1028,11 +1032,15 @@ const MP_ACCESS_TOKEN = isDev
 export const MP_NOTIFICATION_URL = isDev
   ? process.env.MP_SB_NOTIFICATION_URL
   : process.env.MP_NOTIFICATION_URL;
+export const $init_point = isDev ? "sandbox_init_point" : "init_point";
 console.log(
   "\nMP_ACCESS_TOKEN: ",
   MP_ACCESS_TOKEN,
   "\nMP_NOTIFICATION_URL: ",
-  MP_NOTIFICATION_URL,"\n\n"
+  MP_NOTIFICATION_URL,
+  "\nINIT_POINT: ",
+  $init_point,
+  "\n\n"
 );
 
 app.post("/api/create-order-mp", async (req, res) => {
@@ -1064,94 +1072,119 @@ app.post("/api/create-order-mp", async (req, res) => {
     adjustedDiscount !== null ? (withDiscount = adjustedDiscount) : null;
   }
 
-   // step 1: imports
+  // step 1: imports
 
   // Step 2: Initialize the client object
   const client = new MercadoPagoConfig({
-    access_token: MP_ACCESS_TOKEN,
+    accessToken: MP_ACCESS_TOKEN,
   });
 
-  // Step 3: Initialize the API object
-  const payment = new Payment(client);
-
   // Step 4: Create the request object
-  var body = {
-    items: [
-      {
-        title: course.title,
-        quantity: 1,
-        currency_id: "ARS",
-        unit_price: adjustedDiscount !== null ? withDiscount : course.ars_price,
+  let preference = {
+    body: {
+      items: [
+        {
+          title: `curso: ${course.title}`,
+          quantity: 1,
+          currency_id: "ARS",
+          unit_price:
+            adjustedDiscount !== null
+              ? parseFloat(withDiscount)
+              : parseFloat(course.ars_price),
+        },
+      ],
+      back_urls: {
+        success: `${BACKEND_URL}/api/course/${courseId}/`,
+        failure: `${BACKEND_URL}/api/failure-mp`,
+        pending: `${BACKEND_URL}/api/pending-mp`,
       },
-    ],
-    back_urls: {
-      success: `${BACKEND_URL}/api/course/${courseId}/`,
-      failure: `${BACKEND_URL}/api/failure-mp`,
-      pending: `${BACKEND_URL}/api/pending-mp`,
+      //here we use NGROK till it's deployed :IPN  (Instant Payment Notification)
+      notification_url: `${MP_NOTIFICATION_URL}/api/webhook-mp?courseId=${courseId}&userId=${userId}`,
+
+      // Asocia tu píxel de Facebook
+      // tracks: [
+      //   {
+      //     type: "facebook_ad",
+      //     values: {
+      //       pixel_id: ABC,
+      //     },
+      //   },
+      //   // Asocia tu píxel de Google_ad
+      //   {
+      //     type: "google_ad",
+      //     values: {
+      //       conversion_id: "CONVERSION_ID",
+      //       conversion_label: "CONVERSION_LABEL",
+      //     },
+      //   },
+      // ],
     },
-    //here we use NGROK till it's deployed :IPN  (Instant Payment Notification) 
-    notification_url: `${MP_NOTIFICATION_URL}/api/webhook-mp?courseId=${courseId}&userId=${userId}`,
   };
 
   // Step 5: Make the request
-  const result = await payment.create({ body }).then(console.log).catch(console.log);
-
-  console.log(`\n\n--- MP preference created:`);
-
-  // console.log(result.body);
-
-  // change on deployment
-  const initPoint = result.body.sandbox_init_point;
-  const redirectURL = `${initPoint}&courseId=${courseId}`;
-  res.redirect(redirectURL);
+  const preferences = new Preference(client);
+  const preferenceResult = await preferences
+    .create(preference)
+    .then(response => {
+      console.log(`\n\n--- MP preference created:`);
+      // console.log(response);
+      // change on deployment
+      const init_point = response[$init_point];
+      const redirectURL = `${init_point}&courseId=${courseId}`;
+      res.redirect(redirectURL);
+    })
+    .catch(console.log);
 });
-app.get("/api/success-mp"), async (req,res) => {
-  res.send("\n*** Success MP...\n");
-}
-app.get("/api/failure-mp"), async (req,res) => {
-  res.send("failure")
-}
-app.get("/api/pending-mp"), async (req,res) => {
-  res.send("pending")
-}
+app.get("/api/success-mp"),
+  async (req, res) => {
+    res.send("\n*** Success MP...\n");
+  };
+app.get("/api/failure-mp"),
+  async (req, res) => {
+    res.send("failure");
+  };
+app.get("/api/pending-mp"),
+  async (req, res) => {
+    res.send("pending");
+  };
 app.post("/api/webhook-mp", async (req, res) => {
   console.log("\n\n*** Webhook MP...\n\n");
 
-    try {
-      const paymentType = req.query.type;
-      const paymentId = req.query["data.id"];
-      const courseId = req.query.courseId; // Ensure Mercado Pago sends courseSlug
-      const userId = req.query.userId;
-      // console.log("courseId:", courseId);
-      console.log("paymentId:", paymentId);
-      console.log("paymentType:", paymentType);
-      // console.log("userId:", userId);
+  try {
+    const paymentType = req.query.type;
+    const paymentId = req.query["data.id"];
+    const courseId = req.query.courseId; // Ensure Mercado Pago sends courseSlug
+    const userId = req.query.userId;
+    // console.log("courseId:", courseId);
+    console.log("paymentId:", paymentId);
+    console.log("paymentType:", paymentType);
+    // console.log("userId:", userId);
 
-      if (paymentType === "payment" && paymentId && courseId) {
+    if (paymentType === "payment" && paymentId && courseId) {
+      // Fetch course details based on the courseSlug using MySQL query
+      const [rows] = await db
+        .promise()
+        .execute(getCourseFromIdQuery, [courseId]);
+      const course = rows[0];
 
-        // Fetch course details based on the courseSlug using MySQL query
-        const [rows] = await db.promise().execute(getCourseFromIdQuery, [courseId]);
-        const course = rows[0];
+      if (course && userId) {
+        // Add the user and course relationship in user_courses table
+        const [insertUserCourse] = await db
+          .promise()
+          .execute(insertUserCourseQuery, [userId, course.id]);
 
-        if (course && userId) {
-          // Add the user and course relationship in user_courses table
-          const [insertUserCourse] = await db.promise().execute(insertUserCourseQuery, [
-            userId,
-            course.id,
-          ]);
-
-          if (insertUserCourse.affectedRows > 0) {
-            console.log(
-              `\n👌🏽 --Inserted into user_courses: User ID: ${userId}, Course ID: ${course.id}`
-            );
-          }
+        if (insertUserCourse.affectedRows > 0) {
+          console.log(
+            `\n👌🏽 --Inserted into user_courses: User ID: ${userId}, Course ID: ${course.id}`
+          );
         }
       }
-      res.sendStatus(204); // OK but none to return
-    } catch (error) {
-      console.error("Error handling Mercado Pago webhook:", error);
-      res.sendStatus(500);
     }
+    res.sendStatus(204); // OK but none to return
+  } catch (error) {
+    console.error("Error handling Mercado Pago webhook:", error);
+    res.sendStatus(500);
+  }
 });
 
 // ==================================== SERVE COMMON FILES CONFIG  *******************************************************************************
