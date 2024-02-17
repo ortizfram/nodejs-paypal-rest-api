@@ -17,11 +17,12 @@
   background-image: url("../../../../public/images/home/hero-image.jpg");
   background-size: cover;
   background-position: center; /* Centers the background image */
-  height: 90vh;
+  height: 110vh;
   width: 100vw;
   display: flex; /* For centering content */
   justify-content: center; /* Center horizontally */
   align-items: center; /* Center vertically */
+  text-align: center;
 }
 
 .hero-logo {

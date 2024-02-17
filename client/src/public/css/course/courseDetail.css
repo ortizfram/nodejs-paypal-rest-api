@@ -9,6 +9,16 @@
   align-items: center; /* Center vertically */
   text-align: center;
 }
+
+.containerr::before,
+.containerr::after {
+    content: ''; /* Required for pseudo-elements */
+    position: absolute; /* Position the shadows */
+    width: 100vw; /* Full width */
+    height: 110vh; /* Half of the container's height */
+    background: rgba(0, 0, 0, 0.1); /* Shadow color */
+    box-shadow: inset 0px 10px 20px rgba(0, 0, 0, 0.2); /* Inset box shadow */
+}
 .cont-course-detail {
   padding-top: calc(2%*9/16); /* Default padding */
 }
