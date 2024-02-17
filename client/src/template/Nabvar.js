@@ -8,6 +8,8 @@ const URI = "http://localhost:5002"; // Update the base URL
 const CompNavbar = () => {
     const { userData } = useContext(UserContext);
     let user = userData;
+
+    
     
     return (
         <>
