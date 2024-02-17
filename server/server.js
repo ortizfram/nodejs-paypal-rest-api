@@ -972,7 +972,7 @@ app.post("/api/capture-order-paypal", async (req, res) => {
         );
         // Send success response with status 201 and JSON message
       }
-      const message = `User successfully enrolled in course. User ID: ${userId}, Course ID: ${course.id}`;
+      const message = `Este curso ahora es tuyo, podes encontrarlo dentro de 'Mi Libreria'`;
 
       return res.redirect(
         `${FRONTEND_URL}/api/course/${courseId}?message=${message}`
@@ -1010,7 +1010,7 @@ app.get("/api/capture-order-paypal", async (req, res) => {
         );
         // Send success response with status 201 and JSON message
       }
-      const message = `User successfully enrolled in course. User ID: ${userId}, Course ID: ${course.id}`;
+      const message = `Este curso ahora es tuyo, podes encontrarlo dentro de 'Mi Libreria'`;
 
       return res.redirect(
         `${FRONTEND_URL}/api/course/${courseId}?message=${message}`
