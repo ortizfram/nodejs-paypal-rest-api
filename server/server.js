@@ -49,7 +49,7 @@ app.use(
 // PRINT METHOD NAMES AND SESSION STORE
 app.use((req,res,next) => {
   console.log(`\n\n${req.method} - ${req.url}`)
-  console.log(store)
+  console.log(req.sessionID)
   console.log("req.session.user: ",req.session.user)
   next();
 })
@@ -741,6 +741,7 @@ app.post("/login", async (req, res) => {
       await db.promise().execute(sql, [role, user.id]);
       user.role = role;
 
+      req.session.authenticated = true;
       req.session.user = user; // Store the user in the session
       const userId = user.id;
       console.log("\n\nuser: ", user);
