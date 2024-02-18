@@ -20,17 +20,21 @@ const Login = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-
+  
     try {
+      const formData = new URLSearchParams();
+      formData.append('email', email);
+      formData.append('password', password);
+  
       const response = await fetch("http://localhost:5002/login", {
         method: "POST",
-        body: JSON.stringify({ email, password }),
+        body: formData,
         headers: {
-          "Content-Type": "application/json",
+          "Content-Type": "application/x-www-form-urlencoded",
         },
       });
       const data = await response.json();
-
+  
       if (response.ok) {
         setUser(data.user); // Update the user state in the App component
         localStorage.setItem("user", JSON.stringify(data.user)); // Save user data to local storage
@@ -50,6 +54,7 @@ const Login = () => {
       );
     }
   };
+  
 
   useEffect(() => {
     // Check if user data exists in session

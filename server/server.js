@@ -506,6 +506,7 @@ app.get(
 
       let courses = coursesRows.map((course) => {
         return {
+          id: course.id,
           title: course.title,
           slug: course.slug,
           description: course.description,
@@ -542,7 +543,7 @@ app.get(
         const [enrolledCoursesRows] = await db
           .promise()
           .execute(enrolledSql, [user.id]);
-        const enrolledCourseIds = enrolledCoursesRows.map((row) => row.id.toString());
+        const enrolledCourseIds = enrolledCoursesRows.map((row) => row.course_id.toString());
 
         // Filter out courses not enrolled by the user
         courses = courses.filter((course) => enrolledCourseIds.includes(course.id));
@@ -737,14 +738,14 @@ app.post("/login", async (req, res) => {
       const role = isAdmin ? "admin" : user.role;
 
       // Update the user's role in the session and database
-      const sql = "UPDATE users SET role = ? WHERE id = ?";
-      await db.promise().execute(sql, [role, user.id]);
+      const updateSql = "UPDATE users SET role = ? WHERE id = ?";
+      await db.promise().execute(updateSql, [role, user.id]);
       user.role = role;
 
       req.session.authenticated = true;
       req.session.user = user; // Store the user in the session
+
       const userId = user.id;
-      console.log("\n\nuser: ", user);
       return res.status(200).json({
         status: "success",
         message: `Login successful, user: ${userId}`,
@@ -753,7 +754,7 @@ app.post("/login", async (req, res) => {
       });
     } else {
       return res
-        .status(401)
+        .status(403)
         .json({ status: "error", message: "Wrong password or email" });
     }
   } catch (error) {
@@ -763,6 +764,7 @@ app.post("/login", async (req, res) => {
       .json({ status: "error", message: "An error occurred while logging in" });
   }
 });
+
 
 app.post("/login-test", async (req, res) => {
   const { username, password } = req.body;
