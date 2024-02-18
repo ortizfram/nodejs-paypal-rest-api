@@ -35,14 +35,24 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
+// store sessions
+const store = new session.MemoryStore();
 // Use sessions
 app.use(
   session({
-    secret: process.env.SESSION_SECRET || "secret", // Change this to a secure secret key
-    resave: false,
-    saveUninitialized: true,
+    secret: "secretkk", 
+    saveUninitialized: false,
+    store
   })
 );
+
+// PRINT METHOD NAMES AND SESSION STORE
+app.use((req,res,next) => {
+  console.log(`\n\n${req.method} - ${req.url}`)
+  console.log(store)
+  console.log("req.session.user: ",req.session.user)
+  next();
+})
 
 // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^  DB CONFIG and BASE UR  L^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 console.log(`\n\n${process.env.NODE_ENV}\n\n`);
@@ -367,8 +377,8 @@ app.put(
   }
 );
 
+// courses list
 app.get(
-  // courses list
   "/api/courses",
   async (req, res) => {
     try {
@@ -465,6 +475,102 @@ app.get(
     }
   }
 );
+
+// courses-owned list
+app.get(
+  // courses-owned list
+  "/api/courses-owned",
+  async (req, res) => {
+    try {
+      const message = req.query.message;
+      let user = req.session.user;
+      const isAdmin = user && user.role === "admin";
+
+      // Fetch all courses ordered by updated_at descending
+      let sql = `
+      SELECT 
+        courses.*,
+        users.id AS author_id,
+        users.name AS author_name,
+        users.username AS author_username,
+        users.avatar AS author_avatar
+      FROM 
+        courses
+      LEFT JOIN 
+        users ON users.id = courses.author_id
+      ORDER BY 
+        courses.updated_at DESC
+    `;
+
+      const [coursesRows] = await db.promise().execute(sql);
+
+      let courses = coursesRows.map((course) => {
+        return {
+          title: course.title,
+          slug: course.slug,
+          description: course.description,
+          ars_price: course.ars_price,
+          usd_price: course.usd_price,
+          discount_ars: course.discount_ars,
+          discount_usd: course.discount_usd,
+          thumbnail: course.thumbnail,
+          id: course.id.toString(),
+          thumbnailPath: course.thumbnail,
+          created_at: new Date(course.created_at).toLocaleString(),
+          updated_at: new Date(course.updated_at).toLocaleString(),
+          author: {
+            name: course.author_name,
+            username: course.author_username,
+            avatar: course.author_avatar,
+          },
+          next: `/api/course/${course.id}`, // Dynamic course link
+        };
+      });
+
+      // Filter courses for enrolled user
+      if (user) {
+        const enrolledSql = `
+        SELECT 
+          course_id
+        FROM 
+          user_courses 
+        JOIN 
+          courses ON user_courses.course_id = courses.id
+        WHERE 
+          user_courses.user_id = ?
+      `;
+        const [enrolledCoursesRows] = await db
+          .promise()
+          .execute(enrolledSql, [user.id]);
+        const enrolledCourseIds = enrolledCoursesRows.map((row) => row.id.toString());
+
+        // Filter out courses not enrolled by the user
+        courses = courses.filter((course) => enrolledCourseIds.includes(course.id));
+        console.log("\ncourses: ",courses)
+      } else {
+        // If no user is logged in, return an empty array
+        courses = [];
+        console.log("\n\nuser not logged in,\ncourses: ",courses)
+      }
+
+      // Send courses response
+      res.status(200).json({
+        route: "courses",
+        title: "Cursos",
+        courses,
+        totalItems: courses.length,
+        user,
+        message,
+        isAdmin,
+      });
+    } catch (error) {
+      console.log("Error fetching courses:", error);
+      res.status(500).json({ error: "Internal Server Error" });
+    }
+  }
+);
+
+
 
 app.get(
   //course detail
@@ -654,6 +760,32 @@ app.post("/login", async (req, res) => {
     return res
       .status(500)
       .json({ status: "error", message: "An error occurred while logging in" });
+  }
+});
+
+app.post("/login-test", async (req, res) => {
+  const { username, password } = req.body;
+  if (username && password) {
+    if (password === '123') {
+      req.session.authenticated = true;
+      req.session.user = {
+        username,
+        password
+      };
+      // Save session data
+      req.session.save((err) => {
+        if (err) {
+          console.error("Error saving session:", err);
+          res.status(500).json({ "msg": "Internal Server Error" });
+        } else {
+          res.json(req.session);
+        }
+      });
+    } else {
+      res.status(403).json({ "msg": "Bad Credentials" });
+    }
+  } else {
+    res.status(403).json({ "msg": "Bad Credentials" });
   }
 });
 
