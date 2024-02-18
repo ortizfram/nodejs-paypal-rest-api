@@ -34,7 +34,13 @@ export const __dirname = path.dirname(__filename);
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+// Allow requests from localhost:3000
 app.use(cors());
+// Set Access-Control-Allow-Origin header to allow requests from any origin
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  next();
+});
 // store sessions
 const store = new session.MemoryStore();
 // Use sessions
@@ -571,8 +577,6 @@ app.get(
   }
 );
 
-
-
 app.get(
   //course detail
   "/api/course/:id",
@@ -716,8 +720,13 @@ app.post(
 
 // AUTH >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 app.post("/login", async (req, res) => {
+  // Set Content-Type header to indicate that the response is JSON
+  res.setHeader('Content-Type', 'application/json');
   try {
     const { email, password } = req.body;
+    if (!email || !password) {
+      return res.status(400).json({ status: "error", message: "Email and password are required" });
+    }
 
     // Find user in the database that matches the email from the login form
     const sql = "SELECT * FROM users WHERE email = ?";
@@ -764,7 +773,6 @@ app.post("/login", async (req, res) => {
       .json({ status: "error", message: "An error occurred while logging in" });
   }
 });
-
 
 app.post("/login-test", async (req, res) => {
   const { username, password } = req.body;

@@ -30,12 +30,14 @@ const Login = () => {
         method: "POST",
         body: formData,
         headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
+          "Content-Type": "application/json",
         },
       });
       const data = await response.json();
+      console.log("Response data:", data);
   
       if (response.ok) {
+
         setUser(data.user); // Update the user state in the App component
         localStorage.setItem("user", JSON.stringify(data.user)); // Save user data to local storage
         const next = data.redirectUrl;
