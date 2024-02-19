@@ -2,6 +2,7 @@ import cors from "cors";
 import axios from "axios";
 import express, { response } from "express";
 import session from "express-session";
+import bodyParser from "body-parser";
 import path from "path";
 import mysql from "mysql2";
 import bcrypt from "bcrypt";
@@ -32,15 +33,16 @@ export const __filename = fileURLToPath(import.meta.url);
 export const __dirname = path.dirname(__filename);
 
 const app = express();
-app.use(express.json());
+
+app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: true }));
-// Allow requests from localhost:3000
 app.use(cors());
+// Allow requests from localhost:3000
 // Set Access-Control-Allow-Origin header to allow requests from any origin
-app.use((req, res, next) => {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  next();
-});
+// app.use((req, res, next) => {
+//   res.setHeader('Access-Control-Allow-Origin', '*');
+//   next();
+// });
 // store sessions
 const store = new session.MemoryStore();
 // Use sessions
@@ -719,9 +721,27 @@ app.post(
 );
 
 // AUTH >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+// Mock user data (replace this with your database logic)
+const users = [
+  { id: 1, username: 'user1', password: 'password1' },
+  { id: 2, username: 'user2', password: 'password2' }
+];
+app.post("/login-test", async (req, res) => {
+  const { username, password } = req.body;
+  const user = users.find(u => u.username === username && u.password === password);
+  if (user) {
+    req.session.user = user;
+    res.json({ success: true, user });
+  } else {
+    res.json({ success: false, message: 'Invalid username or password' });
+  }
+});
+app.post('/logout-test', (req, res) => {
+  req.session.destroy();
+  res.json({ success: true });
+});
+
 app.post("/login", async (req, res) => {
-  // Set Content-Type header to indicate that the response is JSON
-  res.setHeader('Content-Type', 'application/json');
   try {
     const { email, password } = req.body;
     if (!email || !password) {
@@ -751,16 +771,18 @@ app.post("/login", async (req, res) => {
       await db.promise().execute(updateSql, [role, user.id]);
       user.role = role;
 
-      req.session.authenticated = true;
-      req.session.user = user; // Store the user in the session
+      if (user) {
+        req.session.user = user; 
+        req.session.authenticated = true;
+        const userId = user.id;
+        return res.status(200).json({
+          status: "success",
+          message: `Login successful, user: ${userId}`,
+          user: req.session.user,
+          redirectUrl: "/",
+        });
+      }
 
-      const userId = user.id;
-      return res.status(200).json({
-        status: "success",
-        message: `Login successful, user: ${userId}`,
-        user: req.session.user,
-        redirectUrl: "/",
-      });
     } else {
       return res
         .status(403)
@@ -771,32 +793,6 @@ app.post("/login", async (req, res) => {
     return res
       .status(500)
       .json({ status: "error", message: "An error occurred while logging in" });
-  }
-});
-
-app.post("/login-test", async (req, res) => {
-  const { username, password } = req.body;
-  if (username && password) {
-    if (password === '123') {
-      req.session.authenticated = true;
-      req.session.user = {
-        username,
-        password
-      };
-      // Save session data
-      req.session.save((err) => {
-        if (err) {
-          console.error("Error saving session:", err);
-          res.status(500).json({ "msg": "Internal Server Error" });
-        } else {
-          res.json(req.session);
-        }
-      });
-    } else {
-      res.status(403).json({ "msg": "Bad Credentials" });
-    }
-  } else {
-    res.status(403).json({ "msg": "Bad Credentials" });
   }
 });
 
@@ -870,10 +866,10 @@ app.post("/logout", (req, res) => {
       console.error("Error destroying session:", err);
       res.status(500).json({ error: "An error occurred during logout" });
     } else {
-      console.log("\n*** Logout successful\n");
       res
-        .status(204)
-        .json({ message: "Logged out successfully", redirectUrl: "/" });
+      .status(204)
+      .json({ success: true, redirectUrl: "/" });
+      console.log("\n*** Logout successful\n");
     }
   });
 });
@@ -1337,49 +1333,6 @@ app.get("/api/pending-mp"),
   async (req, res) => {
     res.json({ message: "*** Pending MP..." });
   };
-<<<<<<< HEAD
-app.post("/api/webhook-mp", async (req, res) => {
-  console.log("\n\n*** Webhook MP...\n\n");
-
-  try {
-       // Parse request body to get payment information
-       const paymentType = req.body.type;
-       const paymentId = req.body.data.id;
-       const courseId = req.query.courseId; // Ensure courseId is passed in the query
-       const userId = req.query.userId;
-       
-    console.log("paymentId:", paymentId);
-    console.log("paymentType:", paymentType);
-    // console.log("userId:", userId);
-
-    if (paymentType === "payment" && paymentId && courseId) {
-      // Fetch course details based on the courseSlug using MySQL query
-      const [rows] = await db
-        .promise()
-        .execute(getCourseFromIdQuery, [courseId]);
-      const course = rows[0];
-
-      if (course && userId) {
-        // Add the user and course relationship in user_courses table
-        const [insertUserCourse] = await db
-          .promise()
-          .execute(insertUserCourseQuery, [userId, course.id]);
-
-        if (insertUserCourse.affectedRows > 0) {
-          console.log(
-            `\n👌🏽 --Inserted into user_courses: User ID: ${userId}, Course ID: ${course.id}`
-          );
-        }
-      }
-    }
-    res.sendStatus(204); // OK but none to return
-  } catch (error) {
-    console.error("Error handling Mercado Pago webhook:", error);
-    res.sendStatus(500);
-  }
-});
-=======
->>>>>>> e50ec04118c9342d5f4652963e3dfbda1848d831
 
 // ==================================== SERVE COMMON FILES CONFIG  *******************************************************************************
 // Serve static files from React build directory

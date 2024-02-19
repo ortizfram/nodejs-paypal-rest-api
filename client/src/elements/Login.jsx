@@ -22,7 +22,7 @@ const Login = () => {
     e.preventDefault();
   
     try {
-      const formData = new URLSearchParams();
+      const formData = new FormData();
       formData.append('email', email);
       formData.append('password', password);
   
