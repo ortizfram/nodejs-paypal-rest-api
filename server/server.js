@@ -749,12 +749,14 @@ app.post('/logout-test', (req, res) => {
 });
 
 app.post("/login", async (req, res) => {
-  console.log("**login")
+  console.log("**login");
   try {
     const { email, password } = req.body;
-    console.log(email, password)
+    console.log(email, password);
     if (!email || !password) {
-      return res.status(400).json({ status: "error", message: "Email and password are required" });
+      return res
+        .status(400)
+        .json({ status: "error", message: "Email and password are required" });
     }
 
     // Find user in the database that matches the email from the login form
@@ -780,20 +782,18 @@ app.post("/login", async (req, res) => {
       await db.promise().execute(updateSql, [role, user.id]);
       user.role = role;
 
-      if (user) {
-        req.session.user = user; 
-        req.session.authenticated = true;
-        const userId = user.id;
+      // Save user data in the server
+      req.session.user = user;
+      console.log(req.session.user)
+      req.session.authenticated = true;
 
-        
-        return res.status(200).json({
-          status: "success",
-          message: `Login successful, user: ${userId}`,
-          user: req.session.user,
-          redirectUrl: "/",
-        });
-      }
-
+      // Respond with success message
+      return res.status(200).json({
+        status: "success",
+        message: `Login successful, user: ${user.id}`,
+        user: req.session.user,
+        redirectUrl: "/",
+      });
     } else {
       return res
         .status(403)
@@ -806,6 +806,7 @@ app.post("/login", async (req, res) => {
       .json({ status: "error", message: "An error occurred while logging in" });
   }
 });
+
 
 app.post("/signup", async (req, res) => {
   const { username, name, email, password } = req.body;
