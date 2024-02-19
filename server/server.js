@@ -34,17 +34,22 @@ export const __dirname = path.dirname(__filename);
 
 const app = express();
 
-app.use(bodyParser.json());
-app.use(express.urlencoded({ extended: true }));
 app.use(cors());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
 // Allow requests from localhost:3000
-// Set Access-Control-Allow-Origin header to allow requests from any origin
-// app.use((req, res, next) => {
-//   res.setHeader('Access-Control-Allow-Origin', '*');
-//   next();
-// });
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+  next();
+});
+
 // store sessions
 const store = new session.MemoryStore();
+
 // Use sessions
 app.use(
   session({
@@ -777,6 +782,8 @@ app.post("/login", async (req, res) => {
         req.session.user = user; 
         req.session.authenticated = true;
         const userId = user.id;
+
+        
         return res.status(200).json({
           status: "success",
           message: `Login successful, user: ${userId}`,

@@ -28,7 +28,7 @@ const Login = () => {
   
       const response = await fetch("http://localhost:5002/login", {
         method: "POST",
-        body: formData,
+        body: JSON.stringify(formData), // Stringify the form data
         headers: {
           "Content-Type": "application/json",
         },
