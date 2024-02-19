@@ -9,8 +9,6 @@ import AlertMessage from "../components/alertMessage.jsx";
 
 import "../public/css/home/home.css"
 
-// NodeJS endpoint reference
-const URI_sendEmail = "/send-email"; // Update the base URL
 
 const Home = () => {
   const {user, setUser}= useContext(UserContext)
@@ -41,20 +39,20 @@ const Home = () => {
   };
 
   // send contact Email
-  const sendEmail = async (e) => {
-    try {
-      e.preventDefault();
-      const res = await axios.post(URI_sendEmail, {
-        name: name,
-        email: email,
-        msg: msg,
-      }); //  endpoint
-      console.log("Email sent successfully!", res.data);
-      navigate("/");
-    } catch (error) {
-      console.error("Error sending Email:", error);
-    }
-  };
+  // const sendEmail = async (e) => {
+  //   try {
+  //     e.preventDefault();
+  //     const res = await axios.post(URI_sendEmail, {
+  //       name: name,
+  //       email: email,
+  //       msg: msg,
+  //     }); //  endpoint
+  //     console.log("Email sent successfully!", res.data);
+  //     navigate("/");
+  //   } catch (error) {
+  //     console.error("Error sending Email:", error);
+  //   }
+  // };
 
   return (
     <>
@@ -159,7 +157,7 @@ const Home = () => {
             {/* <!-- contact form --> */}
             <div className="row mt-4">
               <div className="col rounded">
-                <form onSubmit={sendEmail}>
+                <form onSubmit={'#'}>
                   {" "}
                   {/* /send-email */}
                   <h3 className="highlight-txt">Contactar por Email.</h3>

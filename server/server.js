@@ -148,7 +148,9 @@ app.get("/userData", async (req, res) => {
 app.get(
   //home
   "/",
-  async (req, res) => {}
+  async (req, res) => {
+    res.status(200).json({success:true})
+  }
 );
 
 // COURSES >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
