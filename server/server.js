@@ -34,15 +34,31 @@ export const __dirname = path.dirname(__filename);
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+// Allow requests from localhost:3000
 app.use(cors());
+// Set Access-Control-Allow-Origin header to allow requests from any origin
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  next();
+});
+// store sessions
+const store = new session.MemoryStore();
 // Use sessions
 app.use(
   session({
-    secret: process.env.SESSION_SECRET || "secret", // Change this to a secure secret key
-    resave: false,
-    saveUninitialized: true,
+    secret: "secretkk", 
+    saveUninitialized: false,
+    store
   })
 );
+
+// PRINT METHOD NAMES AND SESSION STORE
+app.use((req,res,next) => {
+  console.log(`\n\n${req.method} - ${req.url}`)
+  console.log(req.sessionID)
+  console.log("req.session.user: ",req.session.user)
+  next();
+})
 
 // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^  DB CONFIG and BASE UR  L^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 console.log(`\n\n${process.env.NODE_ENV}\n\n`);
@@ -367,8 +383,8 @@ app.put(
   }
 );
 
+// courses list
 app.get(
-  // courses list
   "/api/courses",
   async (req, res) => {
     try {
@@ -448,6 +464,101 @@ app.get(
       courses = courses.filter(
         (course) => !enrolledCourseIds.includes(course.id)
       );
+
+      // Send courses response
+      res.status(200).json({
+        route: "courses",
+        title: "Cursos",
+        courses,
+        totalItems: courses.length,
+        user,
+        message,
+        isAdmin,
+      });
+    } catch (error) {
+      console.log("Error fetching courses:", error);
+      res.status(500).json({ error: "Internal Server Error" });
+    }
+  }
+);
+
+// courses-owned list
+app.get(
+  // courses-owned list
+  "/api/courses-owned",
+  async (req, res) => {
+    try {
+      const message = req.query.message;
+      let user = req.session.user;
+      const isAdmin = user && user.role === "admin";
+
+      // Fetch all courses ordered by updated_at descending
+      let sql = `
+      SELECT 
+        courses.*,
+        users.id AS author_id,
+        users.name AS author_name,
+        users.username AS author_username,
+        users.avatar AS author_avatar
+      FROM 
+        courses
+      LEFT JOIN 
+        users ON users.id = courses.author_id
+      ORDER BY 
+        courses.updated_at DESC
+    `;
+
+      const [coursesRows] = await db.promise().execute(sql);
+
+      let courses = coursesRows.map((course) => {
+        return {
+          id: course.id,
+          title: course.title,
+          slug: course.slug,
+          description: course.description,
+          ars_price: course.ars_price,
+          usd_price: course.usd_price,
+          discount_ars: course.discount_ars,
+          discount_usd: course.discount_usd,
+          thumbnail: course.thumbnail,
+          id: course.id.toString(),
+          thumbnailPath: course.thumbnail,
+          created_at: new Date(course.created_at).toLocaleString(),
+          updated_at: new Date(course.updated_at).toLocaleString(),
+          author: {
+            name: course.author_name,
+            username: course.author_username,
+            avatar: course.author_avatar,
+          },
+          next: `/api/course/${course.id}`, // Dynamic course link
+        };
+      });
+
+      // Filter courses for enrolled user
+      if (user) {
+        const enrolledSql = `
+        SELECT 
+          course_id
+        FROM 
+          user_courses 
+        JOIN 
+          courses ON user_courses.course_id = courses.id
+        WHERE 
+          user_courses.user_id = ?
+      `;
+        const [enrolledCoursesRows] = await db
+          .promise()
+          .execute(enrolledSql, [user.id]);
+        const enrolledCourseIds = enrolledCoursesRows.map((row) => row.course_id.toString());
+
+        // Filter out courses not enrolled by the user
+        courses = courses.filter((course) => enrolledCourseIds.includes(course.id));
+        console.log("\ncourses: ",courses)
+      } else {
+        // If no user is logged in, return an empty array
+        courses = [];
+        console.log("\n\nuser not logged in,\ncourses: ",courses)
+      }
 
       // Send courses response
       res.status(200).json({
@@ -609,8 +720,13 @@ app.post(
 
 // AUTH >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 app.post("/login", async (req, res) => {
+  // Set Content-Type header to indicate that the response is JSON
+  res.setHeader('Content-Type', 'application/json');
   try {
     const { email, password } = req.body;
+    if (!email || !password) {
+      return res.status(400).json({ status: "error", message: "Email and password are required" });
+    }
 
     // Find user in the database that matches the email from the login form
     const sql = "SELECT * FROM users WHERE email = ?";
@@ -631,13 +747,14 @@ app.post("/login", async (req, res) => {
       const role = isAdmin ? "admin" : user.role;
 
       // Update the user's role in the session and database
-      const sql = "UPDATE users SET role = ? WHERE id = ?";
-      await db.promise().execute(sql, [role, user.id]);
+      const updateSql = "UPDATE users SET role = ? WHERE id = ?";
+      await db.promise().execute(updateSql, [role, user.id]);
       user.role = role;
 
+      req.session.authenticated = true;
       req.session.user = user; // Store the user in the session
+
       const userId = user.id;
-      console.log("\n\nuser: ", user);
       return res.status(200).json({
         status: "success",
         message: `Login successful, user: ${userId}`,
@@ -646,7 +763,7 @@ app.post("/login", async (req, res) => {
       });
     } else {
       return res
-        .status(401)
+        .status(403)
         .json({ status: "error", message: "Wrong password or email" });
     }
   } catch (error) {
@@ -654,6 +771,32 @@ app.post("/login", async (req, res) => {
     return res
       .status(500)
       .json({ status: "error", message: "An error occurred while logging in" });
+  }
+});
+
+app.post("/login-test", async (req, res) => {
+  const { username, password } = req.body;
+  if (username && password) {
+    if (password === '123') {
+      req.session.authenticated = true;
+      req.session.user = {
+        username,
+        password
+      };
+      // Save session data
+      req.session.save((err) => {
+        if (err) {
+          console.error("Error saving session:", err);
+          res.status(500).json({ "msg": "Internal Server Error" });
+        } else {
+          res.json(req.session);
+        }
+      });
+    } else {
+      res.status(403).json({ "msg": "Bad Credentials" });
+    }
+  } else {
+    res.status(403).json({ "msg": "Bad Credentials" });
   }
 });
 
@@ -972,7 +1115,7 @@ app.post("/api/capture-order-paypal", async (req, res) => {
         );
         // Send success response with status 201 and JSON message
       }
-      const message = `User successfully enrolled in course. User ID: ${userId}, Course ID: ${course.id}`;
+      const message = `Este curso ahora es tuyo, podes encontrarlo dentro de 'Mi Libreria'`;
 
       return res.redirect(
         `${FRONTEND_URL}/api/course/${courseId}?message=${message}`
@@ -1010,7 +1153,7 @@ app.get("/api/capture-order-paypal", async (req, res) => {
         );
         // Send success response with status 201 and JSON message
       }
-      const message = `User successfully enrolled in course. User ID: ${userId}, Course ID: ${course.id}`;
+      const message = `Este curso ahora es tuyo, podes encontrarlo dentro de 'Mi Libreria'`;
 
       return res.redirect(
         `${FRONTEND_URL}/api/course/${courseId}?message=${message}`
@@ -1046,8 +1189,8 @@ console.log(
 app.post("/api/create-order-mp", async (req, res) => {
   console.log("\n*** Creating MP order...\n");
 
-  const courseId = req.body.courseId; // is being passed the courseSlug in the request input
-  const userId = req.query.userId; // is being passed the courseSlug in the request input
+  const courseId = req.query.courseId; 
+  const userId = req.query.userId;
   // console.log(`\nSQL Query: ${getCourseFromSlugQuery}\n`);
   // console.log(`\ncourseId: ${[courseId]}\n`);
   // console.log(`\nuserId: ${[userId]}\n`);
@@ -1126,28 +1269,75 @@ app.post("/api/create-order-mp", async (req, res) => {
   const preferences = new Preference(client);
   const preferenceResult = await preferences
     .create(preference)
-    .then(response => {
-      console.log(`\n\n--- MP preference created:`);
+    .then((response) => {
       // console.log(response);
       //add course to user_courses
       const init_point = response[$init_point];
       const redirectURL = `${init_point}&courseId=${courseId}`;
       res.redirect(redirectURL);
+      console.log(`\n\n--- MP preference created:`);
     })
-    .catch(console.log);
+    .catch((error) => {
+      console.error("Error creating MercadoPago preference:", error);
+      // Optionally, you can send an error response to the client
+      res.status(500).send("Error creating MercadoPago preference");
+    });
+});
+app.post("/api/webhook-mp", async (req, res) => {
+  console.log("\n\n*** Webhook MP Received ***\n\n");
+  console.log("Request Body:", req.body);
+
+  // try {
+  const action = req.body.action;
+  const data = req.body.data;
+  const courseId = req.query.courseId; // Ensure Mercado Pago sends courseId
+  const userId = req.query.userId;
+  const paymentId = data.id;
+  console.log(`\naction:${action}\n`);
+  if (action === "payment.update") {
+    console.log("Payment update received for paymentId:", paymentId);
+    console.log(
+      `\n\npaymentId:${paymentId}\ncourseId:${courseId}\nuserId:${userId}\n\n`
+      );
+      try {
+        // Fetch course details based on the courseSlug using MySQL query
+        const [rows] = await db
+        .promise()
+        .execute(getCourseFromIdQuery, [courseId]);
+        const course = rows[0];
+        
+        if (course && userId) {
+          // Add the user and course relationship in user_courses table
+          const [insertUserCourse] = await db
+          .promise()
+          .execute(insertUserCourseQuery, [userId, course.id]);
+          
+          if (insertUserCourse.affectedRows > 0) {
+            console.log(
+              `\n👌🏽 --Inserted into user_courses: User ID: ${userId}, Course ID: ${course.id}`
+              );
+              res.status(200).send("OK");
+            }
+          }
+        } catch (error) {
+          console.error("Error handling Mercado Pago webhook:", error);
+          res.sendStatus(500);
+    }
+  }
 });
 app.get("/api/success-mp"),
   async (req, res) => {
-    res.json({message:"*** Success MP..."});
+    res.json({ message: "*** Success MP..." });
   };
 app.get("/api/failure-mp"),
   async (req, res) => {
-    res.json({message:"*** Failure MP..."});
+    res.json({ message: "*** Failure MP..." });
   };
 app.get("/api/pending-mp"),
   async (req, res) => {
-    res.json({message:"*** Pending MP..."});
+    res.json({ message: "*** Pending MP..." });
   };
+<<<<<<< HEAD
 app.post("/api/webhook-mp", async (req, res) => {
   console.log("\n\n*** Webhook MP...\n\n");
 
@@ -1188,6 +1378,8 @@ app.post("/api/webhook-mp", async (req, res) => {
     res.sendStatus(500);
   }
 });
+=======
+>>>>>>> e50ec04118c9342d5f4652963e3dfbda1848d831
 
 // ==================================== SERVE COMMON FILES CONFIG  *******************************************************************************
 // Serve static files from React build directory

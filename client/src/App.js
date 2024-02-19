@@ -21,6 +21,7 @@ import EmailSentMessage from "./auth/EmailSent.js";
 import {UserContext} from "./hooks/UserContext.js"
 import CourseDeleteConfirmation from "./elements/CourseDelete.jsx";
 import CourseEnroll from "./elements/CourseEnroll.jsx";
+import CoursesOwned from "./elements/CoursesOwned.jsx";
 
 
 function App() {
@@ -75,6 +76,7 @@ function App() {
             <Route path="/api/course/update/:id" element={<CourseUpdate />} />
             <Route path="/api/course/delete/:id" element={<CourseDeleteConfirmation />} />
             <Route path="/api/course/enroll/:id" element={<CourseEnroll />} />
+            <Route path="/api/courses-owned" element={<CoursesOwned />} />
   
             {/* BLOGS */}
             <Route path="/api/blog" element={<CompBlogList />} />

@@ -1,27 +1,31 @@
-.bg-course-detail {
-    position: relative;
-    height: 100%;
-    width: 100vw;
-  }
-  
-  .bg-course-detail::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-image: url("../../../../public/images/auth/buonavibra-marce-frio.png");
-    background-size: cover;
-    background-size: cover;
-    background-position: center;
-    filter: blur(20px); /* Adjust the blur value as needed */
-    z-index: -1;
-  }
-  
-  .container {
-    position: relative; /* Ensures z-index works correctly */
-    z-index: 1; /* Places the content above the blurred background */
-    color: white;
-    padding: 20px;
-  }
+.containerr {
+  background-image: url("../../../../public/images/auth/buonavibra-marce-frio.png");
+  background-size: cover;
+  background-position: center; /* Centers the background image */
+  height: 110vh;
+  width: 100vw;
+  display: flex; /* For centering content */
+  justify-content: center; /* Center horizontally */
+  align-items: center; /* Center vertically */
+  text-align: center;
+}
+
+.containerr::before,
+.containerr::after {
+    content: ''; /* Required for pseudo-elements */
+    position: absolute; /* Position the shadows */
+    width: 100vw; /* Full width */
+    height: 110vh; /* Half of the container's height */
+    background: rgba(0, 0, 0, 0.1); /* Shadow color */
+    box-shadow: inset 0px 10px 20px rgba(0, 0, 0, 0.2); /* Inset box shadow */
+}
+.cont-course-detail {
+  padding-top: calc(2%*9/16); /* Default padding */
+}
+
+.container {
+  margin: 6.2rem auto; /* Default margin */
+  position: relative; /* Ensures z-index works correctly */
+  z-index: 1; /* Places the content above the blurred background */
+  color: white;
+}

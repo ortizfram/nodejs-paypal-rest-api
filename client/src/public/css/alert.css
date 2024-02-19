@@ -17,7 +17,7 @@
     transform: translateX(-50%);
     z-index: 9999; /* Ensure that the alert is displayed above other elements */
     padding: 8px;
-    width: 100%;
+    width: 30%;
     margin-bottom: 20px;
     animation: slideInUp 0.5s ease-in-out;
   }
