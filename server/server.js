@@ -35,8 +35,8 @@ export const __dirname = path.dirname(__filename);
 const app = express();
 
 app.use(cors());
+app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
 
 // Allow requests from localhost:3000
 app.use((req, res, next) => {
@@ -749,60 +749,63 @@ app.post('/logout-test', (req, res) => {
 });
 
 app.post("/login", async (req, res) => {
-  try {
-    const { email, password } = req.body;
-    if (!email || !password) {
-      return res.status(400).json({ status: "error", message: "Email and password are required" });
-    }
+  console.log("**login")
+  console.log(req.body)
+  res.send("Received login request");
+  // try {
+  //   const { email, password } = req.body;
+  //   if (!email || !password) {
+  //     return res.status(400).json({ status: "error", message: "Email and password are required" });
+  //   }
 
-    // Find user in the database that matches the email from the login form
-    const sql = "SELECT * FROM users WHERE email = ?";
-    const [rows] = await db.promise().execute(sql, [email]);
-    const user = rows[0];
+  //   // Find user in the database that matches the email from the login form
+  //   const sql = "SELECT * FROM users WHERE email = ?";
+  //   const [rows] = await db.promise().execute(sql, [email]);
+  //   const user = rows[0];
 
-    // If the user exists and the passwords match
-    if (user && (await bcrypt.compare(password, user.password))) {
-      // Check if the user's email is in the list of admin emails
-      const isAdmin = [
-        "ortizfranco48@gmail.com",
-        "mg.marcela@hotmail.com",
-        "buonavibraclub@gmail.com",
-        "marzettimarcela@gmail.com",
-      ].includes(email);
+  //   // If the user exists and the passwords match
+  //   if (user && (await bcrypt.compare(password, user.password))) {
+  //     // Check if the user's email is in the list of admin emails
+  //     const isAdmin = [
+  //       "ortizfranco48@gmail.com",
+  //       "mg.marcela@hotmail.com",
+  //       "buonavibraclub@gmail.com",
+  //       "marzettimarcela@gmail.com",
+  //     ].includes(email);
 
-      // Determine the role based on email
-      const role = isAdmin ? "admin" : user.role;
+  //     // Determine the role based on email
+  //     const role = isAdmin ? "admin" : user.role;
 
-      // Update the user's role in the session and database
-      const updateSql = "UPDATE users SET role = ? WHERE id = ?";
-      await db.promise().execute(updateSql, [role, user.id]);
-      user.role = role;
+  //     // Update the user's role in the session and database
+  //     const updateSql = "UPDATE users SET role = ? WHERE id = ?";
+  //     await db.promise().execute(updateSql, [role, user.id]);
+  //     user.role = role;
 
-      if (user) {
-        req.session.user = user; 
-        req.session.authenticated = true;
-        const userId = user.id;
+  //     if (user) {
+  //       req.session.user = user; 
+  //       req.session.authenticated = true;
+  //       const userId = user.id;
 
         
-        return res.status(200).json({
-          status: "success",
-          message: `Login successful, user: ${userId}`,
-          user: req.session.user,
-          redirectUrl: "/",
-        });
-      }
+  //       return res.status(200).json({
+  //         status: "success",
+  //         message: `Login successful, user: ${userId}`,
+  //         user: req.session.user,
+  //         redirectUrl: "/",
+  //       });
+  //     }
 
-    } else {
-      return res
-        .status(403)
-        .json({ status: "error", message: "Wrong password or email" });
-    }
-  } catch (error) {
-    console.error("Error logging in:", error);
-    return res
-      .status(500)
-      .json({ status: "error", message: "An error occurred while logging in" });
-  }
+  //   } else {
+  //     return res
+  //       .status(403)
+  //       .json({ status: "error", message: "Wrong password or email" });
+  //   }
+  // } catch (error) {
+  //   console.error("Error logging in:", error);
+  //   return res
+  //     .status(500)
+  //     .json({ status: "error", message: "An error occurred while logging in" });
+  // }
 });
 
 app.post("/signup", async (req, res) => {

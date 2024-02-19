@@ -22,13 +22,12 @@ const Login = () => {
     e.preventDefault();
   
     try {
-      const formData = new FormData();
-      formData.append('email', email);
-      formData.append('password', password);
+      const requestBody = JSON.stringify({ email, password });
+
   
       const response = await fetch("http://localhost:5002/login", {
         method: "POST",
-        body: JSON.stringify(formData), // Stringify the form data
+        body: requestBody, // Stringify the form data
         headers: {
           "Content-Type": "application/json",
         },
