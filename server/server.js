@@ -789,16 +789,9 @@ app.post("/login", async (req, res) => {
       const refreshToken = generateRefreshToken(user);
       refreshTokens.push(refreshToken);
 
-      // Send JSON response
-      res.json({
-        username: user.username,
-        isAdmin: user.isAdmin,
-        accessToken,
-        refreshToken,
-      });
-
       // Perform redirect
-      // res.redirect("/");
+      res.redirect("/");
+
     } else {
       return res
         .status(403)
@@ -811,6 +804,7 @@ app.post("/login", async (req, res) => {
       .json({ status: "error", message: "An error occurred while logging in" });
   }
 });
+
 
 
 const verify = (req, res, next) => {
@@ -835,7 +829,6 @@ app.post("/logout", verify, (req, res) => {
   const refreshToken = req.body.token;
   refreshTokens = refreshTokens.filter((token) => token !== refreshToken);
   res.status(200).json("You logged out successfully.");
-  window.location.href = "/";
 });
 
 app.post("/signup", async (req, res) => {

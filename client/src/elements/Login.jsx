@@ -2,12 +2,12 @@ import { useContext, useState } from "react";
 import { UserContext } from "../hooks/UserContext.js";
 import axios from "axios";
 import {jwtDecode} from "jwt-decode"; 
-import { Navigate } from "react-router-dom";
+import {useNavigate} from 'react-router-dom';
 
 import "../public/css/login.css"; 
 
 const Login = () => {
-  const navigate = Navigate();
+  const navigate = useNavigate();
   const { user, setUser } = useContext(UserContext);
   const [email, setEmail] = useState(""); // Define the email state variable
   const [password, setPassword] = useState("");
