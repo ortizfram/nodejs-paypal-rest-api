@@ -1,91 +1,88 @@
-import { useContext, useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useContext, useState } from "react";
 import { UserContext } from "../hooks/UserContext.js";
-import "../public/css/login.css"; // Import your custom CSS file
+import axios from "axios";
+import {jwtDecode} from "jwt-decode"; 
+import { Navigate } from "react-router-dom";
+
+import "../public/css/login.css"; 
 
 const Login = () => {
-  const { setUser } = useContext(UserContext);
-  const navigate = useNavigate();
-  const [email, setEmail] = useState("");
+  const navigate = Navigate();
+  const { user, setUser } = useContext(UserContext);
+  const [email, setEmail] = useState(""); // Define the email state variable
   const [password, setPassword] = useState("");
   const [backendMessage, setBackendMessage] = useState("");
 
-  useEffect(() => {
-    // Check if user data exists in session
-    const userFromSession = JSON.parse(localStorage.getItem("user"));
-    if (userFromSession) {
-      setUser(userFromSession);
-    }
-  }, [setUser]);
-
-  const handleLogin = async (e) => {
-    e.preventDefault();
-  
+  const refreshToken = async () => {
     try {
-      const requestBody = JSON.stringify({ email, password });
-
-  
-      const response = await fetch("http://localhost:5002/login", {
-        method: "POST",
-        body: requestBody, // Stringify the form data
-        headers: {
-          "Content-Type": "application/json",
-        },
+      const res = await axios.post("/refresh", { token: user.refreshToken });
+      setUser({
+        ...user,
+        accessToken: res.data.accessToken,
+        refreshToken: res.data.refreshToken,
       });
-      const data = await response.json();
-      console.log("Response data:", data);
-  
-      if (response.ok) {
-
-        setUser(data.user); // Update the user state in the App component
-        localStorage.setItem("user", JSON.stringify(data.user)); // Save user data to local storage
-        const next = data.redirectUrl;
-        if (data.status === "success") {
-          alert("Login successful");
-          navigate(next);
-        } else {
-          setBackendMessage(data.message);
-        }
-      } else {
-        setBackendMessage(data.message);
-      }
+      return res.data;
     } catch (error) {
-      setBackendMessage(
-        "An error occurred during login. Please check your credentials."
-      );
+      console.log(error);
     }
   };
-  
 
-  useEffect(() => {
-    // Check if user data exists in session
-    const userFromSession = JSON.parse(localStorage.getItem("user"));
-    if (userFromSession) {
-      setUser(userFromSession);
+  const axiosJWT = axios.create();
+
+  // Refresh automatically
+  axiosJWT.interceptors.request.use(
+    async (config) => {
+      let currentDate = new Date();
+      if (user && user.accessToken) {
+        const decodedToken = jwtDecode(user.accessToken);
+        if (decodedToken.exp * 1000 < currentDate.getTime()) {
+          try {
+            const data = await refreshToken();
+            config.headers.authorization = "Bearer " + data.accessToken;
+          } catch (error) {
+            console.log(error);
+          }
+        }
+      }
+      return config;
+    },
+    (err) => {
+      return Promise.reject(err);
     }
-  }, [setUser]);
+  );
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await axios.post("/login", { email, password }); // Use email instead of username
+      setUser(res.data);
+      navigate("/");
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <div className="login-container flex flex-column">
       <div className="">
-
-      <h1 className="section-title">Ingresar</h1>
+        <h1 className="section-title">Ingresar</h1>
       </div>
       <div className="">
-
-      <form onSubmit={handleLogin} className="login-form">
-        {/* Render backend message */}
-        {backendMessage && (
-          <p className="error-message">{backendMessage}</p>
-        )}
-        <label>Email</label>
-        <input type="text" onChange={(e) => setEmail(e.target.value)} />
-        <label>Password</label>
-        <input type="password" onChange={(e) => setPassword(e.target.value)} />
-        <button type="submit" className="login-button">Login</button>
-      </form>
+        <form onSubmit={handleSubmit} className="login-form">
+          {/* Render backend message */}
+          {backendMessage && <p className="error-message">{backendMessage}</p>}
+          <label>Email</label>
+          <input type="text" onChange={(e) => setEmail(e.target.value)} />
+          <label>Password</label>
+          <input
+            type="password"
+            onChange={(e) => setPassword(e.target.value)}
+          />
+          <button type="submit" className="login-button">
+            Login
+          </button>
+        </form>
       </div>
-
     </div>
   );
 };

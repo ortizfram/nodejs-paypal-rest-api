@@ -3,7 +3,7 @@ import axios from "axios";
 import express, { response } from "express";
 import session from "express-session";
 import bodyParser from "body-parser";
-import jwt from 'jsonwebtoken'
+import jwt from "jsonwebtoken";
 import path from "path";
 import mysql from "mysql2";
 import bcrypt from "bcrypt";
@@ -40,10 +40,13 @@ app.use(bodyParser.json());
 
 // Allow requests from localhost:3000
 app.use((req, res, next) => {
-  res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  res.setHeader('Access-Control-Allow-Credentials', 'true');
+  res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
+  res.setHeader(
+    "Access-Control-Allow-Methods",
+    "GET, POST, OPTIONS, PUT, PATCH, DELETE"
+  );
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.setHeader("Access-Control-Allow-Credentials", "true");
   next();
 });
 
@@ -53,19 +56,17 @@ const store = new session.MemoryStore();
 // Use sessions
 app.use(
   session({
-    secret: "secretkk", 
+    secret: "secretkk",
     saveUninitialized: false,
-    store
+    store,
   })
 );
 
 // PRINT METHOD NAMES AND SESSION STORE
-app.use((req,res,next) => {
-  console.log(`\n\n${req.method} - ${req.url}`)
-  console.log(req.sessionID)
-  console.log("req.session.user: ",req.session.user)
+app.use((req, res, next) => {
+  console.log(`\n\n${req.method} - ${req.url}`);
   next();
-})
+});
 
 // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^  DB CONFIG and BASE UR  L^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 console.log(`\n\n${process.env.NODE_ENV}\n\n`);
@@ -154,8 +155,8 @@ app.get(
   //home
   "/",
   async (req, res) => {
-    console.log(req.session.user)
-    res.status(200).json({success:true})
+    console.log(req.session.user);
+    res.status(200).json({ success: true });
   }
 );
 
@@ -394,16 +395,14 @@ app.put(
 );
 
 // courses list
-app.get(
-  "/api/courses",
-  async (req, res) => {
-    try {
-      const message = req.query.message;
-      let user = req.session.user;
-      const isAdmin = user && user.role === "admin";
+app.get("/api/courses", async (req, res) => {
+  try {
+    const message = req.query.message;
+    let user = req.session.user;
+    const isAdmin = user && user.role === "admin";
 
-      // Fetch all courses ordered by updated_at descending
-      let sql = `
+    // Fetch all courses ordered by updated_at descending
+    let sql = `
       SELECT 
         courses.*,
         users.id AS author_id,
@@ -418,36 +417,36 @@ app.get(
         courses.updated_at DESC
     `;
 
-      const [coursesRows] = await db.promise().query(sql);
-      console.log("coursesRows: ", coursesRows);
+    const [coursesRows] = await db.promise().query(sql);
+    console.log("coursesRows: ", coursesRows);
 
-      let courses = coursesRows.map((course) => {
-        return {
-          title: course.title,
-          slug: course.slug,
-          description: course.description,
-          ars_price: course.ars_price,
-          usd_price: course.usd_price,
-          discount_ars: course.discount_ars,
-          discount_usd: course.discount_usd,
-          thumbnail: course.thumbnail,
-          id: course.id.toString(),
-          thumbnailPath: course.thumbnail,
-          created_at: new Date(course.created_at).toLocaleString(),
-          updated_at: new Date(course.updated_at).toLocaleString(),
-          author: {
-            name: course.author_name,
-            username: course.author_username,
-            avatar: course.author_avatar,
-          },
-          next: `/api/course/${course.id}`, // Dynamic course link
-        };
-      });
+    let courses = coursesRows.map((course) => {
+      return {
+        title: course.title,
+        slug: course.slug,
+        description: course.description,
+        ars_price: course.ars_price,
+        usd_price: course.usd_price,
+        discount_ars: course.discount_ars,
+        discount_usd: course.discount_usd,
+        thumbnail: course.thumbnail,
+        id: course.id.toString(),
+        thumbnailPath: course.thumbnail,
+        created_at: new Date(course.created_at).toLocaleString(),
+        updated_at: new Date(course.updated_at).toLocaleString(),
+        author: {
+          name: course.author_name,
+          username: course.author_username,
+          avatar: course.author_avatar,
+        },
+        next: `/api/course/${course.id}`, // Dynamic course link
+      };
+    });
 
-      // Filter courses for enrolled user
-      let enrolledCourseIds = [];
-      if (user) {
-        const enrolledSql = `
+    // Filter courses for enrolled user
+    let enrolledCourseIds = [];
+    if (user) {
+      const enrolledSql = `
         SELECT 
           courses.*,
           users.name AS author_name,
@@ -462,35 +461,34 @@ app.get(
         WHERE 
           user_courses.user_id = ?
       `;
-        const [enrolledCoursesRows] = await db
-          .promise()
-          .query(enrolledSql, [user.id]);
-        enrolledCourseIds = enrolledCoursesRows.map((enrolledCourse) =>
-          enrolledCourse.id.toString()
-        );
-      }
-
-      // Filter out enrolled courses
-      courses = courses.filter(
-        (course) => !enrolledCourseIds.includes(course.id)
+      const [enrolledCoursesRows] = await db
+        .promise()
+        .query(enrolledSql, [user.id]);
+      enrolledCourseIds = enrolledCoursesRows.map((enrolledCourse) =>
+        enrolledCourse.id.toString()
       );
-
-      // Send courses response
-      res.status(200).json({
-        route: "courses",
-        title: "Cursos",
-        courses,
-        totalItems: courses.length,
-        user,
-        message,
-        isAdmin,
-      });
-    } catch (error) {
-      console.log("Error fetching courses:", error);
-      res.status(500).json({ error: "Internal Server Error" });
     }
+
+    // Filter out enrolled courses
+    courses = courses.filter(
+      (course) => !enrolledCourseIds.includes(course.id)
+    );
+
+    // Send courses response
+    res.status(200).json({
+      route: "courses",
+      title: "Cursos",
+      courses,
+      totalItems: courses.length,
+      user,
+      message,
+      isAdmin,
+    });
+  } catch (error) {
+    console.log("Error fetching courses:", error);
+    res.status(500).json({ error: "Internal Server Error" });
   }
-);
+});
 
 // courses-owned list
 app.get(
@@ -559,15 +557,19 @@ app.get(
         const [enrolledCoursesRows] = await db
           .promise()
           .execute(enrolledSql, [user.id]);
-        const enrolledCourseIds = enrolledCoursesRows.map((row) => row.course_id.toString());
+        const enrolledCourseIds = enrolledCoursesRows.map((row) =>
+          row.course_id.toString()
+        );
 
         // Filter out courses not enrolled by the user
-        courses = courses.filter((course) => enrolledCourseIds.includes(course.id));
-        console.log("\ncourses: ",courses)
+        courses = courses.filter((course) =>
+          enrolledCourseIds.includes(course.id)
+        );
+        console.log("\ncourses: ", courses);
       } else {
         // If no user is logged in, return an empty array
         courses = [];
-        console.log("\n\nuser not logged in,\ncourses: ",courses)
+        console.log("\n\nuser not logged in,\ncourses: ", courses);
       }
 
       // Send courses response
@@ -729,25 +731,24 @@ app.post(
 );
 
 // AUTH >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-// Mock user data (replace this with your database logic)
-const users = [
-  { id: 1, username: 'user1', password: 'password1' },
-  { id: 2, username: 'user2', password: 'password2' }
-];
-app.post("/login-test", async (req, res) => {
-  const { username, password } = req.body;
-  const user = users.find(u => u.username === username && u.password === password);
-  if (user) {
-    req.session.user = user;
-    res.json({ success: true, user });
-  } else {
-    res.json({ success: false, message: 'Invalid username or password' });
-  }
-});
-app.post('/logout-test', (req, res) => {
-  req.session.destroy();
-  res.json({ success: true });
-});
+const generateAccessToken = (user) => {
+  return jwt.sign(
+    { id: user.id, isAdmin: user.isAdmin },
+    process.env.JWT_SECRET_KEY,
+    {
+      expiresIn: "15s",
+    }
+  );
+};
+
+const generateRefreshToken = (user) => {
+  return jwt.sign(
+    { id: user.id, isAdmin: user.isAdmin },
+    process.env.JWT_REFRESH_SECRET_KEY
+  );
+};
+
+let refreshTokens = [];
 
 app.post("/login", async (req, res) => {
   console.log("**login");
@@ -776,34 +777,28 @@ app.post("/login", async (req, res) => {
       ].includes(email);
 
       // Determine the role based on email
-      const role = isAdmin ? "admin" : user.role;
+      const role = isAdmin ? "1" : user.isAdmin;
 
       // Update the user's role in the session and database
-      const updateSql = "UPDATE users SET role = ? WHERE id = ?";
+      const updateSql = "UPDATE users SET isAdmin = ? WHERE id = ?";
       await db.promise().execute(updateSql, [role, user.id]);
       user.role = role;
 
-      // config token
-      const tokenPayload = {
-        _id: user.id,
-        email: user.email,
-      }
-      const token = jwt.sign(tokenPayload, process.env.JWT_SECRET)
-      // set token with cookieParser
-      res.cookie("jwt", token)// see it in Network TAB Headers
+      //Generate an access token
+      const accessToken = generateAccessToken(user);
+      const refreshToken = generateRefreshToken(user);
+      refreshTokens.push(refreshToken);
 
-
-      req.session.user = user;
-      console.log(req.session.user)
-      req.session.authenticated = true;
-
-      // Respond with success message
-      return res.status(200).json({
-        status: "success",
-        message: `Login successful, user: ${user.id}`,
-        user: req.session.user,
-        redirectUrl: "/",
+      // Send JSON response
+      res.json({
+        username: user.username,
+        isAdmin: user.isAdmin,
+        accessToken,
+        refreshToken,
       });
+
+      // Perform redirect
+      // res.redirect("/");
     } else {
       return res
         .status(403)
@@ -817,6 +812,31 @@ app.post("/login", async (req, res) => {
   }
 });
 
+
+const verify = (req, res, next) => {
+  const authHeader = req.headers.authorization;
+  if (authHeader) {
+    const token = authHeader.split(" ")[1];
+
+    jwt.verify(token, process.env.JWT_SECRET_KEY, (err, user) => {
+      if (err) {
+        return res.status(403).json("Token is not valid!");
+      }
+
+      req.user = user;
+      next();
+    });
+  } else {
+    res.status(401).json("You are not authenticated!");
+  }
+};
+
+app.post("/logout", verify, (req, res) => {
+  const refreshToken = req.body.token;
+  refreshTokens = refreshTokens.filter((token) => token !== refreshToken);
+  res.status(200).json("You logged out successfully.");
+  window.location.href = "/";
+});
 
 app.post("/signup", async (req, res) => {
   const { username, name, email, password } = req.body;
@@ -854,7 +874,7 @@ app.post("/signup", async (req, res) => {
     console.log("isAdmin", isAdmin);
 
     // Determine the role based on email
-    const role = isAdmin ? "admin" : "user";
+    const role = isAdmin ? "1" : "0";
     console.log("role:", role);
 
     const data = [username, name, email, hashedPassword, role];
@@ -880,20 +900,6 @@ app.post("/signup", async (req, res) => {
     console.error("Error while saving user:", error);
     res.status(500).json({ error: "Error during signup or login" });
   }
-});
-
-app.post("/logout", (req, res) => {
-  req.session.destroy((err) => {
-    if (err) {
-      console.error("Error destroying session:", err);
-      res.status(500).json({ error: "An error occurred during logout" });
-    } else {
-      res
-      .status(204)
-      .json({ success: true, redirectUrl: "/" });
-      console.log("\n*** Logout successful\n");
-    }
-  });
 });
 
 app.post("/forgot-password", async (req, res) => {
@@ -1207,7 +1213,7 @@ export const $init_point = isDev ? "sandbox_init_point" : "init_point";
 app.post("/api/create-order-mp", async (req, res) => {
   console.log("\n*** Creating MP order...\n");
 
-  const courseId = req.query.courseId; 
+  const courseId = req.query.courseId;
   const userId = req.query.userId;
   // console.log(`\nSQL Query: ${getCourseFromSlugQuery}\n`);
   // console.log(`\ncourseId: ${[courseId]}\n`);
@@ -1316,30 +1322,30 @@ app.post("/api/webhook-mp", async (req, res) => {
     console.log("Payment update received for paymentId:", paymentId);
     console.log(
       `\n\npaymentId:${paymentId}\ncourseId:${courseId}\nuserId:${userId}\n\n`
-      );
-      try {
-        // Fetch course details based on the courseSlug using MySQL query
-        const [rows] = await db
+    );
+    try {
+      // Fetch course details based on the courseSlug using MySQL query
+      const [rows] = await db
         .promise()
         .execute(getCourseFromIdQuery, [courseId]);
-        const course = rows[0];
-        
-        if (course && userId) {
-          // Add the user and course relationship in user_courses table
-          const [insertUserCourse] = await db
+      const course = rows[0];
+
+      if (course && userId) {
+        // Add the user and course relationship in user_courses table
+        const [insertUserCourse] = await db
           .promise()
           .execute(insertUserCourseQuery, [userId, course.id]);
-          
-          if (insertUserCourse.affectedRows > 0) {
-            console.log(
-              `\n👌🏽 --Inserted into user_courses: User ID: ${userId}, Course ID: ${course.id}`
-              );
-              res.status(200).send("OK");
-            }
-          }
-        } catch (error) {
-          console.error("Error handling Mercado Pago webhook:", error);
-          res.sendStatus(500);
+
+        if (insertUserCourse.affectedRows > 0) {
+          console.log(
+            `\n👌🏽 --Inserted into user_courses: User ID: ${userId}, Course ID: ${course.id}`
+          );
+          res.status(200).send("OK");
+        }
+      }
+    } catch (error) {
+      console.error("Error handling Mercado Pago webhook:", error);
+      res.sendStatus(500);
     }
   }
 });

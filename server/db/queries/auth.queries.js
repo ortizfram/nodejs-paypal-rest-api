@@ -6,8 +6,8 @@ export const createUserTableQuery = `
       name VARCHAR(255),
       email VARCHAR(255) NOT NULL,
       password VARCHAR(255) NOT NULL,
-      role ENUM('user', 'admin', 'staff') NOT NULL,
-      resetToken VARCHAR(255) DEFAULT NULL,
+      isAdmin TINYINT(1) NOT NULL,
+      resetToken VARCHAR(255) NOT NULL DEFAULT 0,
       avatar VARCHAR(255) DEFAULT NULL
   );
     `;
