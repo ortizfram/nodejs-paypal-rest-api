@@ -3,11 +3,11 @@ import axios from "axios";
 import express, { response } from "express";
 import session from "express-session";
 import bodyParser from "body-parser";
+import jwt from 'jsonwebtoken'
 import path from "path";
 import mysql from "mysql2";
 import bcrypt from "bcrypt";
 import sendResetEmail from "./src/utils/sendEmail.js";
-import jwt from "jsonwebtoken";
 import slugify from "slugify";
 import { fileURLToPath } from "url";
 import morgan from "morgan";
@@ -783,7 +783,16 @@ app.post("/login", async (req, res) => {
       await db.promise().execute(updateSql, [role, user.id]);
       user.role = role;
 
-      // Save user data in the server
+      // config token
+      const tokenPayload = {
+        _id: user.id,
+        email: user.email,
+      }
+      const token = jwt.sign(tokenPayload, process.env.JWT_SECRET)
+      // set token with cookieParser
+      res.cookie("jwt", token)// see it in Network TAB Headers
+
+
       req.session.user = user;
       console.log(req.session.user)
       req.session.authenticated = true;
@@ -982,15 +991,15 @@ export const PAYPAL_API_SECRET = isDev
 export const PAYPAL_API = isDev
   ? process.env.SB_PAYPAL_API
   : process.env.PAYPAL_API;
-console.log(
-  "PAYPAL_API: ",
-  PAYPAL_API,
-  "\nPAYPAL_API_CLIENT: ",
-  PAYPAL_API_CLIENT,
-  "\nPAYPAL_API_SECRET: ",
-  PAYPAL_API_SECRET,
-  "\n\n"
-);
+// console.log(
+//   "PAYPAL_API: ",
+//   PAYPAL_API,
+//   "\nPAYPAL_API_CLIENT: ",
+//   PAYPAL_API_CLIENT,
+//   "\nPAYPAL_API_SECRET: ",
+//   PAYPAL_API_SECRET,
+//   "\n\n"
+// );
 // paypal ************************
 
 app.post("/api/create-order-paypal", async (req, res) => {
@@ -1185,15 +1194,15 @@ export const MP_NOTIFICATION_URL = isDev
   ? process.env.MP_SB_NOTIFICATION_URL
   : process.env.MP_NOTIFICATION_URL;
 export const $init_point = isDev ? "sandbox_init_point" : "init_point";
-console.log(
-  "\nMP_ACCESS_TOKEN: ",
-  MP_ACCESS_TOKEN,
-  "\nMP_NOTIFICATION_URL: ",
-  MP_NOTIFICATION_URL,
-  "\nINIT_POINT: ",
-  $init_point,
-  "\n\n"
-);
+// console.log(
+//   "\nMP_ACCESS_TOKEN: ",
+//   MP_ACCESS_TOKEN,
+//   "\nMP_NOTIFICATION_URL: ",
+//   MP_NOTIFICATION_URL,
+//   "\nINIT_POINT: ",
+//   $init_point,
+//   "\n\n"
+// );
 
 app.post("/api/create-order-mp", async (req, res) => {
   console.log("\n*** Creating MP order...\n");
